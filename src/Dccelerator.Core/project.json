@@ -1,16 +1,22 @@
 ﻿{
   "version": "1.0.0-*",
-  "description": "Dccelerator.Reflection Class Library",
+  "description": "Dccelerator.Core Class Library",
   "authors": [ "we_apon" ],
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
+  
   "frameworks": {
     "dnxcore50 ": {
       "dependencies": {
       }
+    },
+    "dotnet5.4": {
+      "dependencies": {
+      }
     }
   },
+
   "dependencies": {
     "System.Collections.Concurrent": "4.0.10",
     "System.Reflection": "4.0.10",
@@ -18,6 +24,6 @@
     "Microsoft.CSharp": "4.0.0",
     "System.Collections": "4.0.10",
     "System.Linq": "4.0.0",
-    "System.Threading": "4.0.10",
+    "System.Threading": "4.0.10"
   }
 }

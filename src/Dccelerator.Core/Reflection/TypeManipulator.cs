@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Dccelerator.Reflection
 {
-    public class TypeInfo
+    public class TypeManipulator
     {
         #region public static bool TryGetNestedProperty(object context, string path, out object value)
 
@@ -124,7 +124,7 @@ namespace Dccelerator.Reflection
 
 
         static PropertyPath make_property_path( PropIdentity identity) {
-            var neighborInfo = typeof (TypeInfo<>).MakeGenericType(identity.Type);
+            var neighborInfo = typeof (TypeManipulator<>).MakeGenericType(identity.Type);
             var neighborMethod = neighborInfo.GetMethod("make_property_path", BindingFlags.Static | BindingFlags.NonPublic);
             return (PropertyPath) neighborMethod?.Invoke(null, new object[] {identity.Path});
         }

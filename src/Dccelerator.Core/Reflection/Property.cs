@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Dccelerator.Convertion;
 using Dccelerator.Reflection.Abstract;
 
 
@@ -71,67 +72,7 @@ namespace Dccelerator.Reflection
         
     }
 
-
-/*
-
-    public class Property : Property<object, object>
-    {
-        public Property(PropertyInfo property) : base(property) {}
-    }
-
-*/
-
     
-
-
-
-/*    public class Property : MemberBase, IMember, IProperty
-    {
-        public PropertyInfo Prop { get; set; }
-
-        internal Property(PropertyInfo property) : base(property.Name, MemberKind.Property) {
-            Prop = property;
-        }
-
-        public T GetGetDelegate<T>() where T : class {
-            throw new NotImplementedException();
-        }
-        
-
-        public T GetSetDelegate<T>() where T : class {
-            throw new NotImplementedException();
-        }
-        
-
-
-        public T GetValue<T>() {
-            throw new NotImplementedException();
-        }
-
-
-        public bool TryGetValue<T>(out T value) {
-            throw new NotImplementedException();
-        }
-
-
-        public bool TrySetValue<T>(T value) {
-            throw new NotImplementedException();
-        }
-        
-
-        T IMember.GetInvokeDelegate<T>() {
-            throw new NotSupportedException();
-        }
-
-
-
-
-/*
-        private IMethod _getMethod;
-        private IMethod GetMethod => _getMethod ?? (_getMethod = new Method(Prop.GetGetMethod()));
-#1#
-    }*/
-
 
 
 

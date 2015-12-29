@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Dccelerator.Reflection
 {
-    public class TypeCache
+    public static class TypeCache
     {
         public static readonly Type Void = typeof (void);
         public static readonly Type ObjectType = typeof (object);
@@ -16,14 +16,16 @@ namespace Dccelerator.Reflection
         public static readonly Type EnumerableType = typeof (IEnumerable);
         public static readonly Type ListType = typeof (IList);
         public static readonly Type ConvertibleType = typeof (IConvertible);
-/*        public static readonly Type XmlElementAttributeType = typeof (XmlElementAttribute);
-        public static readonly Type XmlTypeAttributeType = typeof (XmlTypeAttribute);
-        public static readonly Type DataMemberAttributeType = typeof (DataMemberAttribute);
-        public static readonly Type DataContractAttributeType = typeof (DataContractAttribute);*/
+        /*        public static readonly Type XmlElementAttributeType = typeof (XmlElementAttribute);
+                public static readonly Type XmlTypeAttributeType = typeof (XmlTypeAttribute);
+                public static readonly Type DataMemberAttributeType = typeof (DataMemberAttribute);
+                public static readonly Type DataContractAttributeType = typeof (DataContractAttribute);*/
 
 
-        
-        static readonly ConcurrentDictionary<Type, System.Reflection.TypeInfo> _typeInfos = new ConcurrentDictionary<Type, System.Reflection.TypeInfo>(); 
+
+        static readonly ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>> _typeProperties = new ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>>();
+        static readonly ConcurrentDictionary<Type, TypeInfo> _typeInfos = new ConcurrentDictionary<Type, TypeInfo>();
+
         static readonly ConcurrentDictionary<Type, HashSet<Type>> _typeParants = new ConcurrentDictionary<Type, HashSet<Type>>();
         static readonly ConcurrentDictionary<Type, HashSet<Type>> _typeInterfaces = new ConcurrentDictionary<Type, HashSet<Type>>();
         static readonly ConcurrentDictionary<Type, bool> _isStrongEnumerable = new ConcurrentDictionary<Type, bool>();
@@ -138,7 +140,7 @@ namespace Dccelerator.Reflection
 
 
         public static object DefaultInstanceOf(Type type) {
-            if (InfoOf(type).IsClass)
+            if (GetInfo(type).IsClass)
                 return null;
 
             object instance;
@@ -162,13 +164,13 @@ namespace Dccelerator.Reflection
 
 
 
-        public static bool IsInherited(Type childType, Type parentType) {
+        public static bool IsInherited(this Type childType, Type parentType) {
             return ParentsOf(childType).Contains(parentType) || InterfacesOf(childType).Contains(parentType);
         }
 
 
 
-        public static bool IsStrongEnumerable(Type type) {
+        public static bool IsAnCollection(this Type type) {
             bool result;
 
             if (_isStrongEnumerable.TryGetValue(type, out result))
@@ -183,7 +185,7 @@ namespace Dccelerator.Reflection
 
 
 
-        public static HashSet<Type> InterfacesOf(Type type) {
+        public static HashSet<Type> InterfacesOf(this Type type) {
             HashSet<Type> interfaces;
 
 
@@ -199,7 +201,7 @@ namespace Dccelerator.Reflection
 
 
 
-        public static HashSet<Type> ParentsOf(Type type) {
+        public static HashSet<Type> ParentsOf(this Type type) {
             HashSet<Type> parents;
 
 
@@ -217,7 +219,7 @@ namespace Dccelerator.Reflection
 
 
         static void FillParentsOf(Type type, ref HashSet<Type> parents) {
-            var baseType = InfoOf(type).BaseType;
+            var baseType = GetInfo(type).BaseType;
             if (baseType == null)
                 return;
 
@@ -229,8 +231,8 @@ namespace Dccelerator.Reflection
 
 
 
-        public static System.Reflection.TypeInfo InfoOf(Type type) {
-            System.Reflection.TypeInfo info;
+        public static TypeInfo GetInfo(this Type type) {
+            TypeInfo info;
 
             if (_typeInfos.TryGetValue(type, out info))
                 return info;
@@ -241,6 +243,51 @@ namespace Dccelerator.Reflection
                 ? _typeInfos[type] 
                 : info;
         }
+
+
+
+
+
+
+        public static Dictionary<string, PropertyInfo> Properties(this Type type) {
+            Dictionary<string, PropertyInfo> properties;
+            if (_typeProperties.TryGetValue(type, out properties))
+                return properties;
+
+
+            properties = new Dictionary<string, PropertyInfo>();
+            foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Static)) {
+                PropertyInfo storedProperty;
+                if (!properties.TryGetValue(prop.Name, out storedProperty)) {
+                    properties.Add(prop.Name, prop);
+                    continue;
+                }
+
+                properties[prop.Name] = (PropertyInfo) TopInHierarchy(type, prop, storedProperty);
+            }
+
+            return _typeProperties.TryAdd(type, properties)
+                ? properties
+                : _typeProperties[type];
+        }
+
+
+
+
+        /// <summary>
+        /// Returns <see cref="MemberInfo"/>, declared on upper in <paramref name="type"/> hierarchy.
+        /// This's usefull to select <see cref="MemberInfo"/> declared with <see langword="new"/> keyword and hiding another.
+        /// </summary>
+        public static MemberInfo TopInHierarchy(Type type, MemberInfo one, MemberInfo two) {
+            if (one.DeclaringType == type)
+                return one;
+
+            if (two.DeclaringType == type)
+                return two;
+
+            return TopInHierarchy(GetInfo(type).BaseType, one, two);
+        }
+
 
 
     }

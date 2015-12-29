@@ -7,7 +7,7 @@ using Dccelerator.Reflection.Abstract;
 
 namespace Dccelerator.Reflection
 {
-    public static class TypeInfo<TType>
+    public static class TypeManipulator<TType>
     {
         #region Type property
 
@@ -218,7 +218,7 @@ namespace Dccelerator.Reflection
             }
 
             if (neighborProps == null) {
-                var neighborInfo = typeof (TypeInfo<>).MakeGenericType(type);
+                var neighborInfo = typeof (TypeManipulator<>).MakeGenericType(type);
                 var neighborPropsField = neighborInfo.GetField("_properties", BindingFlags.Static | BindingFlags.NonPublic);
                 if (neighborPropsField == null)
                     return null;
