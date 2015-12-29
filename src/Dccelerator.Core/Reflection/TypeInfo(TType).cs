@@ -13,11 +13,17 @@ namespace Dccelerator.Reflection
 
         public static Type Type => _type ?? (_type = typeof (TType));
 
-        public static System.Reflection.TypeInfo Info => _info ?? (_info = Type.GetTypeInfo());
+#if NET40
+        public static Type Info => Type;
+#else
+        public static TypeInfo Info => _info ?? (_info = Type.GetTypeInfo());
+
+        // ReSharper disable StaticMemberInGenericType
+        static TypeInfo _info;
+#endif
 
         // ReSharper disable StaticMemberInGenericType
         static Type _type;
-        static System.Reflection.TypeInfo _info;
 
         #endregion
 

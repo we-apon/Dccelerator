@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Reflection;
 
 
@@ -21,10 +22,11 @@ namespace Dccelerator.Reflection
                 public static readonly Type DataMemberAttributeType = typeof (DataMemberAttribute);
                 public static readonly Type DataContractAttributeType = typeof (DataContractAttribute);*/
 
-
+#if !NET40
+        static readonly ConcurrentDictionary<Type, TypeInfo> _typeInfos = new ConcurrentDictionary<Type, TypeInfo>();
+#endif
 
         static readonly ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>> _typeProperties = new ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>>();
-        static readonly ConcurrentDictionary<Type, TypeInfo> _typeInfos = new ConcurrentDictionary<Type, TypeInfo>();
 
         static readonly ConcurrentDictionary<Type, HashSet<Type>> _typeParants = new ConcurrentDictionary<Type, HashSet<Type>>();
         static readonly ConcurrentDictionary<Type, HashSet<Type>> _typeInterfaces = new ConcurrentDictionary<Type, HashSet<Type>>();
@@ -91,8 +93,11 @@ namespace Dccelerator.Reflection
             if (_genericArguments.TryGetValue(type, out generics))
                 return generics;
 
+#if NET40
+            generics = type.GetGenericArguments();
+#else
             generics = type.GenericTypeArguments;
-
+#endif
 
             _genericArguments[type] = generics;
 
@@ -230,7 +235,18 @@ namespace Dccelerator.Reflection
 
 
 
+#if NET40
 
+        public static Type GetInfo(this Type type) {
+            return type;
+        }
+
+
+        public static IEnumerable<Attribute> GetCustomAttributes(this Type type) {
+            return type.GetCustomAttributes(true).Cast<Attribute>();
+        }
+
+#else
         public static TypeInfo GetInfo(this Type type) {
             TypeInfo info;
 
@@ -243,7 +259,7 @@ namespace Dccelerator.Reflection
                 ? _typeInfos[type] 
                 : info;
         }
-
+#endif
 
 
 
@@ -287,6 +303,10 @@ namespace Dccelerator.Reflection
 
             return TopInHierarchy(GetInfo(type).BaseType, one, two);
         }
+
+
+
+
 
 
 

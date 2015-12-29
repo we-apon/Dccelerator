@@ -1,29 +1,76 @@
 ﻿{
-  "version": "1.0.0-*",
-  "description": "Dccelerator.Core Class Library",
-  "authors": [ "we_apon" ],
-  "tags": [ "" ],
-  "projectUrl": "",
+  "version": "0.0.1-alfa",
+  "description": "Core utitities of Dccelerator framework. \nIt contains some nice stuff like TypeManipulator, SmartConvert and many usefull basic types extensions.",
+  "authors": [ "Kirill Dubinkin" ],
+  "tags": [ "Convetion Reflection Extensions" ],
+  "projectUrl": "https://bitbucket.org/lamerworks/dccelerator",
   "licenseUrl": "",
+
+
+  "configurations": {
+    "Debug": { "compilationOptions": { "define": [ "DEBUG" ] } },
+    "Release": { "compilationOptions": { "optimize": true } }
+  },
   
+
+
   "frameworks": {
-    "dnxcore50 ": {
+
+    "dnx45": { },
+
+    "net40": { "compilationOptions": { "define": [ "NET40" ] } },
+
+    "net45": { },
+
+
+    "netcore45": {
       "dependencies": {
+        "System.Runtime": "4.0.20",
+        "Microsoft.CSharp": "4.0.0",
+        "System.Collections": "4.0.10",
+        "System.Collections.Concurrent": "4.0.10",
+        "System.Reflection": "4.0.10",
+        "System.Linq": "4.0.0"
       }
     },
-    "dotnet5.4": {
+
+
+    "netcore50": {
       "dependencies": {
+        "System.Runtime": "4.0.20",
+        "Microsoft.CSharp": "4.0.0",
+        "System.Collections": "4.0.10",
+        "System.Collections.Concurrent": "4.0.10",
+        "System.Reflection": "4.0.10",
+        "System.Linq": "4.0.0"
+      }
+    },
+
+    "dotnet": {
+      "dependencies": {
+        "System.Runtime": "4.0.20",
+        "Microsoft.CSharp": "4.0.0",
+        "System.Collections": "4.0.10",
+        "System.Collections.Concurrent": "4.0.10",
+        "System.Reflection": "4.0.10",
+        "System.Linq": "4.0.0"
+      }
+    },
+
+
+    "dnxcore50": {
+      "dependencies": {
+        "System.Runtime": "4.0.20",
+        "Microsoft.CSharp": "4.0.0",
+        "System.Collections": "4.0.10",
+        "System.Collections.Concurrent": "4.0.10",
+        "System.Reflection": "4.0.10",
+        "System.Linq": "4.0.0"
       }
     }
+
   },
 
   "dependencies": {
-    "System.Collections.Concurrent": "4.0.10",
-    "System.Reflection": "4.0.10",
-    "System.Runtime": "4.0.20",
-    "Microsoft.CSharp": "4.0.0",
-    "System.Collections": "4.0.10",
-    "System.Linq": "4.0.0",
-    "System.Threading": "4.0.10"
   }
 }
