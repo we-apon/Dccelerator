@@ -1,5 +1,5 @@
 ﻿{
-  "version": "0.0.1-alfa",
+  "version": "0.0.2-alfa",
   "description": "Core utitities of Dccelerator framework. \nIt contains some nice stuff like TypeManipulator, SmartConvert and many usefull basic types extensions.",
   "authors": [ "Kirill Dubinkin" ],
   "tags": [ "Convetion Reflection Extensions" ],
@@ -46,7 +46,18 @@
       }
     },
 
-    "dotnet": {
+    "dotnet51": {
+      "dependencies": {
+        "System.Runtime": "4.0.20",
+        "Microsoft.CSharp": "4.0.0",
+        "System.Collections": "4.0.10",
+        "System.Collections.Concurrent": "4.0.10",
+        "System.Reflection": "4.0.10",
+        "System.Linq": "4.0.0"
+      }
+    },
+
+    "dotnet54": {
       "dependencies": {
         "System.Runtime": "4.0.20",
         "Microsoft.CSharp": "4.0.0",
