@@ -1,16 +1,15 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Dccelerator.Core")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Core utitities of Dccelerator framework. It contains some nice stuff like TypeManipulator, SmartConvert and many usefull basic types extensions.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Dccelerator.Core")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCompany("Kirill Dubinkin")]
+[assembly: AssemblyProduct("Dccelerator")]
+[assembly: AssemblyCopyright("Copyright © Kirill Dubinkin 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

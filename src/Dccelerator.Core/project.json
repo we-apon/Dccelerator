@@ -1,17 +1,19 @@
 ﻿{
-  "version": "0.0.1-alfa",
+  "version": "0.0.2-alfa",
+  "title": "Dccelerator Core Utilities",
   "description": "Core utitities of Dccelerator framework. \nIt contains some nice stuff like TypeManipulator, SmartConvert and many usefull basic types extensions.",
+  "summary": "Core utitities of Dccelerator framework.",
   "authors": [ "Kirill Dubinkin" ],
-  "tags": [ "Convetion Reflection Extensions" ],
-  "projectUrl": "https://bitbucket.org/lamerworks/dccelerator",
-  "licenseUrl": "",
+  "tags": [ "Convertion Reflection Extensions" ],
+  "projectUrl": "https://github.com/we-apon/Dccelerator",
+  "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE",
 
 
   "configurations": {
     "Debug": { "compilationOptions": { "define": [ "DEBUG" ] } },
     "Release": { "compilationOptions": { "optimize": true } }
   },
-  
+
 
 
   "frameworks": {
