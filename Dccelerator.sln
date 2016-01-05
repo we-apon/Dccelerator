@@ -14,6 +14,10 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Dccelerator.Core", "src\Dcc
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "specs", "specs", "{8FCF91C8-AB08-4481-BBEE-94F54CF7F170}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataAccess", "DataAccess", "{2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Dccelerator.DataAccess.Common", "src\DataAccess\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.xproj", "{54F9CC41-92D0-4019-A3A1-7B861EA7B707}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,11 +28,17 @@ Global
 		{ED664BD5-35FD-40E6-9156-1514C14155D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED664BD5-35FD-40E6-9156-1514C14155D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED664BD5-35FD-40E6-9156-1514C14155D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54F9CC41-92D0-4019-A3A1-7B861EA7B707}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54F9CC41-92D0-4019-A3A1-7B861EA7B707}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54F9CC41-92D0-4019-A3A1-7B861EA7B707}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54F9CC41-92D0-4019-A3A1-7B861EA7B707}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{ED664BD5-35FD-40E6-9156-1514C14155D6} = {94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}
+		{2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7} = {94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}
+		{54F9CC41-92D0-4019-A3A1-7B861EA7B707} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
 	EndGlobalSection
 EndGlobal

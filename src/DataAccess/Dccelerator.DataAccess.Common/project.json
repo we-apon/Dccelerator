@@ -1,0 +1,104 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "Dccelerator.DataAccess.Common Class Library",
+  "authors": [ "we_apon" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  
+
+  "configurations": {
+    "Debug": { "compilationOptions": { "define": [ "DEBUG" ] } },
+    "Release": { "compilationOptions": { "optimize": true } }
+  },
+  
+
+
+  "frameworks": {
+
+    "net40": {
+      "compilationOptions": { "define": [ "NET40" ] },
+
+      "dependencies": {
+        "Dccelerator.Core": "0.0.2-alfa"
+      },
+
+      "frameworkAssemblies": {
+        "System.Data": "4.0.0.0",
+        "System.Transactions": "4.0.0.0"
+      }
+
+    },
+
+    "net45": {
+
+      "dependencies": {
+        "Dccelerator.Core": "0.0.2-alfa"
+      },
+
+      "frameworkAssemblies": {
+        "System.Diagnostics.Tracing": "4.0.0.0",
+        "System.Data": "4.0.0.0",
+        "System.Transactions": "4.0.0.0"
+      }
+    },
+
+
+    "dotnet51": {
+      "dependencies": {
+        "System.Runtime": "4.0.20",
+        "Microsoft.CSharp": "4.0.0",
+        "System.Collections": "4.0.10",
+        "System.Collections.Concurrent": "4.0.10",
+        "System.Reflection": "4.0.10",
+        "System.Linq": "4.0.0",
+        "System.Data.Common": "4.0.0",
+        "System.Diagnostics.TraceSource": "4.0.0-beta-23516",
+        "System.Threading.Tasks.Parallel": "4.0.0",
+        "System.Data.SqlClient": "4.0.0-beta-23516",
+        "Dccelerator.Core": "0.0.2-alfa"
+      }
+    },
+
+
+    "dotnet54": {
+      "dependencies": {
+        "System.Runtime": "4.0.20",
+        "Microsoft.CSharp": "4.0.0",
+        "System.Collections": "4.0.10",
+        "System.Collections.Concurrent": "4.0.10",
+        "System.Reflection": "4.0.10",
+        "System.Linq": "4.0.0",
+        "System.Data.Common": "4.0.0",
+        "System.Diagnostics.TraceSource": "4.0.0-beta-23516",
+        "System.Threading.Tasks.Parallel": "4.0.0",
+        "System.Data.SqlClient": "4.0.0-beta-23516",
+        "Dccelerator.Core": "0.0.2-alfa"
+      }
+    },
+
+
+
+
+
+    "dnxcore50": {
+      "dependencies": {
+        "System.Runtime": "4.0.20",
+        "Microsoft.CSharp": "4.0.0",
+        "System.Collections": "4.0.10",
+        "System.Collections.Concurrent": "4.0.10",
+        "System.Reflection": "4.0.10",
+        "System.Linq": "4.0.0",
+        "System.Data.Common": "4.0.0",
+        "System.Diagnostics.TraceSource": "4.0.0-beta-23516",
+        "System.Threading.Tasks.Parallel": "4.0.0",
+        "System.Data.SqlClient" : "4.0.0-beta-23516", 
+        "Dccelerator.Core": "0.0.2-alfa"
+      }
+    }
+
+  },
+
+  "dependencies": {
+  }
+}

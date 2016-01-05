@@ -48,7 +48,18 @@
       }
     },
 
-    "dotnet": {
+    "dotnet51": {
+      "dependencies": {
+        "System.Runtime": "4.0.20",
+        "Microsoft.CSharp": "4.0.0",
+        "System.Collections": "4.0.10",
+        "System.Collections.Concurrent": "4.0.10",
+        "System.Reflection": "4.0.10",
+        "System.Linq": "4.0.0"
+      }
+    },
+
+    "dotnet54": {
       "dependencies": {
         "System.Runtime": "4.0.20",
         "Microsoft.CSharp": "4.0.0",
