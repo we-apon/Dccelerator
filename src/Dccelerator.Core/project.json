@@ -18,6 +18,12 @@
 
   "frameworks": {
 
+
+
+    "net45": { },
+
+
+
     "net40": { "compilationOptions": { "define": [ "NET40" ] } },
 
     "dotnet": {

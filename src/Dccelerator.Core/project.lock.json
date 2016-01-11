@@ -2,6 +2,7 @@
   "locked": false,
   "version": 2,
   "targets": {
+    ".NETFramework,Version=v4.5": {},
     ".NETFramework,Version=v4.0": {},
     ".NETPlatform,Version=v5.0": {
       "Microsoft.CSharp/4.0.0": {
@@ -268,6 +269,8 @@
         }
       }
     },
+    ".NETFramework,Version=v4.5/win7-x86": {},
+    ".NETFramework,Version=v4.5/win7-x64": {},
     ".NETFramework,Version=v4.0/win7-x86": {},
     ".NETFramework,Version=v4.0/win7-x64": {},
     ".NETPlatform,Version=v5.0/win7-x86": {
@@ -1643,6 +1646,7 @@
   },
   "projectFileDependencyGroups": {
     "": [],
+    ".NETFramework,Version=v4.5": [],
     ".NETFramework,Version=v4.0": [],
     ".NETPlatform,Version=v5.0": [
       "System.Runtime >= 4.0.20",

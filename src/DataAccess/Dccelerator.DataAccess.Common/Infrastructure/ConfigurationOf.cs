@@ -32,6 +32,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
         public EntityInfo Info { get; }
 
 
+
         public ConfigurationOfEntity(Type entityType) {
             EntityInfo info;
             if (!_infoCache.TryGetValue(entityType, out info)) {
@@ -49,12 +50,16 @@ namespace Dccelerator.DataAccess.Infrastructure {
         static readonly Type _enumerableType = typeof(IEnumerable);
 
 
-        private EntityInfo GetInfo(Type entityType) {
-            var info = new EntityInfo {EntityType = entityType};
+        EntityInfo GetInfo(Type entityType) {
+            var info = new EntityInfo {
+                Type = entityType,
+            };
+
 
             //bug: detect and use entity attribute defined on top of entity inheritance hierarchy
 
-            var cachedAttribute = Attribute.GetCustomAttribute(entityType, typeof (CachedEntityAttribute), true).SafeCastTo<CachedEntityAttribute>();
+            var cachedAttribute = Attribute.GetCustomAttribute(entityType, typeof (GloballyCachedEntityAttribute), true).SafeCastTo<GloballyCachedEntityAttribute>();
+
             if (cachedAttribute != null) {
                 info.AllowCache = true;
                 info.CacheTimeout = cachedAttribute.Timeout;
@@ -97,7 +102,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
 
             if (info.KeyId == null) {
                 var possibleLongName = entityType.Name + "Id";
-                var idProperty = info.EntityType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FirstOrDefault(x => x.Name == "Id" || x.Name == possibleLongName);
+                var idProperty = info.Type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FirstOrDefault(x => x.Name == "Id" || x.Name == possibleLongName);
                 if (idProperty != null)
                     info.KeyId = idProperty;
                 else {
@@ -109,7 +114,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
                             $"or use identifier in property named 'Id' or '{possibleLongName}'.");
                     else
                         throw new InvalidOperationException($"In order to use inclusions possibility, you must specify {nameof(EntityAttribute.IdProperty)} in {nameof(EntityAttribute)} " +
-                                                            $"on entity {info.EntityType}, or use identifier in property named 'Id' or '{possibleLongName}'.");
+                                                            $"on entity {info.Type}, or use identifier in property named 'Id' or '{possibleLongName}'.");
                 }
             }
 
@@ -120,9 +125,9 @@ namespace Dccelerator.DataAccess.Infrastructure {
             for (var i = 0; i < includeonAttributes.Length; i++) {
                 var includeon = includeonAttributes[i];
 
-                var property = info.EntityType.GetProperty(includeon.PropertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var property = info.Type.GetProperty(includeon.PropertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 if (property == null)
-                    throw new InvalidOperationException($"Can't find property with PropertyName '{includeon.PropertyName}', specified in {nameof(IncludeChildrenAttribute)} on type {info.EntityType}");
+                    throw new InvalidOperationException($"Can't find property with PropertyName '{includeon.PropertyName}', specified in {nameof(IncludeChildrenAttribute)} on type {info.Type}");
 
                 var childInfo = new EntityInfo {
                     TargetPath = includeon.PropertyName,
@@ -140,13 +145,13 @@ namespace Dccelerator.DataAccess.Infrastructure {
 
 
                 if (childInfo.IsCollection) {
-                    childInfo.EntityType = property.PropertyType.ElementType();
+                    childInfo.Type = property.PropertyType.ElementType();
                     if (property.PropertyType.IsArray) {
-                        childInfo.TargetCollectionType = childInfo.EntityType.MakeArrayType();
+                        childInfo.TargetCollectionType = childInfo.Type.MakeArrayType();
                     }
                     else if (property.PropertyType.IsAbstract || property.PropertyType.IsInterface) {
                         childInfo.TargetCollectionType = property.PropertyType.IsGenericType
-                            ? typeof (List<>).MakeGenericType(childInfo.EntityType)
+                            ? typeof (List<>).MakeGenericType(childInfo.Type)
                             : typeof (ArrayList);
                     }
                     else {
@@ -154,43 +159,43 @@ namespace Dccelerator.DataAccess.Infrastructure {
                     }
                 }
                 else {
-                    childInfo.EntityType = property.PropertyType;
+                    childInfo.Type = property.PropertyType;
                 }
 
-                childInfo.EntityType = childInfo.IsCollection
+                childInfo.Type = childInfo.IsCollection
                     ? property.PropertyType.ElementType()
                     : property.PropertyType;
 
 
                 if (childInfo.KeyId == null) {
                     if (childInfo.IsCollection) {
-                        var possibleName = (property.DeclaringType ?? property.ReflectedType ?? info.EntityType).Name + "Id";
+                        var possibleName = (property.DeclaringType ?? property.ReflectedType ?? info.Type).Name + "Id";
 
-                        var idProperty = childInfo.EntityType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FirstOrDefault(x => x.Name == possibleName);
+                        var idProperty = childInfo.Type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FirstOrDefault(x => x.Name == possibleName);
                         if (idProperty != null) {
                             childInfo.KeyId = idProperty;
                         } else throw new InvalidOperationException($"You must specify {nameof(IncludeChildrenAttribute.KeyIdName)} in {nameof(IncludeChildrenAttribute)} " +
                                                                 $"with {nameof(IncludeChildrenAttribute.PropertyName)} '{includeon.PropertyName}' " +
-                                                                $"on entity {info.EntityType}, because it can't be finded automatically.");
+                                                                $"on entity {info.Type}, because it can't be finded automatically.");
                     }
                     else {
                         var possibleName = property.Name + "Id";
-                        if (info.EntityType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Any(x => x.Name == possibleName)) {
+                        if (info.Type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Any(x => x.Name == possibleName)) {
                             childInfo.ChildIdKey = possibleName;
                         } else throw new InvalidOperationException($"You must specify {nameof(IncludeChildrenAttribute.KeyIdName)} in {nameof(IncludeChildrenAttribute)} " +
                                                                 $"with {nameof(IncludeChildrenAttribute.PropertyName)} '{includeon.PropertyName}' " +
-                                                                $"on entity {info.EntityType}, because it can't be finded automatically.");
+                                                                $"on entity {info.Type}, because it can't be finded automatically.");
 
-                        var idProperty = childInfo.EntityType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FirstOrDefault(x => x.Name == "Id" || x.Name == possibleName);
+                        var idProperty = childInfo.Type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FirstOrDefault(x => x.Name == "Id" || x.Name == possibleName);
                         if (idProperty != null)
                             childInfo.KeyId = idProperty;
                         else throw new InvalidOperationException($"You must specify {nameof(IncludeChildrenAttribute.KeyIdName)} in {nameof(IncludeChildrenAttribute)} " +
                                                                 $"with {nameof(IncludeChildrenAttribute.PropertyName)} '{includeon.PropertyName}' " +
-                                                                $"on entity {info.EntityType}, because it can't be finded automatically.");
+                                                                $"on entity {info.Type}, because it can't be finded automatically.");
                     }
                 }
 
-                var ownerReferenceProperty = childInfo.EntityType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FirstOrDefault(x => x.PropertyType.IsAssignableFrom(entityType) && x.Name == (property.DeclaringType ?? property.ReflectedType ?? info.EntityType).Name);
+                var ownerReferenceProperty = childInfo.Type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FirstOrDefault(x => x.PropertyType.IsAssignableFrom(entityType) && x.Name == (property.DeclaringType ?? property.ReflectedType ?? info.Type).Name);
                 childInfo.OwnerReferenceName = ownerReferenceProperty?.Name;
 
                 info.Children[i] = childInfo;

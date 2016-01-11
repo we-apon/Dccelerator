@@ -2,13 +2,13 @@
   "locked": false,
   "version": 2,
   "targets": {
-    ".NETFramework,Version=v4.0": {
+    ".NETFramework,Version=v4.5": {
       "Dccelerator.Core/0.0.3-alfa": {
         "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
+        "framework": ".NETFramework,Version=v4.5"
       }
     },
-    ".NETFramework,Version=v4.5": {
+    ".NETFramework,Version=v4.0": {
       "Dccelerator.Core/0.0.3-alfa": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0"
@@ -394,6 +394,18 @@
         }
       }
     },
+    ".NETFramework,Version=v4.5/win7-x86": {
+      "Dccelerator.Core/0.0.3-alfa": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5"
+      }
+    },
+    ".NETFramework,Version=v4.5/win7-x64": {
+      "Dccelerator.Core/0.0.3-alfa": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5"
+      }
+    },
     ".NETFramework,Version=v4.0/win7-x86": {
       "Dccelerator.Core/0.0.3-alfa": {
         "type": "project",
@@ -401,18 +413,6 @@
       }
     },
     ".NETFramework,Version=v4.0/win7-x64": {
-      "Dccelerator.Core/0.0.3-alfa": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      }
-    },
-    ".NETFramework,Version=v4.5/win7-x86": {
-      "Dccelerator.Core/0.0.3-alfa": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0"
-      }
-    },
-    ".NETFramework,Version=v4.5/win7-x64": {
       "Dccelerator.Core/0.0.3-alfa": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0"
@@ -2283,15 +2283,15 @@
   },
   "projectFileDependencyGroups": {
     "": [],
-    ".NETFramework,Version=v4.0": [
+    ".NETFramework,Version=v4.5": [
       "Dccelerator.Core ",
+      "fx/System.Diagnostics.Tracing >= 4.0.0",
       "fx/System.Data >= 4.0.0",
       "fx/System.Transactions >= 4.0.0",
       "fx/System.Xml >= 4.0.0"
     ],
-    ".NETFramework,Version=v4.5": [
+    ".NETFramework,Version=v4.0": [
       "Dccelerator.Core ",
-      "fx/System.Diagnostics.Tracing >= 4.0.0",
       "fx/System.Data >= 4.0.0",
       "fx/System.Transactions >= 4.0.0",
       "fx/System.Xml >= 4.0.0"
@@ -2302,6 +2302,7 @@
       "System.Collections >= 4.0.10",
       "System.Collections.Concurrent >= 4.0.10",
       "System.Reflection >= 4.0.10",
+      "System.Reflection.Extensions >= 4.0.0",
       "System.Linq >= 4.0.0",
       "System.Data.Common >= 4.0.0",
       "System.Diagnostics.TraceSource >= 4.0.0-beta-23409",

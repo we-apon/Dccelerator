@@ -178,7 +178,7 @@ namespace Dccelerator.DataAccess {
             var info = ConfigurationOf<TEntity>.Info;
             if (info.KeyId == null)
                 throw new InvalidOperationException($"In order to delete entities of type {TypeManipulator<TEntity>.Type}, you must specify {nameof(EntityAttribute.IdProperty)} in {nameof(EntityAttribute)} " +
-                                                            $"on entity {info.EntityType}, or use identifier in property named 'Id' or '{TypeManipulator<TEntity>.Type.Name + "Id"}'.");
+                                                            $"on entity {info.Type}, or use identifier in property named 'Id' or '{TypeManipulator<TEntity>.Type.Name + "Id"}'.");
 
             object id;
             if (!TypeManipulator<TEntity>.TryGetNestedProperty(entity, info.KeyId.Name, out id))
@@ -204,7 +204,7 @@ namespace Dccelerator.DataAccess {
                     var info = ConfigurationOf<TEntity>.Info;
                     if (info.KeyId == null)
                         throw new InvalidOperationException($"In order to delete entities of type {TypeManipulator<TEntity>.Type}, you must specify {nameof(EntityAttribute.IdProperty)} in {nameof(EntityAttribute)} " +
-                                                                    $"on entity {info.EntityType}, or use identifier in property named 'Id' or '{TypeManipulator<TEntity>.Type.Name + "Id"}'.");
+                                                                    $"on entity {info.Type}, or use identifier in property named 'Id' or '{TypeManipulator<TEntity>.Type.Name + "Id"}'.");
 
             var name = NameOfDeleteProcedureFor(entityName);
             using (var connection = InstantinateConnection()) {

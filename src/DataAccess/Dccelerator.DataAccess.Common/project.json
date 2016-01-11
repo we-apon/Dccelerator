@@ -16,20 +16,6 @@
 
   "frameworks": {
 
-    "net40": {
-      "compilationOptions": { "define": [ "NET40" ] },
-
-      "dependencies": {
-        "Dccelerator.Core": ""
-      },
-
-      "frameworkAssemblies": {
-        "System.Data": "4.0.0.0",
-        "System.Transactions": "4.0.0.0",
-        "System.Xml": "4.0.0.0" 
-      }
-
-    },
 
     "net45": {
 
@@ -46,6 +32,22 @@
     },
 
 
+    "net40": {
+      "compilationOptions": { "define": [ "NET40" ] },
+
+      "dependencies": {
+        "Dccelerator.Core": ""
+      },
+
+      "frameworkAssemblies": {
+        "System.Data": "4.0.0.0",
+        "System.Transactions": "4.0.0.0",
+        "System.Xml": "4.0.0.0" 
+      }
+
+    },
+
+
     "dotnet": {
       "dependencies": {
         "System.Runtime": "4.0.20",
@@ -53,6 +55,7 @@
         "System.Collections": "4.0.10",
         "System.Collections.Concurrent": "4.0.10",
         "System.Reflection": "4.0.10",
+        "System.Reflection.Extensions": "4.0.0",
         "System.Linq": "4.0.0",
         "System.Data.Common": "4.0.0",
         "System.Diagnostics.TraceSource": "4.0.0-beta-23409",

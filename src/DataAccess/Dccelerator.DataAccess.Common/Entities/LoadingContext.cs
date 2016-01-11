@@ -33,7 +33,7 @@ namespace Dccelerator.DataAccess.Entities {
         /// <summary>
         /// Tells, is current entity lazy loading can use cache. 
         /// Default is <see langword="true"/>. 
-        /// Once you set it to <see langword="false"/>, all lazy loading queries will not be use cache, even it <see cref="CachedEntityAttribute"/> was used.
+        /// Once you set it to <see langword="false"/>, all lazy loading queries will not be use cache, even it <see cref="GloballyCachedEntityAttribute"/> was used.
         /// </summary>
         public bool DontUseCache { get; set; }
     }

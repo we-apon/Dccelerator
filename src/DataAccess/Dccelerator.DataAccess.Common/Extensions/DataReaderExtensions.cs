@@ -69,7 +69,7 @@ namespace Dccelerator.DataAccess {
                             mainObjects.Add(keyId, item);
                         }
                         catch (Exception e) {
-                            Internal.TraceEvent(TraceEventType.Critical, $"On reading '{mainObjectInfo.EntityType}' using special name {mainObjectInfo.EntityName} getted exception, possibly because reader contains more then one object with same idenifier.\n" +
+                            Internal.TraceEvent(TraceEventType.Critical, $"On reading '{mainObjectInfo.Type}' using special name {mainObjectInfo.EntityName} getted exception, possibly because reader contains more then one object with same idenifier.\n" +
                                                                          $"Identifier: {keyId}\n" +
                                                                          $"Exception: {e}");
 
@@ -81,7 +81,7 @@ namespace Dccelerator.DataAccess {
 
                     for (var resultIdx = 0; resultIdx < includeInformation.Length; resultIdx++) {
                         if (!reader.NextResult()) {
-                            Internal.TraceEvent(TraceEventType.Warning, $"Object {mainObjectInfo.EntityType.FullName} has includedInformation for #{includeInformation.Length} items, but reader returned only {reader.Depth} tables (including main objects)");
+                            Internal.TraceEvent(TraceEventType.Warning, $"Object {mainObjectInfo.Type.FullName} has includedInformation for #{includeInformation.Length} items, but reader returned only {reader.Depth} tables (including main objects)");
                             return mainObjects.Values;
                         }
 
@@ -98,7 +98,7 @@ namespace Dccelerator.DataAccess {
                             var item = ReadItem(reader, info, out keyId);
 
                             if (keyId == null) {
-                                Internal.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.EntityType}, {info.TargetPath} (used on entity {mainObjectInfo.EntityType}");
+                                Internal.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.Type}, {info.TargetPath} (used on entity {mainObjectInfo.Type}");
                                 break;
                             }
 
@@ -110,16 +110,16 @@ namespace Dccelerator.DataAccess {
                                             return;
 
                                         if (!TypeManipulator.TrySetNestedProperty(mainObject, info.TargetPath, item))
-                                            Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.EntityType} in result set #{resultIdx}.");
+                                            Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.TargetPath} from '{mainObjectInfo.Type.FullName}' context.\nTarget path specified for child item {info.Type} in result set #{resultIdx}.");
                                     });
 
 /*
                                 mainObjects.Values.Where(x => {
                                     object value;
-                                    return TypeManipulator.TryGetNestedProperty(x, info.ChildIdKey, out value) && value == keyId;
+                                    return TypeManipulator.TryGetValueOnPath(x, info.ChildIdKey, out value) && value == keyId;
                                 }).Perform(x => {
-                                    if (!TypeManipulator.TrySetNestedProperty(x, info.TargetPath, item))
-                                        Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.EntityType} in result set #{resultIdx}.");
+                                    if (!TypeManipulator.TrySetValueOnPath(x, info.TargetPath, item))
+                                        Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.TargetPath} from '{mainObjectInfo.Type.FullName}' context.\nTarget path specified for child item {info.Type} in result set #{resultIdx}.");
                                 }).ToEnd();
 */
 
@@ -130,12 +130,12 @@ namespace Dccelerator.DataAccess {
                                     Internal.TraceEvent(TraceEventType.Warning, $"In result set #{resultIdx} finded data row with item {item}, that doesn't has owner object in result set #1.\nOwner Id is {keyId} ({info.KeyIdName}).\nTarget path is '{info.TargetPath}'.");
                                     continue;
                                 }
-                                if (!TypeManipulator.TrySetNestedProperty(mainObject, info.TargetPath, item))
-                                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.EntityType} in result set #{resultIdx}.");
+                                if (!TypeManipulator.TrySetValueOnPath(mainObject, info.TargetPath, item))
+                                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.TargetPath} from '{mainObjectInfo.Type.FullName}' context.\nTarget path specified for child item {info.Type} in result set #{resultIdx}.");
                                 
                                 if (!string.IsNullOrWhiteSpace(info.OwnerReferenceName))
-                                    if (!TypeManipulator.TrySetNestedProperty(item, info.OwnerReferenceName, mainObject))
-                                        Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.OwnerReferenceName} from '{info.EntityType}' context. This should be reference to owner object ({mainObject})");
+                                    if (!TypeManipulator.TrySetValueOnPath(item, info.OwnerReferenceName, mainObject))
+                                        Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.OwnerReferenceName} from '{info.Type}' context. This should be reference to owner object ({mainObject})");
 */
 
                                 continue;
@@ -155,19 +155,19 @@ namespace Dccelerator.DataAccess {
                                 child => {
                                     object mainObject;
                                     if (!mainObjects.TryGetValue(child.Key, out mainObject)) {
-                                        Internal.TraceEvent(TraceEventType.Warning, $"In result set #{resultIdx} finded data row of type {info.EntityType}, that doesn't has owner object in result set #1.\nOwner Id is {child.Key} ({info.KeyId.Name}).\nTarget path is '{info.TargetPath}'.");
+                                        Internal.TraceEvent(TraceEventType.Warning, $"In result set #{resultIdx} finded data row of type {info.Type}, that doesn't has owner object in result set #1.\nOwner Id is {child.Key} ({info.KeyId.Name}).\nTarget path is '{info.TargetPath}'.");
                                         return;
                                     }
 
                                     if (!TypeManipulator.TrySetNestedProperty(mainObject, info.TargetPath, child.Value))
-                                        Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.EntityType} in result set #{resultIdx}.");
+                                        Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.TargetPath} from '{mainObjectInfo.Type.FullName}' context.\nTarget path specified for child item {info.Type} in result set #{resultIdx}.");
 
                                     if (string.IsNullOrWhiteSpace(info.OwnerReferenceName))
                                         return;
 
                                     foreach (var item in child.Value) {
                                         if (!TypeManipulator.TrySetNestedProperty(item, info.OwnerReferenceName, mainObject))
-                                            Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.OwnerReferenceName} from '{info.EntityType}' context. This should be reference to owner object ({mainObject})");
+                                            Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.OwnerReferenceName} from '{info.Type}' context. This should be reference to owner object ({mainObject})");
                                     }
                                 });
                         }
@@ -181,7 +181,7 @@ namespace Dccelerator.DataAccess {
 
 
         private static object ReadItem(this DbDataReader reader, EntityInfo info, out object keyId) {
-            var item = Activator.CreateInstance(info.EntityType);
+            var item = Activator.CreateInstance(info.Type);
 
             keyId = null;
 
@@ -195,7 +195,7 @@ namespace Dccelerator.DataAccess {
                     keyId = value;
 
                 if (!TypeManipulator.TrySetNestedProperty(item, name, value))
-                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {name} from '{info.EntityType.FullName}' context.");
+                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {name} from '{info.Type.FullName}' context.");
             }
             return item;
         }

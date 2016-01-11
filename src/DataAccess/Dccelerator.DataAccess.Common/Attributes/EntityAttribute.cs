@@ -29,8 +29,11 @@ namespace Dccelerator.DataAccess
         /// Specifies <c>repository</c>, that can be used to get marked entity.
         /// </summary>
         /// <param name="repository"><see cref="Type"/> of class, that implements <see cref="IDataAccessRepository"/> interface</param>
-        public EntityAttribute( Type repository) {
+        public EntityAttribute(Type repository) {
             Repository = repository;
+
+            if (!(Repository is IDataAccessRepository))
+                throw new InvalidOperationException($"{nameof(Repository)} should implement {nameof(IDataAccessRepository)} interface.");
         }
 
 

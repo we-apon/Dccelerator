@@ -112,7 +112,7 @@ namespace Dccelerator.Convertion
             foreach (var destinationProperty in destinationProps) {
                 object value;
 
-                if (!TypeManipulator.TryGetNestedProperty(other, destinationProperty.Key, out value) || !TypeManipulator.TrySetNestedProperty(entity, destinationProperty.Key, value)) {
+                if (!TypeManipulator.TryGetValueOnPath(other, destinationProperty.Key, out value) || !TypeManipulator.TrySetValueOnPath(entity, destinationProperty.Key, value)) {
                     unconvertedProps.Add(destinationProperty.Key, destinationProperty.Value);
                 }
             }
