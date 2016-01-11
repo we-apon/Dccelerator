@@ -1,45 +1,43 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 
 
 namespace Dccelerator.Reflection
 {
-    public class TypeManipulator
+    public static class TypeManipulator
     {
-        #region public static bool TryGetNestedProperty(object context, string path, out object value)
 
-        public static bool TryGetNestedProperty(object context, string path, out object value) {
-            if (context == null || string.IsNullOrWhiteSpace(path)) {
-                value = null;
-                return false;
-            }
+        /// <summary>
+        /// Returns an structure for manipulating property what placed on <paramref name="path"/>, if we start looking from specified <paramref name="contextType"/>.
+        /// Is will return null, when path is wrong.
+        /// </summary>
+        /// <param name="contextType"></param> //todo: documentation
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static PropertyPath GetPropertyPath(this Type contextType, string path) {
 
-            return TryGetNestedProperty(context, new PropIdentity(context.GetType(), path), out value);
+            var identity = new PropIdentity(contextType, path);
+
+            PropertyPath propertyPath;
+            if (_propertyPaths.TryGetValue(identity, out propertyPath))
+                return propertyPath;
+
+            propertyPath = make_property_path(identity);
+            if (!_propertyPaths.TryAdd(identity, propertyPath))
+                propertyPath = _propertyPaths[identity];
+
+            return propertyPath;
         }
 
 
-        static bool TryGetNestedProperty(object context, PropIdentity identity, out object value) {
+
+
+        public static bool TryGetValueOnPath(this object context, string path, out object value) {
             PropertyPath propertyPath;
-            bool isGetted;
-            lock (_propertyPaths)
-                isGetted = _propertyPaths.TryGetValue(identity, out propertyPath);
 
-            if (propertyPath != null)
-                return propertyPath.TryGetValueOfTargetProperty(context, out value);
-
-            if (isGetted) {
-                value = null;
-                return false;
-            }
-
-
-            propertyPath = make_property_path(identity);
-            lock (_propertyPaths)
-                _propertyPaths[identity] = propertyPath;
-
-
-            if (propertyPath == null) {
+            if (context == null || string.IsNullOrWhiteSpace(path) || (propertyPath = GetPropertyPath(context.GetType(), path)) == null) {
                 value = null;
                 return false;
             }
@@ -47,38 +45,18 @@ namespace Dccelerator.Reflection
             return propertyPath.TryGetValueOfTargetProperty(context, out value);
         }
 
-        #endregion
+        
 
-
-
-        #region public static bool TrySetNestedProperty(object context, string path, object value)
-
-        public static bool TrySetNestedProperty(object context, string path, object value) {
-            return context != null && !string.IsNullOrWhiteSpace(path) && TrySetNestedProperty(context, new PropIdentity(context.GetType(), path), value);
-        }
-
-
-        static bool TrySetNestedProperty(object context, PropIdentity identity, object value) {
+        public static bool TrySetValueOnPath(this object context, string path, object value) {
 
             PropertyPath propertyPath;
-            bool isGetted;
-            lock (_propertyPaths)
-                isGetted = _propertyPaths.TryGetValue(identity, out propertyPath);
 
-            if (propertyPath != null)
-                return propertyPath.TrySetTargetProperty(context, value);
-
-            if (isGetted)
-                return false;
-
-            propertyPath = make_property_path(identity);
-            lock (_propertyPaths)
-                _propertyPaths[identity] = propertyPath;
-
-            return propertyPath != null && propertyPath.TrySetTargetProperty(context, value);
+            return context != null 
+                && !string.IsNullOrWhiteSpace(path) 
+                && (propertyPath = GetPropertyPath(context.GetType(), path)) != null
+                && propertyPath.TrySetTargetProperty(context, value);
         }
-
-        #endregion
+        
 
 
 
@@ -120,7 +98,7 @@ namespace Dccelerator.Reflection
         }
 
 
-        static readonly Dictionary<PropIdentity, PropertyPath> _propertyPaths = new Dictionary<PropIdentity, PropertyPath>();
+        static readonly ConcurrentDictionary<PropIdentity, PropertyPath> _propertyPaths = new ConcurrentDictionary<PropIdentity, PropertyPath>();
 
 
         static PropertyPath make_property_path( PropIdentity identity) {

@@ -175,6 +175,9 @@ namespace Dccelerator.Reflection
 
 
 
+        /// <summary>
+        /// Returns <see langword="true"/>, if <paramref name="type"/> is an collection (e.g. an <seealso cref="IEnumerable"/> and not <see cref="String"/>).
+        /// </summary>
         public static bool IsAnCollection(this Type type) {
             bool result;
 

@@ -188,7 +188,7 @@ namespace Dccelerator.Reflection
 
         // ReSharper restore StaticMemberInGenericType
 
-        public static bool TryGetNestedProperty(object context, string path, out object value) {
+        public static bool TryGetValueOnPath(object context, string path, out object value) {
             var propertyPath = get_me_property_path_for(path);
             if (propertyPath != null)
                 return propertyPath.TryGetValueOfTargetProperty(context, out value);
@@ -198,7 +198,7 @@ namespace Dccelerator.Reflection
         }
 
 
-        public static bool TrySetNestedProperty(object context, string path, object value) {
+        public static bool TrySetValueOnPath(object context, string path, object value) {
             var propertyPath = get_me_property_path_for(path);
             return propertyPath != null && propertyPath.TrySetTargetProperty(context, value);
         }
