@@ -237,14 +237,24 @@ namespace Dccelerator.Reflection
 
 #if NET40
 
+        /// <summary>
+        /// Return <see cref="Type"/> instance that was passed as <paramref name="type"/>.
+        /// </summary>
+        /// <remarks>
+        /// This extension method exists just for .net 4.0 api compatibility with modern target platforms
+        /// </remarks>
         public static Type GetInfo(this Type type) {
             return type;
         }
 
-
         public static IEnumerable<Attribute> GetCustomAttributes(this Type type) {
             return type.GetCustomAttributes(true).Cast<Attribute>();
         }
+
+        public static IEnumerable<TAttribute> GetCustomAttributes<TAttribute>(this Type type) where TAttribute : Attribute {
+            return type.GetCustomAttributes(true).OfType<TAttribute>();
+        }
+
 
 #else
         public static TypeInfo GetInfo(this Type type) {
@@ -260,7 +270,6 @@ namespace Dccelerator.Reflection
                 : info;
         }
 #endif
-
 
 
 
