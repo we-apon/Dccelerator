@@ -31,7 +31,7 @@ namespace Dccelerator.Reflection
         static readonly ConcurrentDictionary<Type, HashSet<Type>> _typeParants = new ConcurrentDictionary<Type, HashSet<Type>>();
         static readonly ConcurrentDictionary<Type, HashSet<Type>> _typeInterfaces = new ConcurrentDictionary<Type, HashSet<Type>>();
         static readonly ConcurrentDictionary<Type, bool> _isStrongEnumerable = new ConcurrentDictionary<Type, bool>();
-        static readonly ConcurrentDictionary<Type, object> _defaultInstances = new ConcurrentDictionary<Type, object>();
+        /*static readonly ConcurrentDictionary<Type, object> _defaultInstances = new ConcurrentDictionary<Type, object>();*/
         static readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, bool>> _isAssiblableFrom = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, bool>>();
         static readonly ConcurrentDictionary<Type, Type> _collectionElementTypes = new ConcurrentDictionary<Type, Type>();
         static readonly ConcurrentDictionary<Type, Type[]> _genericArguments = new ConcurrentDictionary<Type, Type[]>();
@@ -105,21 +105,26 @@ namespace Dccelerator.Reflection
         }
 
 
-        public static Type ElementTypeOf(Type collectionType) {
+        /// <summary>
+        /// Returns type of element of <paramref name="collectionType"/>.
+        /// </summary>
+        /// <returns>Returns null, if <paramref name="collectionType"/> is not an collection at all.</returns>
+        public static Type ElementType(this Type collectionType) {
             Type elementType;
 
             if (_collectionElementTypes.TryGetValue(collectionType, out elementType))
                 return elementType;
 
-            if (collectionType.IsArray)
+            if (collectionType.IsArray) //todo: check caching performance
                 elementType = collectionType.GetElementType();
-            else {
+            else if (EnumerableType.IsAssignableFrom(collectionType)) {
                 var generics = GenericsOf(collectionType);
                 elementType = generics.Length > 0 ? generics[0] : ObjectType;
             }
 
-            _collectionElementTypes[collectionType] = elementType;
-            return elementType;
+            return _collectionElementTypes.TryAdd(collectionType, elementType) 
+                ? elementType 
+                : _collectionElementTypes[collectionType];
         }
 
 
@@ -137,12 +142,12 @@ namespace Dccelerator.Reflection
 
 
             result = targetType.IsAssignableFrom(valueType);
-            assignables[valueType] = result;
-
-
-            return result;
+            return assignables.TryAdd(valueType, result)
+                ? result
+                : assignables[valueType];
         }
 
+/*
 
         public static object DefaultInstanceOf(Type type) {
             if (GetInfo(type).IsClass)
@@ -162,10 +167,11 @@ namespace Dccelerator.Reflection
             }
 
 
-            _defaultInstances[type] = instance;
-
-            return instance;
+            return _defaultInstances.TryAdd(type, instance)
+                ? instance
+                : _defaultInstances[type];
         }
+*/
 
 
 
@@ -201,10 +207,10 @@ namespace Dccelerator.Reflection
                 return interfaces;
 
             interfaces = new HashSet<Type>(type.GetInterfaces());
-            _typeInterfaces[type] = interfaces;
 
-
-            return interfaces;
+            return _typeInterfaces.TryAdd(type, interfaces)
+                ? interfaces
+                : _typeInterfaces[type];
         }
 
 
@@ -219,10 +225,9 @@ namespace Dccelerator.Reflection
             parents = new HashSet<Type>();
             FillParentsOf(type, ref parents);
 
-            _typeParants[type] = parents;
-
-
-            return parents;
+            return _typeParants.TryAdd(type, parents)
+                ? parents
+                : _typeParants[type];
         }
 
 
