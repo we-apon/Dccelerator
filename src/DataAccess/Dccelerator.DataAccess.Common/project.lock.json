@@ -120,23 +120,6 @@
           "lib/dotnet/System.Data.Common.dll": {}
         }
       },
-      "System.Data.SqlClient/4.0.0-beta-22605": {
-        "type": "package",
-        "dependencies": {
-          "System.Data.Common": "4.0.0-beta-22605",
-          "System.Globalization": "4.0.0-beta-22605",
-          "System.IO": "4.0.0-beta-22605",
-          "System.Runtime": "4.0.0-beta-22605",
-          "System.Threading.Tasks": "4.0.0-beta-22605",
-          "System.Xml.ReaderWriter": "4.0.0-beta-22605"
-        },
-        "compile": {
-          "lib/contract/System.Data.SqlClient.dll": {}
-        },
-        "runtime": {
-          "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Data.SqlClient.dll": {}
-        }
-      },
       "System.Diagnostics.Debug/4.0.10": {
         "type": "package",
         "dependencies": {
@@ -379,18 +362,6 @@
         },
         "runtime": {
           "lib/dotnet/System.Threading.Tasks.Parallel.dll": {}
-        }
-      },
-      "System.Xml.ReaderWriter/4.0.0-beta-23019": {
-        "type": "package",
-        "dependencies": {
-          "System.IO": "4.0.0-beta-23019",
-          "System.Runtime": "4.0.0-beta-23019",
-          "System.Text.Encoding": "4.0.0-beta-23019",
-          "System.Threading.Tasks": "4.0.0-beta-23019"
-        },
-        "compile": {
-          "ref/dotnet/System.Xml.ReaderWriter.dll": {}
         }
       }
     },
@@ -542,23 +513,6 @@
           "lib/dotnet/System.Data.Common.dll": {}
         }
       },
-      "System.Data.SqlClient/4.0.0-beta-22605": {
-        "type": "package",
-        "dependencies": {
-          "System.Data.Common": "4.0.0-beta-22605",
-          "System.Globalization": "4.0.0-beta-22605",
-          "System.IO": "4.0.0-beta-22605",
-          "System.Runtime": "4.0.0-beta-22605",
-          "System.Threading.Tasks": "4.0.0-beta-22605",
-          "System.Xml.ReaderWriter": "4.0.0-beta-22605"
-        },
-        "compile": {
-          "lib/contract/System.Data.SqlClient.dll": {}
-        },
-        "runtime": {
-          "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Data.SqlClient.dll": {}
-        }
-      },
       "System.Diagnostics.Debug/4.0.10": {
         "type": "package",
         "dependencies": {
@@ -801,18 +755,6 @@
         },
         "runtime": {
           "lib/dotnet/System.Threading.Tasks.Parallel.dll": {}
-        }
-      },
-      "System.Xml.ReaderWriter/4.0.0-beta-23019": {
-        "type": "package",
-        "dependencies": {
-          "System.IO": "4.0.0-beta-23019",
-          "System.Runtime": "4.0.0-beta-23019",
-          "System.Text.Encoding": "4.0.0-beta-23019",
-          "System.Threading.Tasks": "4.0.0-beta-23019"
-        },
-        "compile": {
-          "ref/dotnet/System.Xml.ReaderWriter.dll": {}
         }
       }
     },
@@ -940,23 +882,6 @@
           "lib/dotnet/System.Data.Common.dll": {}
         }
       },
-      "System.Data.SqlClient/4.0.0-beta-22605": {
-        "type": "package",
-        "dependencies": {
-          "System.Data.Common": "4.0.0-beta-22605",
-          "System.Globalization": "4.0.0-beta-22605",
-          "System.IO": "4.0.0-beta-22605",
-          "System.Runtime": "4.0.0-beta-22605",
-          "System.Threading.Tasks": "4.0.0-beta-22605",
-          "System.Xml.ReaderWriter": "4.0.0-beta-22605"
-        },
-        "compile": {
-          "lib/contract/System.Data.SqlClient.dll": {}
-        },
-        "runtime": {
-          "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Data.SqlClient.dll": {}
-        }
-      },
       "System.Diagnostics.Debug/4.0.10": {
         "type": "package",
         "dependencies": {
@@ -1199,18 +1124,6 @@
         },
         "runtime": {
           "lib/dotnet/System.Threading.Tasks.Parallel.dll": {}
-        }
-      },
-      "System.Xml.ReaderWriter/4.0.0-beta-23019": {
-        "type": "package",
-        "dependencies": {
-          "System.IO": "4.0.0-beta-23019",
-          "System.Runtime": "4.0.0-beta-23019",
-          "System.Text.Encoding": "4.0.0-beta-23019",
-          "System.Threading.Tasks": "4.0.0-beta-23019"
-        },
-        "compile": {
-          "ref/dotnet/System.Xml.ReaderWriter.dll": {}
         }
       }
     }
@@ -1414,22 +1327,6 @@
         "System.Data.Common.4.0.0.nupkg",
         "System.Data.Common.4.0.0.nupkg.sha512",
         "System.Data.Common.nuspec"
-      ]
-    },
-    "System.Data.SqlClient/4.0.0-beta-22605": {
-      "type": "package",
-      "sha512": "9spKCZqNmCYeacDZscDR7R3qvRT2dI1kyAY4zl3iv2WSTcj6sSh/ry2hptjqLr4ihIspoiRp3aPw+gW5r+NihA==",
-      "files": [
-        "lib/aspnetcore50/System.Data.SqlClient.dll",
-        "lib/contract/System.Data.SqlClient.dll",
-        "lib/net45/System.Data.SqlClient.dll",
-        "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Data.SqlClient.dll",
-        "License.rtf",
-        "native/win7/x64/sni.dll",
-        "native/win7/x86/sni.dll",
-        "System.Data.SqlClient.4.0.0-beta-22605.nupkg",
-        "System.Data.SqlClient.4.0.0-beta-22605.nupkg.sha512",
-        "System.Data.SqlClient.nuspec"
       ]
     },
     "System.Diagnostics.Debug/4.0.10": {
@@ -2263,22 +2160,6 @@
         "System.Threading.Tasks.Parallel.4.0.0.nupkg.sha512",
         "System.Threading.Tasks.Parallel.nuspec"
       ]
-    },
-    "System.Xml.ReaderWriter/4.0.0-beta-23019": {
-      "type": "package",
-      "sha512": "oTwL5bWQoa/8fapVgwbr/AXlb1BU7mL14PY4HSD+jxavnrH78n356KndxuJhZD2H2uJh6EAW4Eyn3I0/F9+esA==",
-      "files": [
-        "lib/net45/_._",
-        "lib/win8/_._",
-        "License.rtf",
-        "ref/dotnet/System.Xml.ReaderWriter.dll",
-        "ref/net45/_._",
-        "ref/netcore50/System.Xml.ReaderWriter.dll",
-        "ref/win8/_._",
-        "System.Xml.ReaderWriter.4.0.0-beta-23019.nupkg",
-        "System.Xml.ReaderWriter.4.0.0-beta-23019.nupkg.sha512",
-        "System.Xml.ReaderWriter.nuspec"
-      ]
     }
   },
   "projectFileDependencyGroups": {
@@ -2287,13 +2168,11 @@
       "Dccelerator.Core ",
       "fx/System.Diagnostics.Tracing >= 4.0.0",
       "fx/System.Data >= 4.0.0",
-      "fx/System.Transactions >= 4.0.0",
       "fx/System.Xml >= 4.0.0"
     ],
     ".NETFramework,Version=v4.0": [
       "Dccelerator.Core ",
       "fx/System.Data >= 4.0.0",
-      "fx/System.Transactions >= 4.0.0",
       "fx/System.Xml >= 4.0.0"
     ],
     ".NETPlatform,Version=v5.0": [
@@ -2307,7 +2186,6 @@
       "System.Data.Common >= 4.0.0",
       "System.Diagnostics.TraceSource >= 4.0.0-beta-23409",
       "System.Threading.Tasks.Parallel >= 4.0.0",
-      "System.Data.SqlClient >= 4.0.0-beta-22605",
       "Dccelerator.Core "
     ]
   }

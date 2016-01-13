@@ -12,13 +12,13 @@ using Dccelerator.Reflection;
 
 namespace Dccelerator.DataAccess.Infrastructure {
     class EntityInfo : IEntityInfo {
-        public Type Type;
+        public Type Type { get; }
 
 
 #if NET40
-        public Type TypeInfo;
+        public Type TypeInfo { get; }
 #else
-        public TypeInfo TypeInfo;
+        public TypeInfo TypeInfo { get; }
 #endif
 
         public string EntityName => _entityName ?? (_entityName = string.IsNullOrWhiteSpace(EntityAttribute.Name) ? Type.Name : EntityAttribute.Name);

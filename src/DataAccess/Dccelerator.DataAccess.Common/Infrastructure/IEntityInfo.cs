@@ -4,6 +4,19 @@ using System.Reflection;
 
 namespace Dccelerator.DataAccess.Infrastructure {
     interface IEntityInfo {
+
+
+        Type Type { get; }
+
+
+#if NET40
+        Type TypeInfo { get; }
+#else
+        TypeInfo TypeInfo { get; }
+#endif
+
+
+
         string EntityName { get; }
 
 

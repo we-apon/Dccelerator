@@ -260,6 +260,9 @@ namespace Dccelerator.Reflection
 
 
 #else
+        /// <summary>
+        /// Returns globally cached info about <paramref name="type"/>.
+        /// </summary>
         public static TypeInfo GetInfo(this Type type) {
             TypeInfo info;
 

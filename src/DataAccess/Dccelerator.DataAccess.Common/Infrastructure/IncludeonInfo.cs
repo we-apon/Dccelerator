@@ -1,5 +1,9 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Dccelerator.Reflection;
 using Dccelerator.Reflection.Abstract;
 
@@ -29,6 +33,19 @@ namespace Dccelerator.DataAccess.Infrastructure {
 
         #region Implementation of IEntityInfo
 
+        public Type Type => _type ?? (_type = IsCollection ? _targetProperty.Info.PropertyType.ElementType() : _targetProperty.Info.PropertyType);
+        Type _type;
+
+
+
+#if NET40
+        public Type TypeInfo => Type;
+#else
+        public TypeInfo TypeInfo => _typeInfo ?? (_typeInfo = Type.GetInfo());
+        TypeInfo _typeInfo;
+#endif
+
+
         public string EntityName { get; }
 
 
@@ -36,7 +53,57 @@ namespace Dccelerator.DataAccess.Infrastructure {
         /// Contains name and type of key id field of entity.
         /// Can be null, because syntetic entities may hasn't unique identifier.
         /// </summary>
-        public PropertyInfo KeyId { get; }
+        public PropertyInfo KeyId => _keyId ?? (_keyId = GetKeyId());
+        PropertyInfo _keyId;
+
+        PropertyInfo GetKeyId() {
+            if (string.IsNullOrWhiteSpace(_includeon.KeyIdName))
+                return null;
+
+            if (IsCollection) {
+                var declaringType = _targetProperty.Info.DeclaringType ?? _targetProperty.Info.ReflectedType;
+
+                var possibleNames = new List<string>(declaringType == null ? 4 : 6) {
+                    _entityInfo.Type.Name + "Id",
+                    _entityInfo.Type.Name + "_Id",
+                    _entityInfo.EntityName + "Id",
+                    _entityInfo.EntityName + "_Id"
+                };
+                if (declaringType != null) {
+                    possibleNames.Add(declaringType.Name + "Id");
+                    possibleNames.Add(declaringType.Name + "_Id");
+                }
+
+
+                var keyId = Type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .FirstOrDefault(x => possibleNames.Any(z => string.Compare(x.Name, z, StringComparison.InvariantCultureIgnoreCase) == 0));
+
+                if (keyId != null)
+                    return keyId;
+
+                throw new InvalidOperationException($"You must specify {nameof(IncludeChildrenAttribute.KeyIdName)} in {nameof(IncludeChildrenAttribute)} " +
+                                                    $"with {nameof(IncludeChildrenAttribute.PropertyName)} '{_includeon.PropertyName}' " +
+                                                    $"on entity {_entityInfo.Type}, because it can't be finded automatically.");
+            }
+            else {
+                var possibleNames = new [] {
+                    _targetProperty.Info.Name + "Id",
+                    _targetProperty.Info.Name + "_Id",                        
+                };
+
+                var keyId = _entityInfo.Type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                    .FirstOrDefault(x => possibleNames.Any(z => string.Compare(x.Name, z, StringComparison.InvariantCultureIgnoreCase) == 0));
+
+                if (keyId == null)
+                    throw new InvalidOperationException($"You must specify {nameof(IncludeChildrenAttribute.KeyIdName)} in {nameof(IncludeChildrenAttribute)} " +
+                                                        $"with {nameof(IncludeChildrenAttribute.PropertyName)} '{_includeon.PropertyName}' " +
+                                                        $"on entity {_entityInfo.Type}, because it can't be finded automatically.");
+
+                return keyId;
+            }
+        }
+
+
 
 
         /// <summary>
@@ -56,17 +123,58 @@ namespace Dccelerator.DataAccess.Infrastructure {
         bool? _isCollection;
 
 
-
         public string[] ColumnNames { get; }
-        public string ChildIdKey { get; }
+
+
+        public string ChildIdKey => KeyId?.Name;
 
         public string TargetPath => _includeon.PropertyName;
 
 
 
-        public string OwnerReferenceName { get; }
-        public Type TargetCollectionType { get; }
+        public string OwnerReferenceName => _ownerReferenceName ?? (_ownerReferenceName = GetOwnerReference());
+        bool _isOwnerReferenceGetted;
+        string _ownerReferenceName;
+
+        string GetOwnerReference() {
+            if (_isOwnerReferenceGetted)
+                return _ownerReferenceName;
+
+            var ownerReference = Type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .FirstOrDefault(x => x.PropertyType.IsAssignableFrom(_entityInfo.Type) && x.Name == (_targetProperty.Info.DeclaringType ?? _targetProperty.Info.ReflectedType ?? Type).Name);
+
+            _isOwnerReferenceGetted = true;
+            return ownerReference?.Name;
+        }
+
+
+
+
+
+        public Type TargetCollectionType => _targetCollectionType ?? (_targetCollectionType = GetTargetCollectionType());
+        Type _targetCollectionType;
+
+        Type GetTargetCollectionType() {
+            if (!IsCollection)
+                return null;
+
+            var targetType = _targetProperty.Info.PropertyType;
+
+            if (targetType.IsArray)
+                return Type.MakeArrayType();
+
+            if (targetType.IsAbstract || targetType.IsInterface)
+                return targetType.IsGenericType
+                    ? typeof (List<>).MakeGenericType(Type)
+                    : typeof (ArrayList);
+
+            return null;
+        }
+
 
         #endregion
+
+
+
     }
 }

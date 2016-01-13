@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Text;
 using Dccelerator.DataAccess.Infrastructure;
@@ -25,10 +24,6 @@ namespace Dccelerator.DataAccess.Implementations.ReadingRepositories {
 
         const int DefaultRetryCount = 6;
 
-        const int DeadlockErrorNumber = 1205;
-        const int LockingErrorNumber = 1222;
-        const int UpdateConflictErrorNumber = 3960;
-
 
         protected TResult RetryOnDeadlock<TResult>(Func<TResult> func, int retryCount = DefaultRetryCount) {
             var attemptNumber = 1;
@@ -36,21 +31,7 @@ namespace Dccelerator.DataAccess.Implementations.ReadingRepositories {
                 try {
                     return func();
                 }
-                catch (SqlException exception) {
-                    Internal.TraceEvent(TraceEventType.Warning, $"On attempt count #{attemptNumber} gaived sql exception:\n{exception}");
-                    if (!exception.Errors.Cast<SqlError>().Any(error =>
-                        (error.Number == DeadlockErrorNumber) ||
-                        (error.Number == LockingErrorNumber) ||
-                        (error.Number == UpdateConflictErrorNumber))) {
-                        Internal.TraceEvent(TraceEventType.Critical, $"Sql exception has only bad errors: {exception.Errors.Cast<SqlError>().Aggregate(string.Empty, (s, error) => $"[ErrorNumber #{error.Number} {error.Message}] ")}");
-                        throw;
-                    }
-                    if (attemptNumber == retryCount + 1) {
-                        Internal.TraceEvent(TraceEventType.Critical, "Attempt count exceeded retry count");
-                        throw;
-                    }
-                }
-                catch (Exception e) {
+                catch (Exception e) { //todo: make it work!
                     Internal.TraceEvent(TraceEventType.Critical, $"On attempt coun #{attemptNumber} gaived exception:\n{e}");
                     throw;
                 }

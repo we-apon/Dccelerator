@@ -2,54 +2,25 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using Dccelerator.DataAccess.Infrastructure;
 using System.Linq;
-using System.Transactions;
 
 
 namespace Dccelerator.DataAccess.Implementations.Transactions {
-
-
-    class SimpleScheduledTransaction : NotScheduledDataTransaction {
-        private readonly ITransactionScheduler _scheduler;
-
-
-        public SimpleScheduledTransaction(ITransactionScheduler scheduler, IDataManagerFactory factory, IsolationLevel isolationLevel) : base(factory, isolationLevel) {
-            _scheduler = scheduler;
-        }
-
-
-        #region Overrides of NotScheduledDataTransaction
-
-        /// <summary>
-        /// Doing nothing.
-        /// </summary>
-        public override void Dispose() {
-            if (IsCommited)
-                return;
-
-            _scheduler.Append(this); //todo: this is will be work, but that is bad way.
-        }
-
-        #endregion
-    }
-
-
-
     /// <summary>
     /// An realization of <see cref="IDataTransaction"/> that is not deferring anything.
     /// Once methods like <see cref="Insert{TEntity}"/> or <see cref="UpdateMany{TEntity}"/> called - in just doing it and no waits for anyone.
     /// <see cref="Dispose"/> and <see cref="Commit"/> is unused. They're doing nothing.
     /// </summary>
-    class NotScheduledDataTransaction : IDataTransaction {
-        private readonly IDataManagerFactory _factory;
-        private readonly IsolationLevel _isolationLevel;
-        private readonly object _lock = new object();
+    public abstract class NotScheduledDataTransaction : IDataTransaction {
+        readonly IDataManagerFactory _factory;
+        readonly IsolationLevel _isolationLevel;
+        readonly object _lock = new object();
 
-        private readonly ConcurrentQueue<Func<IDataManagerFactory, bool>> _actions = new ConcurrentQueue<Func<IDataManagerFactory, bool>>();
-        private bool _isCommited;
+        readonly ConcurrentQueue<Func<IDataManagerFactory, bool>> _actions = new ConcurrentQueue<Func<IDataManagerFactory, bool>>();
+        bool _isCommited;
+
 
         public NotScheduledDataTransaction(IDataManagerFactory factory, IsolationLevel isolationLevel) {
             _factory = factory;
@@ -57,42 +28,33 @@ namespace Dccelerator.DataAccess.Implementations.Transactions {
         }
 
 
-        private const int DefaultRetryCount = 6;
-
-        private const int DeadlockErrorNumber = 1205;
-        private const int LockingErrorNumber = 1222;
-        private const int UpdateConflictErrorNumber = 3960;
+        const int DefaultRetryCount = 6;
 
 
-        protected TResult RetryOnDeadlock<TResult>(Func<TResult> func, int retryCount = DefaultRetryCount) {
+        protected virtual TResult RetryOnDeadlock<TResult>(Func<TResult> func, int retryCount = DefaultRetryCount) {
             var attemptNumber = 1;
             while (true) {
                 try {
                     return func();
                 }
-                catch (SqlException exception) {
+                catch (Exception exception) {
                     Internal.TraceEvent(TraceEventType.Warning, $"On attempt count #{attemptNumber} gaived sql exception:\n{exception}");
-                    if (!exception.Errors.Cast<SqlError>().Any(error =>
-                        (error.Number == DeadlockErrorNumber) ||
-                        (error.Number == LockingErrorNumber) ||
-                        (error.Number == UpdateConflictErrorNumber))) {
-                        Internal.TraceEvent(TraceEventType.Critical, $"Sql exception has only bad errors: {exception.Errors.Cast<SqlError>().Aggregate(string.Empty, (s, error) => $"[ErrorNumber #{error.Number} {error.Message}] ")}");
+                    if (!IsDeadlockException(exception))
                         throw;
-                    }
+
                     if (attemptNumber == retryCount + 1) {
                         Internal.TraceEvent(TraceEventType.Critical, "Attempt count exceeded retry count");
                         throw;
                     }
                 }
-                catch (Exception e) {
-                    Internal.TraceEvent(TraceEventType.Critical, $"On attempt coun #{attemptNumber} gaived exception:\n{e}");
-                    throw;
-                }
+
                 attemptNumber++;
             }
         }
 
 
+
+        protected abstract bool IsDeadlockException(Exception exception);
 
 
 
@@ -194,7 +156,7 @@ namespace Dccelerator.DataAccess.Implementations.Transactions {
             return RetryOnDeadlock(() => {
                 var queue = _actions.ToArray();
 
-                using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions {IsolationLevel = _isolationLevel})) {
+                using (var scope = BeginTransactionScope(_isolationLevel)) {
                     foreach (var action in queue) {
                         if (!action(_factory)) {
                             _isCommited = false;
@@ -209,11 +171,17 @@ namespace Dccelerator.DataAccess.Implementations.Transactions {
         }
 
 
+        protected abstract ISpecificTransactionScope BeginTransactionScope(IsolationLevel isolationLevel);
+
+
+
+
+
         /// <summary>
         /// Returns state of current transaction
         /// </summary>
         public bool IsCommited => _isCommited;
-        
+
 
         #region Implementation of IDisposable
 
