@@ -129,10 +129,22 @@ namespace Dccelerator
 
 
         /// <summary>
-        /// Performs specified <paramref name="action"/> on evety item from <paramref name="collection"/> in yilded loop.
+        /// Applies specified <paramref name="action"/> on every item from <paramref name="collection"/> in yielded loop.
         /// </summary>
-        
+        /// <seealso cref="Map{T}"/>
         public static IEnumerable<T> Perform<T>( this IEnumerable<T> collection,  Action<T> action) {
+            foreach (var item in collection) {
+                action(item);
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Same as <see cref="Perform{T}"/> method, applies specified <paramref name="action"/> on every item from <paramref name="collection"/> in yielded loop.
+        /// In most languages such method called 'map', so.
+        /// </summary>
+        /// <seealso cref="Perform{T}"/>
+        public static IEnumerable<T> Map<T>( this IEnumerable<T> collection,  Action<T> action) {
             foreach (var item in collection) {
                 action(item);
                 yield return item;

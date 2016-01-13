@@ -13,18 +13,18 @@ namespace Dccelerator.Convertion
     /// </summary>
     public class SmartConvert
     {
-        private static readonly Dictionary<Type, Dictionary<Type, ConvertibleToAttribute>> _convertibleAttributesCache = new Dictionary<Type, Dictionary<Type, ConvertibleToAttribute>>();
-        private static readonly Dictionary<Type, Dictionary<Type, ConvertibleFromAttribute>> _convertibleFromAttributesCache = new Dictionary<Type, Dictionary<Type, ConvertibleFromAttribute>>();
-        private static readonly Dictionary<Type, Dictionary<Type, IConvertHelper>> _convertHelpers = new Dictionary<Type, Dictionary<Type, IConvertHelper>>();
-        private static readonly IConvertHelper _defaultConvertHelper = new DefaultConvertHelper();
-        private static readonly object _lock = new object();
+        static readonly Dictionary<Type, Dictionary<Type, ConvertibleToAttribute>> _convertibleAttributesCache = new Dictionary<Type, Dictionary<Type, ConvertibleToAttribute>>();
+        static readonly Dictionary<Type, Dictionary<Type, ConvertibleFromAttribute>> _convertibleFromAttributesCache = new Dictionary<Type, Dictionary<Type, ConvertibleFromAttribute>>();
+        static readonly Dictionary<Type, Dictionary<Type, IConvertHelper>> _convertHelpers = new Dictionary<Type, Dictionary<Type, IConvertHelper>>();
+        static readonly IConvertHelper _defaultConvertHelper = new DefaultConvertHelper();
+        static readonly object _lock = new object();
 
-        private readonly object _entity;
-        private readonly Type _sourceType;
-        private readonly Dictionary<Type, ConvertibleToAttribute> _convertibleAttributes;
+        readonly object _entity;
+        readonly Type _sourceType;
+        readonly Dictionary<Type, ConvertibleToAttribute> _convertibleAttributes;
 
 
-        private class DefaultConvertHelper : IConvertHelper
+        class DefaultConvertHelper : IConvertHelper
         {
             
             public object ConvertTo(Type targetType, object entity) {
@@ -35,7 +35,7 @@ namespace Dccelerator.Convertion
         }
 
 
-        private SmartConvert( object entity) {
+        SmartConvert( object entity) {
             _entity = entity;
             if (_entity == null)
                 return;
@@ -85,8 +85,8 @@ namespace Dccelerator.Convertion
         static readonly Type _convertibleToAttributeType = typeof (ConvertibleToAttribute);
         static readonly Type _convertibleFromAttributeType = typeof (ConvertibleFromAttribute);
 
-        
-        private static Dictionary<Type, ConvertibleToAttribute> GetConvertibleToAttributesFrom( Type type) {
+
+        static Dictionary<Type, ConvertibleToAttribute> GetConvertibleToAttributesFrom( Type type) {
             Dictionary<Type, ConvertibleToAttribute> attributes;
             lock (_lock) {
                 if (_convertibleAttributesCache.TryGetValue(type, out attributes)) {
@@ -122,8 +122,7 @@ namespace Dccelerator.Convertion
         }
 
 
-
-        private IConvertHelper ConverterFor( Type targetType) {
+        IConvertHelper ConverterFor( Type targetType) {
             Dictionary<Type, IConvertHelper> convertHelperAssociation;
             lock (_convertHelpers) {
                 if (!_convertHelpers.TryGetValue(_sourceType, out convertHelperAssociation)) {

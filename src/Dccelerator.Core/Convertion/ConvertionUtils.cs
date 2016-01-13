@@ -71,7 +71,7 @@ namespace Dccelerator.Convertion
 
             IList targetList;
 
-            var targetItemType = TypeCache.ElementTypeOf(targetType);
+            var targetItemType = targetType.ElementType();
 
             if (targetType.IsArray) {
                 var count = collection.Count(); //bug: need to check it for multipple enumerations
