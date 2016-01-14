@@ -134,7 +134,8 @@ namespace Dccelerator.Reflection
             ConcurrentDictionary<Type, bool> assignables;
             if (!_isAssiblableFrom.TryGetValue(targetType, out assignables)) {
                 assignables = new ConcurrentDictionary<Type, bool>();
-                _isAssiblableFrom[targetType] = assignables;
+                if (!_isAssiblableFrom.TryAdd(targetType, assignables))
+                    assignables = _isAssiblableFrom[targetType];
             }
 
             if (assignables.TryGetValue(valueType, out result))
@@ -142,6 +143,7 @@ namespace Dccelerator.Reflection
 
 
             result = targetType.IsAssignableFrom(valueType);
+            
             return assignables.TryAdd(valueType, result)
                 ? result
                 : assignables[valueType];

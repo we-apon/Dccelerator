@@ -45,6 +45,29 @@ namespace Dccelerator.Convertion
             if (TypeCache.IsAssignableFrom(targetType, valueType))
                 return value;
 
+
+
+            var implicitCastMethod = valueType.GetMethod("op_Implicit", new[] { targetType });
+            if (implicitCastMethod != null)
+                return implicitCastMethod.Invoke(null, new object[] { value });
+
+            implicitCastMethod = targetType.GetMethod("op_Implicit", new[] { valueType });
+            if (implicitCastMethod != null)
+                return implicitCastMethod.Invoke(null, new object[] { value });
+
+
+
+
+            var explicitCastMethod = valueType.GetMethod("op_Explicit", new[] { targetType });
+            if (explicitCastMethod != null)
+                return explicitCastMethod.Invoke(null, new object[] { value });
+
+            explicitCastMethod = targetType.GetMethod("op_Explicit", new[] { valueType });
+            if (explicitCastMethod != null)
+                return explicitCastMethod.Invoke(null, new object[] { value });
+
+
+
             if (targetType == TypeCache.StringType)
                 return value.ToString();
 
@@ -112,7 +135,7 @@ namespace Dccelerator.Convertion
             foreach (var destinationProperty in destinationProps) {
                 object value;
 
-                if (!TypeManipulator.TryGetValueOnPath(other, destinationProperty.Key, out value) || !TypeManipulator.TrySetValueOnPath(entity, destinationProperty.Key, value)) {
+                if (!other.TryGetValueOnPath(destinationProperty.Key, out value) || !entity.TrySetValueOnPath(destinationProperty.Key, value)) {
                     unconvertedProps.Add(destinationProperty.Key, destinationProperty.Value);
                 }
             }
