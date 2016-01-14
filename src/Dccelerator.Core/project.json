@@ -1,7 +1,7 @@
 ﻿{
   "version": "0.0.3-alfa",
   "title": "Dccelerator's core utilities",
-  "description": "Core utitities of Dccelerator framework. \nIt contains some nice stuff like TypeManipulator, SmartConvert and many usefull basic types extensions.",
+  "description": "Core utitities of Dccelerator framework. \nIt contains some nice stuff like TypeManipulator, SmartConvert and many usefull reflection extensions.",
   "summary": "Core utitities of Dccelerator framework.",
   "authors": [ "Kirill Dubinkin" ],
   "tags": [ "Convertion Reflection Extensions" ],
