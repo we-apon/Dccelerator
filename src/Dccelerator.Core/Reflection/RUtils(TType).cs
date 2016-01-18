@@ -7,7 +7,19 @@ using Dccelerator.Reflection.Abstract;
 
 namespace Dccelerator.Reflection
 {
-    public static class TypeManipulator<TType>
+
+    /// <summary>
+    /// Reflection Utilities.
+    /// Contains useful methods for manipulating types and it's members (mostly properties) in simple and fast manner.
+    /// Methods of this class works using Expression Threes to generate and compile delegates to accessing properties much more faster than reflection.
+    /// It also used caching of properties paths.
+    /// </summary>
+    /// <remarks>
+    /// Currently it invokes every property through delegate, to access nested properties.
+    /// In future, I will generate and use delegate accessing full requested property path at one call.
+    /// </remarks>
+    /// <seealso cref="RUtils"/>
+    public static class RUtils<TType>
     {
         #region Type property
 
@@ -188,6 +200,28 @@ namespace Dccelerator.Reflection
 
         // ReSharper restore StaticMemberInGenericType
 
+
+
+
+        /// <summary>
+        /// Returns value of static property placed on <paramref name="path"/> with started point at <typeparamref name="TType"/>.
+        /// </summary>
+        /// <param name="path">Path to requested property</param>
+        /// <param name="value">Value</param>
+        public static bool TryGetValueOnPath(string path, out object value) {
+            return TryGetValueOnPath(null, path, out value);
+        }
+
+
+        /// <summary>
+        /// Returns value of property placed on <paramref name="path"/> with started point at <paramref name="context"/>.
+        /// </summary>
+        /// <param name="context">
+        /// Object that has property on passed <paramref name="path"/>. 
+        /// It can be <see langword="null"/> for static properties.
+        /// </param>
+        /// <param name="path">Path to requested property</param>
+        /// <param name="value">Value</param>
         public static bool TryGetValueOnPath(object context, string path, out object value) {
             var propertyPath = get_me_property_path_for(path);
             if (propertyPath != null)
@@ -198,6 +232,7 @@ namespace Dccelerator.Reflection
         }
 
 
+        
         public static bool TrySetValueOnPath(object context, string path, object value) {
             var propertyPath = get_me_property_path_for(path);
             return propertyPath != null && propertyPath.TrySetTargetProperty(context, value);
@@ -224,7 +259,7 @@ namespace Dccelerator.Reflection
             }
 
             if (neighborProps == null) {
-                var neighborInfo = typeof (TypeManipulator<>).MakeGenericType(type);
+                var neighborInfo = typeof (RUtils<>).MakeGenericType(type);
                 var neighborPropsField = neighborInfo.GetField("_properties", BindingFlags.Static | BindingFlags.NonPublic);
                 if (neighborPropsField == null)
                     return null;

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Dccelerator.Core")]
-[assembly: AssemblyDescription("Core utitities of Dccelerator framework. It contains some nice stuff like TypeManipulator, SmartConvert and many usefull basic types extensions.")]
+[assembly: AssemblyDescription("Core utitities of Dccelerator framework. It contains some nice stuff like RUtils, SmartConvert and many usefull basic types extensions.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kirill Dubinkin")]
 [assembly: AssemblyProduct("Dccelerator")]

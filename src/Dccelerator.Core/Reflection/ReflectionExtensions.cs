@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using Dccelerator.Convertion;
 
@@ -17,6 +18,7 @@ namespace Dccelerator.Reflection {
         /// <param name="context">Context of <paramref name="property"/></param>
         /// <param name="index">Index of <paramref name="property"/>. Can be <see langword="null"/></param>
         /// <param name="value">Value of <paramref name="property"/></param>
+        [Obsolete("Use RUtils to manipulate properties")]
         public static bool TryGetValue(this PropertyInfo property, object context, object[] index, out object value) {
             try {
                 value = property.GetValue(context, index);
@@ -35,6 +37,7 @@ namespace Dccelerator.Reflection {
         /// <param name="property">Property defined in <paramref name="context"/>'s type.</param>
         /// <param name="context">Context of <paramref name="property"/></param>
         /// <param name="value">Value of <paramref name="property"/></param>
+        [Obsolete("Use RUtils to manipulate properties")]
         public static bool TryGetValue(this PropertyInfo property, object context, out object value) {
             return property.TryGetValue(context, null, out value);
         }
@@ -45,6 +48,7 @@ namespace Dccelerator.Reflection {
         /// </summary>
         /// <param name="property">An static property</param>
         /// <param name="value">Value of <paramref name="property"/></param>
+        [Obsolete("Use RUtils to manipulate properties")]
         public static bool TryGetValue(this PropertyInfo property, out object value) {
             return property.TryGetValue(null, null, out value);
         }
@@ -59,6 +63,7 @@ namespace Dccelerator.Reflection {
         /// <param name="index">Index of <paramref name="property"/>. Can be <see langword="null"/></param>
         /// <param name="value">Value of <paramref name="property"/></param>
         /// <seealso cref="CastingUtils.SafeCastTo{T}"/>
+        [Obsolete("Use RUtils to manipulate properties")]
         public static bool TryGetValue<T>(this PropertyInfo property, object context, object[] index, out T value) {
             try {
                 value = property.GetValue(context, index).SafeCastTo<T>();
@@ -79,6 +84,7 @@ namespace Dccelerator.Reflection {
         /// <param name="context">Context of <paramref name="property"/></param>
         /// <param name="value">Value of <paramref name="property"/></param>
         /// <seealso cref="CastingUtils.SafeCastTo{T}"/>
+        [Obsolete("Use RUtils to manipulate properties")]
         public static bool TryGetValue<T>(this PropertyInfo property, object context, out T value) {
             return property.TryGetValue(context, null, out value);
         }
@@ -92,6 +98,7 @@ namespace Dccelerator.Reflection {
         /// <typeparam name="T">Type of <paramref name="value"/></typeparam>
         /// <param name="property">An static property</param>
         /// <param name="value">Value of <paramref name="property"/></param>
+        [Obsolete("Use RUtils to manipulate properties")]
         public static bool TryGetValue<T>(this PropertyInfo property, out T value) {
             return property.TryGetValue(null, null, out value);
         }
@@ -105,6 +112,7 @@ namespace Dccelerator.Reflection {
         /// <param name="context">Context of <paramref name="property"/></param>
         /// <param name="index">Index of <paramref name="property"/>. Can be <see langword="null"/>. Argument is not required</param>
         /// <seealso cref="CastingUtils.SafeCastTo{T}"/>
+        [Obsolete("Use RUtils to manipulate properties")]
         public static T GetValue<T>(this PropertyInfo property, object context = null, object[] index = null) {
             return property != null ? property.GetValue(context, index).SafeCastTo<T>() : default(T);
         }
@@ -116,6 +124,7 @@ namespace Dccelerator.Reflection {
         /// This method is part of recursion of methods <see cref="ConvertionUtils.ConvertTo"/> and <see cref="ConvertionUtils.FillAllFrom{T1, T2}"/>, and class <see cref="SmartConvert"/>
         /// </summary>
         /// <exception cref="Exception">Than convertion is not work.</exception>
+        [Obsolete("Use RUtils to manipulate properties")]
         public static void SmartSetValue(this PropertyInfo targetProperty, object obj, object value) {
             var targetValue = value.ConvertTo(targetProperty.PropertyType);
 
@@ -123,6 +132,8 @@ namespace Dccelerator.Reflection {
             targetProperty.SetValue(obj, targetValue ?? value, null);
         }
 
+
+        
     }
 
 }
