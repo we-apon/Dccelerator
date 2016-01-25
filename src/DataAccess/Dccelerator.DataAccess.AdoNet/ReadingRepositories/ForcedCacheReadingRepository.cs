@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Dccelerator.DataAccess.Implementations.ReadingRepositories {
+namespace Dccelerator.DataAccess.Ado.ReadingRepositories {
     internal sealed class ForcedCacheReadingRepository : CachedReadingRepository
     {
         #region Overrides of CachedReadingRepository

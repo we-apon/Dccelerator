@@ -6,7 +6,7 @@ namespace Dccelerator.DataAccess.Implementations.Transactions {
         readonly ITransactionScheduler _scheduler;
 
 
-        public SimpleScheduledTransaction(ITransactionScheduler scheduler, IDataManagerFactory factory, IsolationLevel isolationLevel) : base(factory, isolationLevel) {
+        protected SimpleScheduledTransaction(ITransactionScheduler scheduler, IDataManagerFactory factory, IsolationLevel isolationLevel) : base(factory, isolationLevel) {
             _scheduler = scheduler;
         }
 

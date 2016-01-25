@@ -9,7 +9,7 @@ using Dccelerator.Reflection;
 namespace Dccelerator.DataAccess.Infrastructure {
     abstract class CriterionGeneratorBase<TEntity> where TEntity : class {
 
-        protected static readonly Type EntityType = TypeManipulator<TEntity>.Type;
+        protected static readonly Type EntityType = RUtils<TEntity>.Type;
 
         // ReSharper disable once StaticMemberInGenericType
         static readonly ConcurrentDictionary<string, object> _expressionMethods = new ConcurrentDictionary<string, object>();

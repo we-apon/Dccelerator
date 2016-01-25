@@ -3,8 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using Dccelerator.DataAccess.Infrastructure;
-using System.Linq;
 
 
 namespace Dccelerator.DataAccess.Implementations.Transactions {
@@ -66,7 +64,7 @@ namespace Dccelerator.DataAccess.Implementations.Transactions {
             if (_isCommited)
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
-            var info = ConfigurationOf<TEntity>.Info;
+            var info = _factory.InfoAbout<TEntity>();
             var repository = info.RealRepository;
             var name = info.EntityName;
             _actions.Enqueue(factory => repository.InsertMany(name, entities));
@@ -80,7 +78,7 @@ namespace Dccelerator.DataAccess.Implementations.Transactions {
             if (_isCommited)
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
-            var info = ConfigurationOf<TEntity>.Info;
+            var info = _factory.InfoAbout<TEntity>();
             var repository = info.RealRepository;
             var name = info.EntityName;
             _actions.Enqueue(factory => repository.Insert(name, entity));
@@ -94,7 +92,7 @@ namespace Dccelerator.DataAccess.Implementations.Transactions {
             if (_isCommited)
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
-            var info = ConfigurationOf<TEntity>.Info;
+            var info = _factory.InfoAbout<TEntity>();
             var repository = info.RealRepository;
             var name = info.EntityName;
             _actions.Enqueue(factory => repository.Update(name, entity));
@@ -108,7 +106,7 @@ namespace Dccelerator.DataAccess.Implementations.Transactions {
             if (_isCommited)
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
-            var info = ConfigurationOf<TEntity>.Info;
+            var info = _factory.InfoAbout<TEntity>();
             var repository = info.RealRepository;
             var name = info.EntityName;
             _actions.Enqueue(factory => repository.UpdateMany(name, entities));
@@ -122,7 +120,7 @@ namespace Dccelerator.DataAccess.Implementations.Transactions {
             if (_isCommited)
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
-            var info = ConfigurationOf<TEntity>.Info;
+            var info = _factory.InfoAbout<TEntity>();
             var repository = info.RealRepository;
             var name = info.EntityName;
             _actions.Enqueue(factory => repository.Delete(name, entity));
@@ -136,7 +134,7 @@ namespace Dccelerator.DataAccess.Implementations.Transactions {
             if (_isCommited)
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
-            var info = ConfigurationOf<TEntity>.Info;
+            var info = _factory.InfoAbout<TEntity>();
             var repository = info.RealRepository;
             var name = info.EntityName;
             _actions.Enqueue(factory => repository.DeleteMany(name, entities));

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Dccelerator.Reflection;
 using Dccelerator.Reflection.Abstract;
 
@@ -40,6 +39,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
 
 #if NET40
         public Type TypeInfo => Type;
+        public IEntityInfo[] Children { get; } = null;
 #else
         public TypeInfo TypeInfo => _typeInfo ?? (_typeInfo = Type.GetInfo());
         TypeInfo _typeInfo;
@@ -123,7 +123,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
         bool? _isCollection;
 
 
-        public string[] ColumnNames { get; }
+        public string[] ColumnNames { get; set; }
 
 
         public string ChildIdKey => KeyId?.Name;

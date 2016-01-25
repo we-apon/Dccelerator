@@ -5,14 +5,11 @@ using System.Linq.Expressions;
 
 namespace Dccelerator.DataAccess.Infrastructure {
     abstract class DataFilterBase<TEntity, TResult> : CriterionGeneratorBase<TEntity>, IDataFilter<TEntity, TResult> where TEntity : class {
-        // ReSharper disable once StaticMemberInGenericType
-        private static readonly IDataCriterion[] _emptyCriteria = new IDataCriterion[0];
 
-        protected static readonly EntityInfo Info = ConfigurationOf<TEntity>.Info;
+        // ReSharper disable once StaticMemberInGenericType
+        static readonly IDataCriterion[] _emptyCriteria = new IDataCriterion[0];
 
         protected abstract TResult ApplyFilterWith(ICollection<IDataCriterion> criteria);
-
-        
 
 
         #region Implementation of IDataFilter<TEntity,TResult>

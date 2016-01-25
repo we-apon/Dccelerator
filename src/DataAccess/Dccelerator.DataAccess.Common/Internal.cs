@@ -3,7 +3,7 @@
 
 namespace Dccelerator.DataAccess {
     static class Internal {
-        private static readonly TraceSource _trace = new TraceSource("Dccelerator.DataAccess");
+        static readonly TraceSource _trace = new TraceSource("Dccelerator.DataAccess");
 
 
         internal static void TraceEvent(TraceEventType eventType,  string message) {

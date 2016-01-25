@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Data.Common;
+﻿using System;
+using System.Collections.Generic;
+using Dccelerator.DataAccess.Infrastructure;
 
 
 namespace Dccelerator.DataAccess {
@@ -14,9 +15,16 @@ namespace Dccelerator.DataAccess {
         /// </summary>
         /// <param name="entityName">Database-specific name of some entity</param>
         /// <param name="criteria">Filtering criteria</param>
-        /// <param name="reader">An data reader</param>
-        /// <returns>Connection of <paramref name="reader"/>. Reader and connection will be disposed just after all requested information are readed.</returns>
-        DbConnection Read( string entityName,  ICollection<IDataCriterion> criteria, out DbDataReader reader);
+        IEnumerable<object> Read(string entityName,  ICollection<IDataCriterion> criteria, IEntityInfo info);
+
+
+        bool Any(string entityName, ICollection<IDataCriterion> criteria);
+
+
+        IEnumerable<object> ReadColumn(int columnIdx, string entityName, ICollection<IDataCriterion> criteria);
+
+
+        int CountOf(string entityName, ICollection<IDataCriterion> criteria);
 
 
         /// <summary>

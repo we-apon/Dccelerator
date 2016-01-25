@@ -1,13 +1,13 @@
 ﻿using System.Data;
+using Dccelerator.DataAccess.Ado.DataGetters;
+using Dccelerator.DataAccess.Ado.ReadingRepositories;
 using Dccelerator.DataAccess.Implementations;
 using Dccelerator.DataAccess.Implementations.DataExistenceChecker;
-using Dccelerator.DataAccess.Implementations.DataGetters;
-using Dccelerator.DataAccess.Implementations.ReadingRepositories;
 using Dccelerator.DataAccess.Implementations.Schedulers;
-using Dccelerator.DataAccess.Implementations.Transactions;
+using Dccelerator.DataAccess.Infrastructure;
 
 
-namespace Dccelerator.DataAccess.Infrastructure {
+namespace Dccelerator.DataAccess.Ado {
     public abstract class DataManagerFactoryBase : IDataManagerFactory {
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
         /// This method will be called on each delete request.
         /// </summary>
         public virtual IDataExistenceChecker<TEntity> DataExistenceChecker<TEntity>() where TEntity : class {
-            return new DataExistenceChecker<TEntity>(new ForcedCacheReadingRepository());
+            return new DataExistenceChecker<TEntity>(new ForcedCacheReadingRepository(), InfoAbout<TEntity>().EntityName);
         }
 
 
@@ -43,7 +43,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
         /// This method will be called on each delete request.
         /// </summary>
         public IDataExistenceChecker<TEntity> NoCachedExistenceChecker<TEntity>() where TEntity : class {
-            return new DataExistenceChecker<TEntity>(new DirectReadingRepository());
+            return new DataExistenceChecker<TEntity>(new DirectReadingRepository(), InfoAbout<TEntity>().EntityName);
         }
 
 
@@ -52,7 +52,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
         /// This method will be called on each delete request.
         /// </summary>
         public virtual IDataCountChecker<TEntity> DataCountChecker<TEntity>() where TEntity : class {
-            return new DataCountChecker<TEntity>(new ForcedCacheReadingRepository());
+            return new DataCountChecker<TEntity>(new ForcedCacheReadingRepository(), InfoAbout<TEntity>().EntityName);
         }
 
 
@@ -61,10 +61,11 @@ namespace Dccelerator.DataAccess.Infrastructure {
         /// This method will be called on each delete request.
         /// </summary>
         public IDataCountChecker<TEntity> NoCachedDataCountChecker<TEntity>() where TEntity : class {
-            return new DataCountChecker<TEntity>(new DirectReadingRepository());
+            return new DataCountChecker<TEntity>(new DirectReadingRepository(), InfoAbout<TEntity>().EntityName);
         }
 
 
+/*
         /// <summary>
         /// Instantinate an <see cref="IDataTransaction"/>.
         /// This method will be called on each <see cref="IDataManager.BeginTransaction"/> call.
@@ -73,6 +74,14 @@ namespace Dccelerator.DataAccess.Infrastructure {
             return new SimpleScheduledTransaction(scheduler, this, isolationLevel);
 //            return new NotScheduledDataTransaction(this, isolationLevel);
         }
+*/
+
+
+        /// <summary>
+        /// Instantinate an <see cref="IDataTransaction"/>.
+        /// This method will be called on each <see cref="IDataManager.BeginTransaction"/> call.
+        /// </summary>
+        public abstract IDataTransaction DataTransaction(ITransactionScheduler scheduler, IsolationLevel isolationLevel = IsolationLevel.ReadCommitted);
 
 
         /// <summary>
@@ -81,6 +90,11 @@ namespace Dccelerator.DataAccess.Infrastructure {
         /// </summary>
         public ITransactionScheduler Scheduler() {
             return new DummyScheduler();
+        }
+
+
+        public IEntityInfo InfoAbout<TEntity>() {
+            throw new System.NotImplementedException();
         }
     }
 }

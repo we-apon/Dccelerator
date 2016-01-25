@@ -10,6 +10,17 @@
           "JetBrains.Annotations": "10.0.0"
         }
       },
+      "Dccelerator.DataAccess.Common/0.0.1-alfa": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.0",
+        "dependencies": {
+          "Dccelerator.Core": null
+        },
+        "frameworkAssemblies": [
+          "System.Data",
+          "System.Xml"
+        ]
+      },
       "JetBrains.Annotations/10.0.0": {
         "type": "package",
         "compile": {
@@ -27,6 +38,17 @@
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
+      },
+      "Dccelerator.DataAccess.Common/0.0.1-alfa": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.0",
+        "dependencies": {
+          "Dccelerator.Core": null
+        },
+        "frameworkAssemblies": [
+          "System.Data",
+          "System.Xml"
+        ]
       },
       "JetBrains.Annotations/10.0.0": {
         "type": "package",
@@ -46,6 +68,17 @@
           "JetBrains.Annotations": "10.0.0"
         }
       },
+      "Dccelerator.DataAccess.Common/0.0.1-alfa": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.0",
+        "dependencies": {
+          "Dccelerator.Core": null
+        },
+        "frameworkAssemblies": [
+          "System.Data",
+          "System.Xml"
+        ]
+      },
       "JetBrains.Annotations/10.0.0": {
         "type": "package",
         "compile": {
@@ -61,6 +94,10 @@
     "Dccelerator.Core/0.0.4-alfa": {
       "type": "project",
       "path": "../../Dccelerator.Core/project.json"
+    },
+    "Dccelerator.DataAccess.Common/0.0.1-alfa": {
+      "type": "project",
+      "path": "../Dccelerator.DataAccess.Common/project.json"
     },
     "JetBrains.Annotations/10.0.0": {
       "type": "package",
@@ -82,6 +119,7 @@
     "": [],
     ".NETFramework,Version=v4.0": [
       "Dccelerator.Core ",
+      "Dccelerator.DataAccess.Common ",
       "fx/System.Data >= 4.0.0",
       "fx/System.Xml >= 4.0.0"
     ]

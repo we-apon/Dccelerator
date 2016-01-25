@@ -5,7 +5,7 @@ using System.Linq;
 using Dccelerator.Reflection;
 
 
-namespace Dccelerator.DataAccess.Implementations.ReadingRepositories {
+namespace Dccelerator.DataAccess.Ado.ReadingRepositories {
     internal class CachedReadingRepository : DirectReadingRepository
     {
         readonly ConcurrentDictionary<string, EntitiesCache> _entities = new ConcurrentDictionary<string, EntitiesCache>();
@@ -57,7 +57,7 @@ namespace Dccelerator.DataAccess.Implementations.ReadingRepositories {
         public override IEnumerable<object> ReadColumn(string columnName, string entityName, Type entityType, ICollection<IDataCriterion> criteria) {
             return Read(entityName, entityType, criteria).Select(x => {
                 object value;
-                TypeManipulator.TryGetNestedProperty(x, columnName, out value);
+                x.TryGetValueOnPath(columnName, out value);
                 return value;
             });
         }

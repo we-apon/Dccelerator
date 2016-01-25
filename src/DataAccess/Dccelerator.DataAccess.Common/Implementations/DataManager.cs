@@ -26,7 +26,7 @@ namespace Dccelerator.DataAccess.Implementations {
         /// Returns an <see cref="IDataGetter{TEntity}"/> for getting that entity in cached context.
         /// </summary>
         public IDataGetter<TEntity> Get<TEntity>() where TEntity : class, new() {
-            var type = TypeManipulator<TEntity>.Type;
+            var type = RUtils<TEntity>.Type;
 
             object getter;
             if (_getters.TryGetValue(type, out getter))
@@ -54,7 +54,7 @@ namespace Dccelerator.DataAccess.Implementations {
         /// </summary>
         public IDataExistenceChecker<TEntity> Any<TEntity>() where TEntity : class
         {
-            var type = TypeManipulator<TEntity>.Type;
+            var type = RUtils<TEntity>.Type;
 
             object checker;
             if (_existenceCheckers.TryGetValue(type, out checker))
@@ -81,7 +81,7 @@ namespace Dccelerator.DataAccess.Implementations {
         /// Returns an <see cref="IDataCountChecker{TEntity}"/> for getting count of some <typeparamref name="TEntity"/> in database.
         /// </summary>
         public IDataCountChecker<TEntity> CountOf<TEntity>() where TEntity : class {
-            var type = TypeManipulator<TEntity>.Type;
+            var type = RUtils<TEntity>.Type;
 
             object checker;
             if (_countCheckers.TryGetValue(type, out checker))

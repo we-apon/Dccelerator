@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Dccelerator.DataAccess.Common")]
+[assembly: AssemblyTitle("Dccelerator.DataAccess.Ado.SqlClient")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Dccelerator.DataAccess.Common")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyProduct("Dccelerator.DataAccess.Ado.SqlClient")]
+[assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("54f9cc41-92d0-4019-a3a1-7b861ea7b707")]
-
-
-[assembly: InternalsVisibleTo("Dccelerator.DataAccess.AdoNet")]
+[assembly: Guid("802e612e-433f-4974-8c7a-38398a982275")]

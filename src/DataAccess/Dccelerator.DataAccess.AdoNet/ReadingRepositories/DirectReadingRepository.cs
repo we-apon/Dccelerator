@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using Dccelerator.DataAccess.Infrastructure;
-using System.Linq;
 
-namespace Dccelerator.DataAccess.Implementations.ReadingRepositories {
+
+namespace Dccelerator.DataAccess.Ado.ReadingRepositories {
 
 
     class DirectReadingRepository : IInternalReadingRepository {
@@ -20,6 +21,7 @@ namespace Dccelerator.DataAccess.Implementations.ReadingRepositories {
         }
 
         readonly ConcurrentDictionary<Type, EntityConfig> _configs = new ConcurrentDictionary<Type, EntityConfig>();
+
 
 
         const int DefaultRetryCount = 6;
@@ -87,27 +89,15 @@ namespace Dccelerator.DataAccess.Implementations.ReadingRepositories {
         public virtual IEnumerable<object> Read( string entityName, Type entityType,  ICollection<IDataCriterion> criteria) {
             var config = ConfigOf(entityType);
 
-
-            return RetryOnDeadlock(() => {
-                DbDataReader reader;
-                var connection = config.Repository.Read(entityName, criteria, out reader);
-                //var columnNames = ColumnNamesFrom(config, reader);
-                return reader.To(connection, config.Info);
-            });
+            return RetryOnDeadlock(() => config.Repository.Read(entityName, criteria, config.Info));
         }
 
 
         public virtual bool Any( string entityName, Type entityType,  ICollection<IDataCriterion> criteria) {
             var repository = ConfigOf(entityType).Repository;
 
-            return RetryOnDeadlock(() => {
-                DbDataReader reader;
-                using (repository.Read(entityName, criteria, out reader)) {
-                    return reader.Read();
-                }
-            });
+            return RetryOnDeadlock(() => repository.Any(entityName, criteria));
         }
-
 
         /// <summary>
         /// Reads column with specified <paramref name="columnName"/> from entity with <paramref name="entityName"/>, filtered with specified <paramref name="criteria"/>.
@@ -117,11 +107,9 @@ namespace Dccelerator.DataAccess.Implementations.ReadingRepositories {
         public virtual IEnumerable<object> ReadColumn( string columnName,  string entityName, Type entityType,  ICollection<IDataCriterion> criteria) {
             var config = ConfigOf(entityType);
 
-            return RetryOnDeadlock(() => {
-                DbDataReader reader;
-                var connection = config.Repository.Read(entityName, criteria, out reader);
-                return reader.SelectColumn(Array.IndexOf(ColumnNamesFrom(config, reader), columnName), connection);
-            });
+            throw new NotImplementedException();
+
+            //return RetryOnDeadlock(() => config.Repository.ReadColumn(Array.IndexOf(ColumnNamesFrom(config, reader), columnName), entityName, criteria));
         }
 
 
@@ -129,11 +117,7 @@ namespace Dccelerator.DataAccess.Implementations.ReadingRepositories {
         /// Returns count of entities with <paramref name="entityName"/> that satisfies specified <paramref name="criteria"/>
         /// </summary>
         public virtual int CountOf( string entityName, Type entityType,  ICollection<IDataCriterion> criteria) {
-            return RetryOnDeadlock(() => {
-                DbDataReader reader;
-                var connection = ConfigOf(entityType).Repository.Read(entityName, criteria, out reader);
-                return reader.RowsCount(connection);
-            });
+            return RetryOnDeadlock(() => ConfigOf(entityType).Repository.CountOf(entityName, criteria));
         }
     }
 }

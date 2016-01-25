@@ -3,7 +3,7 @@ using System.Reflection;
 
 
 namespace Dccelerator.DataAccess.Infrastructure {
-    interface IEntityInfo {
+    public interface IEntityInfo {
 
 
         Type Type { get; }
@@ -16,6 +16,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
 #endif
 
 
+        IEntityInfo[] Children { get; }
 
         string EntityName { get; }
 
@@ -36,7 +37,9 @@ namespace Dccelerator.DataAccess.Infrastructure {
         bool AllowCache { get; }
         TimeSpan CacheTimeout { get; }
         Type RealRepositoryType { get; }
+
         IInternalReadingRepository GlobalReadingRepository { get; }
+
         IDataAccessRepository RealRepository { get; }
         EntityAttribute EntityAttribute { get; }
 
@@ -46,7 +49,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
 
 
          bool IsCollection { get; }
-         string[] ColumnNames { get; }
+         string[] ColumnNames { get; set; }
          // string KeyIdName { get; }
          string ChildIdKey { get; }
          string TargetPath { get; }

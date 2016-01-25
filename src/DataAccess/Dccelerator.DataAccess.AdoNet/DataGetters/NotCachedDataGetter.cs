@@ -1,7 +1,8 @@
-using Dccelerator.DataAccess.Implementations.ReadingRepositories;
+using Dccelerator.DataAccess.Ado.ReadingRepositories;
+using Dccelerator.DataAccess.Implementations.DataGetters;
 
 
-namespace Dccelerator.DataAccess.Implementations.DataGetters {
+namespace Dccelerator.DataAccess.Ado.DataGetters {
 
     /// <summary>
     /// Manager, that can get something from <seealso cref="IDataAccessRepository"/>, using some <see cref="IDataCriterion"/>.

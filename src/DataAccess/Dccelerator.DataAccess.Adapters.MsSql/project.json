@@ -1,38 +1,24 @@
-﻿{
-  "version": "0.0.1-alfa",
-  "description": "Dccelerator.DataAccess.Common Class Library",
+{
+  "version": "1.0.0-*",
+  "description": "Dccelerator.DataAccess.Ado.SqlClient Class Library",
   "authors": [ "we_apon" ],
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
-  
-
-  "configurations": {
-    "Debug": { "compilationOptions": { "define": [ "DEBUG" ] } },
-    "Release": { "compilationOptions": { "optimize": true } }
-  },
-
-
-
   "frameworks": {
-
     "net40": {
       "compilationOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] },
-
       "dependencies": {
-        "Dccelerator.Core": ""
+        "Dccelerator.Core": "",
+        "Dccelerator.DataAccess.Common": ""
       },
-
       "frameworkAssemblies": {
         "System.Data": "4.0.0.0",
         "System.Xml": "4.0.0.0"
       }
-
     }
   },
-
-
-
   "dependencies": {
+    "Dccelerator.DataAccess.AdoNet": "1.0.0-*"
   }
 }

@@ -7,7 +7,7 @@ namespace Dccelerator.DataAccess {
     /// <summary>
     /// Abstraction of reading repository, used only in internal implementation of data access.
     /// </summary>
-    interface IInternalReadingRepository {
+    public interface IInternalReadingRepository {
 
         /// <summary>
         /// Reads entities by its <paramref name="entityName"/>, filtering they by <paramref name="criteria"/>

@@ -1,17 +1,13 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Configuration;
 using System.Reflection;
-using System.Threading.Tasks;
 using Dccelerator.DataAccess.Attributes;
-using Dccelerator.DataAccess.Implementations.ReadingRepositories;
 using Dccelerator.Reflection;
 
 
 namespace Dccelerator.DataAccess.Infrastructure {
-    class EntityInfo : IEntityInfo {
+    abstract class EntityInfo : IEntityInfo {
         public Type Type { get; }
 
 
@@ -26,7 +22,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
 
 
         public bool IsCollection => false;
-        public string[] ColumnNames => null;
+        public string[] ColumnNames { get; set; }
         //public string KeyIdName => null;
         public string ChildIdKey => null;
         public string TargetPath => null;
@@ -80,15 +76,14 @@ namespace Dccelerator.DataAccess.Infrastructure {
         public Type RealRepositoryType => EntityAttribute.Repository;
 
 
-        public IInternalReadingRepository GlobalReadingRepository => _readingRepository ?? (_readingRepository = AllowCache ? new CachedReadingRepository() : new DirectReadingRepository());
-        IInternalReadingRepository _readingRepository;
+        public abstract IInternalReadingRepository GlobalReadingRepository { get; }
 
 
         public IDataAccessRepository RealRepository => _realRepository ?? (_realRepository = (IDataAccessRepository)Activator.CreateInstance(RealRepositoryType));
         IDataAccessRepository _realRepository;
 
 
-        public IEntityInfo[] Children;
+        public IEntityInfo[] Children { get; }
 
 
 

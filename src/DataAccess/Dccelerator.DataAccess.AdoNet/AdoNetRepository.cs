@@ -7,7 +7,7 @@ using Dccelerator.DataAccess.Infrastructure;
 using Dccelerator.Reflection;
 
 
-namespace Dccelerator.DataAccess {
+namespace Dccelerator.DataAccess.Ado {
     
 
     /// <summary>
@@ -57,7 +57,7 @@ namespace Dccelerator.DataAccess {
         protected virtual IEnumerable<TParameter> ParametersFrom<TEntity>(TEntity entity) where TEntity : class {
             var parameters = ConfigurationOf<TEntity>.Info.PersistedFields.Select(x => {
                 object value;
-                if (!TypeManipulator<TEntity>.TryGetNestedProperty(entity, x.Item1, out value))
+                if (!RUtils<TEntity>.TryGetValueOnPath(entity, x.Item1, out value))
                     throw new InvalidOperationException($"Entity of type {entity.GetType()} should contain property '{x.Item1}', " +
                                                         $"but in some reason value or that property could not be getted.");
 
@@ -67,6 +67,7 @@ namespace Dccelerator.DataAccess {
         }
 
 
+/*
 
         /// <summary>
         /// Returns reader that can be used to get some data by <paramref name="entityName"/>, filtering it by <paramref name="criteria"/>.
@@ -85,6 +86,60 @@ namespace Dccelerator.DataAccess {
                 connection.Open();
                 reader = command.ExecuteReader();
                 return connection;
+            }
+        }
+*/
+
+
+        /// <summary>
+        /// Returns reader that can be used to get some data by <paramref name="entityName"/>, filtering it by <paramref name="criteria"/>.
+        /// </summary>
+        /// <param name="entityName">Database-specific name of some entity</param>
+        /// <param name="criteria">Filtering criteria</param>
+        public IEnumerable<object> Read(string entityName, ICollection<IDataCriterion> criteria, IEntityInfo info) {
+            var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
+
+            using (var connection = InstantinateConnection())
+            using (var command = CommandFor(NameOfReadProcedureFor(entityName), connection, parameters)) {
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                    return reader.To(info);
+            }
+        }
+
+
+        public bool Any(string entityName, ICollection<IDataCriterion> criteria) {
+            var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
+
+            using (var connection = InstantinateConnection())
+            using (var command = CommandFor(NameOfReadProcedureFor(entityName), connection, parameters)) {
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                    return reader.Read();
+            }
+        }
+
+
+        public IEnumerable<object> ReadColumn(int columnIdx, string entityName, ICollection<IDataCriterion> criteria) {
+            var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
+
+            using (var connection = InstantinateConnection())
+            using (var command = CommandFor(NameOfReadProcedureFor(entityName), connection, parameters)) {
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                    return reader.SelectColumn(columnIdx);
+            }
+        }
+
+
+        public int CountOf(string entityName, ICollection<IDataCriterion> criteria) {
+            var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
+
+            using (var connection = InstantinateConnection())
+            using (var command = CommandFor(NameOfReadProcedureFor(entityName), connection, parameters)) {
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                    return reader.RowsCount();
             }
         }
 
@@ -177,11 +232,11 @@ namespace Dccelerator.DataAccess {
         public virtual bool Delete<TEntity>(string entityName, TEntity entity) where TEntity : class {
             var info = ConfigurationOf<TEntity>.Info;
             if (info.KeyId == null)
-                throw new InvalidOperationException($"In order to delete entities of type {TypeManipulator<TEntity>.Type}, you must specify {nameof(EntityAttribute.IdProperty)} in {nameof(EntityAttribute)} " +
-                                                            $"on entity {info.Type}, or use identifier in property named 'Id' or '{TypeManipulator<TEntity>.Type.Name + "Id"}'.");
+                throw new InvalidOperationException($"In order to delete entities of type {RUtils<TEntity>.Type}, you must specify {nameof(EntityAttribute.IdProperty)} in {nameof(EntityAttribute)} " +
+                                                            $"on entity {info.Type}, or use identifier in property named 'Id' or '{RUtils<TEntity>.Type.Name + "Id"}'.");
 
             object id;
-            if (!TypeManipulator<TEntity>.TryGetNestedProperty(entity, info.KeyId.Name, out id))
+            if (!RUtils<TEntity>.TryGetValueOnPath(entity, info.KeyId.Name, out id))
                 throw new InvalidOperationException($"Entity of type {entity.GetType()} should contain property '{info.KeyId.Name}', " +
                                                     $"but in some reason value or that property could not be getted.");
 
@@ -203,8 +258,8 @@ namespace Dccelerator.DataAccess {
         public virtual bool DeleteMany<TEntity>(string entityName, IEnumerable<TEntity> entities) where TEntity : class {
                     var info = ConfigurationOf<TEntity>.Info;
                     if (info.KeyId == null)
-                        throw new InvalidOperationException($"In order to delete entities of type {TypeManipulator<TEntity>.Type}, you must specify {nameof(EntityAttribute.IdProperty)} in {nameof(EntityAttribute)} " +
-                                                                    $"on entity {info.Type}, or use identifier in property named 'Id' or '{TypeManipulator<TEntity>.Type.Name + "Id"}'.");
+                        throw new InvalidOperationException($"In order to delete entities of type {RUtils<TEntity>.Type}, you must specify {nameof(EntityAttribute.IdProperty)} in {nameof(EntityAttribute)} " +
+                                                                    $"on entity {info.Type}, or use identifier in property named 'Id' or '{RUtils<TEntity>.Type.Name + "Id"}'.");
 
             var name = NameOfDeleteProcedureFor(entityName);
             using (var connection = InstantinateConnection()) {
@@ -213,7 +268,7 @@ namespace Dccelerator.DataAccess {
                 foreach (var entity in entities) {
 
                     object id;
-                    if (!TypeManipulator<TEntity>.TryGetNestedProperty(entity, info.KeyId.Name, out id))
+                    if (!RUtils<TEntity>.TryGetValueOnPath(entity, info.KeyId.Name, out id))
                         throw new InvalidOperationException($"Entity of type {entity.GetType()} should contain property '{info.KeyId.Name}', " +
                                                             $"but in some reason value or that property could not be getted.");
 
