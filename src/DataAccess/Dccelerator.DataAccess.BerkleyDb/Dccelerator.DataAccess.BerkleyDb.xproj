@@ -6,8 +6,8 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>54f9cc41-92d0-4019-a3a1-7b861ea7b707</ProjectGuid>
-    <RootNamespace>Dccelerator.DataAccess</RootNamespace>
+    <ProjectGuid>dfc1c934-716c-4c1b-8689-efb4f192c0f1</ProjectGuid>
+    <RootNamespace>Dccelerator.DataAccess.BerkleyDb</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\..\..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">..\..\..\artifacts\bin\$(MSBuildProjectName)\</OutputPath>
   </PropertyGroup>

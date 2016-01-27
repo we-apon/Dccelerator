@@ -1,11 +1,10 @@
 ﻿{
   "version": "1.0.0-*",
-  "description": "Dccelerator.DataAccess.AdoNet Class Library",
+  "description": "Dccelerator.DataAccess.BerkleyDb Class Library",
   "authors": [ "we_apon" ],
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
-
   "frameworks": {
     "net40": {
       "compilationOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] },
@@ -14,10 +13,10 @@
         "Dccelerator.DataAccess.Common": ""
       },
       "frameworkAssemblies": {
-        "System.Data": "4.0.0.0",
-        "System.Xml": "4.0.0.0"
       }
     }
+  },
+  "dependencies": {
+    "BerkleyDB": "6.1.26-debug"
   }
-
 }

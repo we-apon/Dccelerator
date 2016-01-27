@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Dccelerator.DataAccess.Adapters.MsSql")]
+[assembly: AssemblyTitle("Dccelerator.DataAccess.BerkleyDb")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Dccelerator.DataAccess.Adapters.MsSql")]
+[assembly: AssemblyProduct("Dccelerator.DataAccess.BerkleyDb")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,4 +20,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("802e612e-433f-4974-8c7a-38398a982275")]
+[assembly: Guid("dfc1c934-716c-4c1b-8689-efb4f192c0f1")]

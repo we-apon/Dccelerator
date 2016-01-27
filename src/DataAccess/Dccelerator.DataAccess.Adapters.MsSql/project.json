@@ -1,6 +1,6 @@
 {
   "version": "1.0.0-*",
-  "description": "Dccelerator.DataAccess.Ado.SqlClient Class Library",
+  "description": "Dccelerator.DataAccess.Adapters.MsSql Class Library",
   "authors": [ "we_apon" ],
   "tags": [ "" ],
   "projectUrl": "",
