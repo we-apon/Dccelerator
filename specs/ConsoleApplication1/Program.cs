@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using BerkeleyDB;
 using Dccelerator;
+using Dccelerator.DataAccess.BerkeleyDb;
+using Dccelerator.DataAccess.Implementations;
 using Dccelerator.Reflection;
 using ServiceStack;
 
@@ -27,7 +29,7 @@ namespace ConsoleApplication1
                 File.Delete(_logTxt);
 
 #if DEBUG
-            var length = 10000;
+            var length = 100;
 #else
             var length = 100000;
 #endif
@@ -49,8 +51,8 @@ namespace ConsoleApplication1
                     otherEntities[i*2 + 1] = other2;
 
                     entities[i] = someEntity;
-                    serializedEntities[i] = someEntity.Serialize();
-                    ids[i] = someEntity.Id.ToByteArray();
+                    serializedEntities[i] = someEntity.ToBinnary();
+                    ids[i] = someEntity.Id.ToBinnary();
                 });
 
 
@@ -58,7 +60,18 @@ namespace ConsoleApplication1
 
             TestBTreehDb(length, ids, entities, otherEntities);
 
-            TestBTreehDbMt(length, ids, entities, otherEntities);
+            //TestBTreehDbMt(length, ids, entities, otherEntities);
+
+            var factory = new BDbDataManagerFactory(_home, Path.Combine(_home, "btree.bdb"), "asdasdd");
+            var manager = new DataManager(factory);
+
+            var entityId = entities.Shuffle().First().Id;
+            var getter = manager.Get<SomeOtherEntity>();
+
+            var twoOtherEntities = getter.Where(x => x.SomeEntityId, entityId).ToList();
+
+
+
 
 /*
 
@@ -421,12 +434,12 @@ namespace ConsoleApplication1
                 entitiesDb.Instance().Put(id, data);
 
                 var other1 = otherEntities[i*2];
-                var other1Id = new DatabaseEntry(other1.Id.ToByteArray());
+                var other1Id = new DatabaseEntry(other1.Id.ToBinnary());
                 var other1Data = new DatabaseEntry(Encoding.UTF8.GetBytes(other1.ToJson()));
                 otherEntitiesDb.Instance().Put(other1Id, other1Data);
 
                 var other2 = otherEntities[i*2 + 1];
-                var other2Id = new DatabaseEntry(other2.Id.ToByteArray());
+                var other2Id = new DatabaseEntry(other2.Id.ToBinnary());
                 var other2Data = new DatabaseEntry(Encoding.UTF8.GetBytes(other2.ToJson()));
                 otherEntitiesDb.Instance().Put(other2Id, other2Data);
             });
@@ -490,7 +503,7 @@ namespace ConsoleApplication1
             Parallel.For(0,
                 otherEntities.Length,
                 i => {
-                    var id = new DatabaseEntry(otherEntities[i].Id.ToByteArray());
+                    var id = new DatabaseEntry(otherEntities[i].Id.ToBinnary());
                     var result = otherEntitiesDb.Instance().Get(id);
                     resultPairs.Add(result);
                 });
@@ -581,10 +594,8 @@ namespace ConsoleApplication1
             GC.Collect();
 
             var bTreeDbPath = Path.Combine(_home, "btree.bdb");
-            if (File.Exists(bTreeDbPath))
-                File.Delete(bTreeDbPath);
-
-
+/*            if (File.Exists(bTreeDbPath))
+                File.Delete(bTreeDbPath);*/
 
 
             var databaseEnvironmentConfig = new DatabaseEnvironmentConfig {
@@ -636,18 +647,17 @@ namespace ConsoleApplication1
             watch.Restart();
             for (int i = 0; i < length; i++) {
                 var id = new DatabaseEntry(ids[i]);
-                var text = entities[i].ToJson();
-                var data = new DatabaseEntry(Encoding.UTF8.GetBytes(text));
+                var data = new DatabaseEntry(entities[i].ToBinnary());
                 entitiesDb.Put(id, data);
 
-                var other1 = otherEntities[i*2];
+                var other1 = otherEntities[i * 2];
                 var other1Id = new DatabaseEntry(other1.Id.ToByteArray());
-                var other1Data = new DatabaseEntry(Encoding.UTF8.GetBytes(other1.ToJson()));
+                var other1Data = new DatabaseEntry(other1.ToBinnary());
                 otherEntitiesDb.Put(other1Id, other1Data);
 
-                var other2 = otherEntities[i*2 +1];
+                var other2 = otherEntities[i * 2 + 1];
                 var other2Id = new DatabaseEntry(other2.Id.ToByteArray());
-                var other2Data = new DatabaseEntry(Encoding.UTF8.GetBytes(other2.ToJson()));
+                var other2Data = new DatabaseEntry(other2.ToBinnary());
                 otherEntitiesDb.Put(other2Id, other2Data);
 
             }
@@ -663,7 +673,7 @@ namespace ConsoleApplication1
             watch.Restart();
             for (int i = 0; i < length*2; i++) {
                 var otherEntity = otherEntities[i];
-                var id = new DatabaseEntry(otherEntity.Id.ToByteArray());
+                var id = new DatabaseEntry(otherEntity.Id.ToBinnary());
 
                 var text = otherEntity.ToJson();
                 var data = new DatabaseEntry(Encoding.UTF8.GetBytes(text));
@@ -723,7 +733,7 @@ namespace ConsoleApplication1
 
             watch.Restart();
             foreach (var otherEntity in otherEntities.Shuffle()) {
-                var id = new DatabaseEntry(otherEntity.Id.ToByteArray());
+                var id = new DatabaseEntry(otherEntity.Id.ToBinnary());
                 var result = otherEntitiesDb.Get(id);
                 resultPairs.Add(result);
             }
@@ -796,17 +806,16 @@ namespace ConsoleApplication1
             var foreignKeyConfig = new SecondaryBTreeDatabaseConfig(
                 otherEntitiesDb,
                 (pKey, pData) => {
-                    var text = Encoding.UTF8.GetString(pData.Data);
-                    var otherEntity = text.FromJson<SomeOtherEntity>();
+                    var otherEntity = pData.Data.FromBytes<SomeOtherEntity>();
 
-                    var secondaryId = otherEntity.SomeEntityId.ToByteArray();
+                    var secondaryId = otherEntity.SomeEntityId.ToBinnary();
                     return new DatabaseEntry(secondaryId);
                 }) {
                     Env = env,
                     Encrypted = env?.EncryptAlgorithm == EncryptionAlgorithm.AES,
-                    Duplicates = DuplicatesPolicy.SORTED,
+                    Duplicates = DuplicatesPolicy.UNSORTED,
                     Creation = CreatePolicy.IF_NEEDED,
-                    ErrorPrefix = $"{otherEntitiesDb.DatabaseName}->{entitiesDb.DatabaseName} Db:",
+                    ErrorPrefix = $"{otherEntitiesDb.DatabaseName}.{nameof(SomeOtherEntity.SomeEntityId)} Db:",
                     ErrorFeedback = (prefix, message) => 
                     File.AppendAllText(_logTxt, prefix + message + "\n")
                 };
@@ -814,7 +823,7 @@ namespace ConsoleApplication1
             foreignKeyConfig.SetForeignKeyConstraint(entitiesDb, ForeignKeyDeleteAction.ABORT);
 
 
-            var secondary = SecondaryBTreeDatabase.Open(bTreeDbPath, $"{otherEntitiesDb.DatabaseName}->{entitiesDb.DatabaseName}", foreignKeyConfig);
+            var secondary = SecondaryBTreeDatabase.Open(bTreeDbPath, $"{otherEntitiesDb.DatabaseName}.{nameof(SomeOtherEntity.SomeEntityId)}", foreignKeyConfig);
             return secondary;
         }
 

@@ -7,7 +7,7 @@
     <ProjectGuid>{3B9C2C1D-5363-456F-B34C-03B5E633B792}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DataAccess.BerkleyDb.Specs</RootNamespace>
+    <RootNamespace>With_Dccelerator.DataAccess.BerkleyDb_assembly</RootNamespace>
     <AssemblyName>DataAccess.BerkleyDb.Specs</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -30,9 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dccelerator.Core, Version=0.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Dccelerator.Core.0.0.4-alfa\lib\net40\Dccelerator.Core.dll</HintPath>
+    <Reference Include="Dccelerator.Core, Version=0.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Dccelerator.Core.0.0.5-alfa\lib\net40\Dccelerator.Core.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Dccelerator.DataAccess.BerkeleyDb">
+      <HintPath>..\..\artifacts\bin\Dccelerator.DataAccess.BerkeleyDb\Debug\net40\Dccelerator.DataAccess.BerkeleyDb.dll</HintPath>
     </Reference>
     <Reference Include="Dccelerator.DataAccess.Common, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Dccelerator.DataAccess.Common.0.0.1-alfa\lib\net40\Dccelerator.DataAccess.Common.dll</HintPath>
@@ -69,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
+    <Compile Include="DataManagerFactory Specs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

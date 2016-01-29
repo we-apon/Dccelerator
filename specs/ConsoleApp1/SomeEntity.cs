@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Text;
-using System.Xml;
 using System.Xml.Serialization;
-using ServiceStack;
+using Dccelerator;
 
 
 namespace ConsoleApplication1 {
@@ -30,7 +27,17 @@ namespace ConsoleApplication1 {
         [XmlElement]
         public string Value { get; set; }
 
+
+        public byte[] Serialize() {
+            return this.ToBinnary();
+        }
+
+
+        public static SomeEntity Deserialize(byte[] bytes) {
+            return bytes.FromBytes<SomeEntity>();
+        }
     }
+
 
 
 
@@ -44,6 +51,14 @@ namespace ConsoleApplication1 {
 
         public string Value { get; set; }
 
-        
+
+        public byte[] Serialize() {
+            return this.ToBinnary();
+        }
+
+
+        public static SomeOtherEntity Deserialize(byte[] bytes) {
+            return bytes.FromBytes<SomeOtherEntity>();
+        }
     }
 }

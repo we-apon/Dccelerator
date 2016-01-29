@@ -2,7 +2,7 @@
   "locked": false,
   "version": 2,
   "targets": {
-    ".NETFramework,Version=v4.0": {
+    "DNX,Version=v4.5.1": {
       "BerkleyDB/6.1.26-debug": {
         "type": "package",
         "compile": {
@@ -12,14 +12,23 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.4-alfa": {
+      "Dccelerator.Core/0.0.5-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa": {
+      "Dccelerator.DataAccess.BerkeleyDb/0.0.1-alfa2": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.0",
+        "dependencies": {
+          "BerkleyDB": "6.1.26-debug",
+          "Dccelerator.Core": null,
+          "Dccelerator.DataAccess.Common": null
+        }
+      },
+      "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -40,7 +49,7 @@
         }
       }
     },
-    ".NETFramework,Version=v4.0/win7-x86": {
+    "DNX,Version=v4.5.1/win7-x86": {
       "BerkleyDB/6.1.26-debug": {
         "type": "package",
         "compile": {
@@ -50,14 +59,23 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.4-alfa": {
+      "Dccelerator.Core/0.0.5-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa": {
+      "Dccelerator.DataAccess.BerkeleyDb/0.0.1-alfa2": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.0",
+        "dependencies": {
+          "BerkleyDB": "6.1.26-debug",
+          "Dccelerator.Core": null,
+          "Dccelerator.DataAccess.Common": null
+        }
+      },
+      "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -78,7 +96,7 @@
         }
       }
     },
-    ".NETFramework,Version=v4.0/win7-x64": {
+    "DNX,Version=v4.5.1/win7-x64": {
       "BerkleyDB/6.1.26-debug": {
         "type": "package",
         "compile": {
@@ -88,14 +106,23 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.4-alfa": {
+      "Dccelerator.Core/0.0.5-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa": {
+      "Dccelerator.DataAccess.BerkeleyDb/0.0.1-alfa2": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.0",
+        "dependencies": {
+          "BerkleyDB": "6.1.26-debug",
+          "Dccelerator.Core": null,
+          "Dccelerator.DataAccess.Common": null
+        }
+      },
+      "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -118,13 +145,17 @@
     }
   },
   "libraries": {
-    "Dccelerator.Core/0.0.4-alfa": {
+    "Dccelerator.Core/0.0.5-alfa2": {
       "type": "project",
-      "path": "../../Dccelerator.Core/project.json"
+      "path": "../../src/Dccelerator.Core/project.json"
     },
-    "Dccelerator.DataAccess.Common/0.0.1-alfa": {
+    "Dccelerator.DataAccess.BerkeleyDb/0.0.1-alfa2": {
       "type": "project",
-      "path": "../Dccelerator.DataAccess.Common/project.json"
+      "path": "../../src/DataAccess/Dccelerator.DataAccess.BerkeleyDb/project.json"
+    },
+    "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
+      "type": "project",
+      "path": "../../src/DataAccess/Dccelerator.DataAccess.Common/project.json"
     },
     "BerkleyDB/6.1.26-debug": {
       "type": "package",
@@ -160,11 +191,12 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "BerkleyDB >= 6.1.26-debug"
+      "BerkleyDB >= 6.1.26-debug",
+      "Dccelerator.Core >= 0.0.5-alfa2"
     ],
-    ".NETFramework,Version=v4.0": [
-      "Dccelerator.Core ",
-      "Dccelerator.DataAccess.Common "
+    "DNX,Version=v4.5.1": [
+      "Dccelerator.DataAccess.BerkeleyDb >= 0.0.1-alfa2",
+      "Dccelerator.DataAccess.Common >= 0.0.1-alfa2"
     ]
   }
 }
