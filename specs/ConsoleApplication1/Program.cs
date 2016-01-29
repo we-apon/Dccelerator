@@ -27,9 +27,9 @@ namespace ConsoleApplication1
                 File.Delete(_logTxt);
 
 #if DEBUG
-            var length = 1000;
+            var length = 10000;
 #else
-            var length = 1000000;
+            var length = 100000;
 #endif
             File.AppendAllText(_logTxt, $"Entities count: {length}\nOther entities count: {length*2}\n\n");
 
@@ -57,6 +57,8 @@ namespace ConsoleApplication1
 
 
             TestBTreehDb(length, ids, entities, otherEntities);
+
+            TestBTreehDbMt(length, ids, entities, otherEntities);
 
 /*
 
@@ -348,6 +350,232 @@ namespace ConsoleApplication1
         }
         
 
+        static void TestBTreehDbMt(int length, byte[][] ids, SomeEntity[] entities, SomeOtherEntity[] otherEntities) {
+
+            GC.Collect();
+
+            var bTreeDbPath = Path.Combine(_home, "btree.bdb");
+            if (File.Exists(bTreeDbPath))
+                File.Delete(bTreeDbPath);
+
+
+            var envOpen = new Func<DatabaseEnvironment>(() => {
+                var databaseEnvironmentConfig = new DatabaseEnvironmentConfig {
+                    Create = true,
+                    UseMPool = true,
+                    SystemMemory = true,
+                    Lockdown = true,
+                   // ErrorPrefix = "Environment: ",
+                   // ErrorFeedback = (prefix, message) => File.AppendAllText(_logTxt, prefix + message + "\n"),
+                };
+                databaseEnvironmentConfig.SetEncryption("asdasdd", EncryptionAlgorithm.AES);
+                return DatabaseEnvironment.Open(_home, databaseEnvironmentConfig);
+            });
+
+            var entitiesDb = new ThreadLocalDb<BTreeDatabase>(envOpen, env => OpenBTreeDb(bTreeDbPath, nameof(SomeEntity), env));
+
+            var otherEntitiesDb = new ThreadLocalDb<BTreeDatabase>(envOpen, env => OpenBTreeDb(bTreeDbPath, nameof(SomeOtherEntity), env)); // primary
+
+            
+            //var foreignKey = new ThreadLocalDb<SecondaryBTreeDatabase>(envOpen, env => MakeForeingKey(bTreeDbPath, otherEntitiesDb.Instance(), entitiesDb.Instance(), env));
+            // foreign key and constraint
+                                                                                                                        
+            
+                      
+            //var foreignKey = MakeForeingKey(bTreeDbPath, otherEntitiesDb, entitiesDb, env); // foreign key and constraint
+
+
+            /*
+                        var foreignFields = new [] {nameof(SomeEntity.Name), nameof(SomeEntity.Value)};
+                        var indexes = new List<SecondaryBTreeDatabase>();
+                        foreach (var foreignField in foreignFields) {
+
+
+                            indexes.Add(SecondaryBTreeDatabase.Open(bTreeDbPath,
+                                $"{nameof(SomeEntity)}_{foreignField}",
+                                new SecondaryBTreeDatabaseConfig(bTreeDb,
+                                    (key, data) => {
+                                        var entity = SomeEntity.Deserialize(data.Data);
+                                        object value;
+                                        if (!RUtils<SomeEntity>.TryGetValueOnPath(entity, foreignField, out value))
+                                            return null;
+
+                                        return new DatabaseEntry(Encoding.UTF8.GetBytes((string) value));
+                                    }) {
+                                        Env = env,
+                                        Creation = CreatePolicy.IF_NEEDED,
+                                        ErrorPrefix = $"Secondary '{foreignField}': ",
+                                        ErrorFeedback = (prefix, message) => File.AppendAllText(_logTxt, prefix + message + "\n"),
+                                    }));
+                        }
+            */
+
+
+
+            var watch = new Stopwatch();
+            watch.Restart();
+            Parallel.For(0, length, i => {
+                var id = new DatabaseEntry(ids[i]);
+                var text = entities[i].ToJson();
+                var data = new DatabaseEntry(Encoding.UTF8.GetBytes(text));
+                entitiesDb.Instance().Put(id, data);
+
+                var other1 = otherEntities[i*2];
+                var other1Id = new DatabaseEntry(other1.Id.ToByteArray());
+                var other1Data = new DatabaseEntry(Encoding.UTF8.GetBytes(other1.ToJson()));
+                otherEntitiesDb.Instance().Put(other1Id, other1Data);
+
+                var other2 = otherEntities[i*2 + 1];
+                var other2Id = new DatabaseEntry(other2.Id.ToByteArray());
+                var other2Data = new DatabaseEntry(Encoding.UTF8.GetBytes(other2.ToJson()));
+                otherEntitiesDb.Instance().Put(other2Id, other2Data);
+            });
+
+            watch.Stop();
+            File.AppendAllText(_logTxt, "Put in b-tree in parallel: " + watch.Elapsed + "\n");
+            
+            entitiesDb.Sync();
+            otherEntitiesDb.Sync();
+
+
+            
+
+            var resultPairs = new ConcurrentBag<KeyValuePair<DatabaseEntry, DatabaseEntry>>();
+/*
+
+            watch.Restart();
+            using (var cursor = entitiesDb.Cursor()) {
+                while (cursor.MoveNext()) {
+                    var current = cursor.Current;
+                    resultPairs.Add(current);
+                }
+            }
+            watch.Stop();
+            File.AppendAllText(_logTxt, "Continuous read from entities b-tree: " + watch.Elapsed + "\n");
+
+            resultPairs.Clear();
+            GC.Collect();
+
+            watch.Restart();
+            using (var cursor = otherEntitiesDb.Cursor()) {
+                while (cursor.MoveNext()) {
+                    var current = cursor.Current;
+                    resultPairs.Add(current);
+                }
+            }
+            watch.Stop();
+            File.AppendAllText(_logTxt, "Continuous read from other entities b-tree: " + watch.Elapsed + "\n");
+
+            resultPairs.Clear();
+            GC.Collect();
+*/
+
+
+
+            watch.Restart();
+            Parallel.For(0,
+                ids.Length,
+                i => {
+                    var id = new DatabaseEntry(ids[i]);
+                    var result = entitiesDb.Instance().Get(id);
+                    resultPairs.Add(result);
+                });
+            watch.Stop();
+            File.AppendAllText(_logTxt, "Search by key in entities b-tree in parallel: " + watch.Elapsed + "\n");
+
+            resultPairs = new ConcurrentBag<KeyValuePair<DatabaseEntry, DatabaseEntry>>();
+            GC.Collect();
+
+            watch.Restart();
+            Parallel.For(0,
+                otherEntities.Length,
+                i => {
+                    var id = new DatabaseEntry(otherEntities[i].Id.ToByteArray());
+                    var result = otherEntitiesDb.Instance().Get(id);
+                    resultPairs.Add(result);
+                });
+
+            watch.Stop();
+            File.AppendAllText(_logTxt, "Search by key in other entities b-tree in parallel: " + watch.Elapsed + "\n");
+
+
+            resultPairs = new ConcurrentBag<KeyValuePair<DatabaseEntry, DatabaseEntry>>();
+            GC.Collect();
+
+/*
+            watch.Restart();
+            Parallel.For(0,
+                ids.Length,
+                i => {
+
+                    var foreignCursor = otherEntitiesDb.Foreign().Cursor();
+
+                    var someEntityId = new DatabaseEntry(ids[i]);
+
+                    if (!foreignCursor.Move(someEntityId, exact: true)) {
+                        Console.WriteLine($"{someEntityId} is not found in foreign database");
+                        return;
+                    }
+
+                    resultPairs.Add(foreignCursor.Current);
+
+                    while (foreignCursor.MoveNextDuplicate()) {
+                        resultPairs.Add(foreignCursor.Current);
+                    }
+
+                    foreignCursor.Close();
+                });
+*/
+/*
+
+            watch.Stop();
+            File.AppendAllText(_logTxt, "Search other entity by id of entity (by foreign key) in b-tree in parallel: " + watch.Elapsed + "\n");
+
+            resultPairs = new ConcurrentBag<KeyValuePair<DatabaseEntry, DatabaseEntry>>();
+            GC.Collect();*/
+            
+
+
+            entitiesDb.Close();
+
+            otherEntitiesDb.Close();
+
+
+            /*
+                        var concurrentResults = new ConcurrentBag<KeyValuePair<DatabaseEntry, DatabaseEntry>>();
+                        watch.Restart();
+                        Parallel.ForEach(ids,
+                            bytes => {
+                                var id = new DatabaseEntry(bytes);
+                                var result = bTreeDb.Get(id);
+                                concurrentResults.Add(result);
+                            });
+                        watch.Stop();
+                        File.AppendAllText(_logTxt, "Parallel search by key in b-tree: " + watch.Elapsed + "\n");
+                        GC.Collect();
+            #1#
+
+
+            watch.Restart();
+            entitiesDb.Sync();
+            otherEntitiesDb.Sync();
+            foreignKey.Sync();
+            File.AppendAllText(_logTxt, "b-tree sync: " + watch.Elapsed + "\n\n");
+
+/*            foreach (var index in indexes) {
+                index.Close();
+            }#1#
+            
+            foreignKey.Close();
+            otherEntitiesDb.Close();
+            otherEntitiesDb.Dispose();
+            entitiesDb.Close();
+            entitiesDb.Dispose();
+            GC.Collect();*/
+        }
+
+
+
         static void TestBTreehDb(int length, byte[][] ids, SomeEntity[] entities, SomeOtherEntity[] otherEntities) {
 
             GC.Collect();
@@ -362,16 +590,19 @@ namespace ConsoleApplication1
             var databaseEnvironmentConfig = new DatabaseEnvironmentConfig {
                 Create = true,
                 UseMPool = true,
+                SystemMemory = true,
+                Lockdown = true,
                 ErrorPrefix = "Environment: ",
                 ErrorFeedback = (prefix, message) => File.AppendAllText(_logTxt, prefix + message + "\n"),
             };
             databaseEnvironmentConfig.SetEncryption("asdasdd", EncryptionAlgorithm.AES);
             var env = DatabaseEnvironment.Open(_home, databaseEnvironmentConfig);
 
+
             var otherEntitiesDb = OpenBTreeDb(bTreeDbPath, nameof(SomeOtherEntity), env); //primary
             var entitiesDb = OpenBTreeDb(bTreeDbPath, nameof(SomeEntity), env); // foreign
 
-            var foreignKey = MakeForeingKey(bTreeDbPath, otherEntitiesDb, entitiesDb, env);
+            var foreignKey = MakeForeingKey(bTreeDbPath, otherEntitiesDb, entitiesDb, env); // foreign key and constraint
 
 
 /*
@@ -427,8 +658,8 @@ namespace ConsoleApplication1
             otherEntitiesDb.Sync();
             foreignKey.Sync();
 
-/*
 
+/*
             watch.Restart();
             for (int i = 0; i < length*2; i++) {
                 var otherEntity = otherEntities[i];
@@ -572,10 +803,12 @@ namespace ConsoleApplication1
                     return new DatabaseEntry(secondaryId);
                 }) {
                     Env = env,
+                    Encrypted = env?.EncryptAlgorithm == EncryptionAlgorithm.AES,
                     Duplicates = DuplicatesPolicy.SORTED,
                     Creation = CreatePolicy.IF_NEEDED,
                     ErrorPrefix = $"{otherEntitiesDb.DatabaseName}->{entitiesDb.DatabaseName} Db:",
-                    ErrorFeedback = (prefix, message) => File.AppendAllText(_logTxt, prefix + message + "\n")
+                    ErrorFeedback = (prefix, message) => 
+                    File.AppendAllText(_logTxt, prefix + message + "\n")
                 };
 
             foreignKeyConfig.SetForeignKeyConstraint(entitiesDb, ForeignKeyDeleteAction.ABORT);
@@ -587,15 +820,17 @@ namespace ConsoleApplication1
 
 
         static BTreeDatabase OpenBTreeDb(string filePath, string dbName, DatabaseEnvironment environment) {
-            return BTreeDatabase.Open(filePath, dbName,
+            var db = BTreeDatabase.Open(filePath, dbName,
                 new BTreeDatabaseConfig {
                     Env = environment,
-                    Encrypted = environment.EncryptAlgorithm != EncryptionAlgorithm.DEFAULT,
+                    Encrypted = environment?.EncryptAlgorithm == EncryptionAlgorithm.AES,
                     Creation = CreatePolicy.IF_NEEDED,
                     ReadOnly = false,
                     ErrorPrefix = $"{dbName}Db: ",
-                    ErrorFeedback = (prefix, message) => File.AppendAllText(_logTxt, prefix + message + "\n"),
+                    ErrorFeedback = (prefix, message) => 
+                    File.AppendAllText(_logTxt, prefix + message + "\n"),
                 });
+            return db;
         }
 
         
