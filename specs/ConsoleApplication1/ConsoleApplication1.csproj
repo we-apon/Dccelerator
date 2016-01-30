@@ -33,7 +33,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dccelerator.Core, Version=0.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Dccelerator.Core, Version=0.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\artifacts\bin\Dccelerator.Core\Debug\net40\Dccelerator.Core.dll</HintPath>
     </Reference>
@@ -91,6 +91,10 @@
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(SolutionDir)artifacts\bin\Dccelerator.Core\$(ConfigurationName)\net40\* $(TargetDir) /Y &amp;&amp; copy $(SolutionDir)artifacts\bin\Dccelerator.DataAccess.Common\$(ConfigurationName)\net40\* $(TargetDir) /Y &amp;&amp; copy $(SolutionDir)artifacts\bin\Dccelerator.DataAccess.BerkeleyDb\$(ConfigurationName)\net40\* $(TargetDir) /Y
+</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

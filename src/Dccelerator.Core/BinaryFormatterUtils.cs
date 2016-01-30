@@ -2,7 +2,6 @@
 
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 
 
@@ -39,7 +38,7 @@ namespace Dccelerator {
         }
 
 
-        public static object FromBytes(this byte[] bytes, Type type) {
+        public static object FromBytes(this byte[] bytes) {
 
 
             var formatter = new BinaryFormatter();

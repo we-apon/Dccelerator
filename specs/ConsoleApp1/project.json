@@ -19,6 +19,11 @@
     "ConsoleApp1": "ConsoleApp1"
   },
 
+
+  "packInclude": {
+    "content/":  "lib*.dll"
+  },
+
   "frameworks": {
     "dnx451": {
       "dependencies": {

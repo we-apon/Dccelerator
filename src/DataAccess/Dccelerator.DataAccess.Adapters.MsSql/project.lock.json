@@ -3,7 +3,7 @@
   "version": 2,
   "targets": {
     ".NETFramework,Version=v4.0": {
-      "Dccelerator.Core/0.0.4-alfa": {
+      "Dccelerator.Core/0.0.5-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -22,7 +22,7 @@
           "System.Xml"
         ]
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa": {
+      "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -44,7 +44,7 @@
       }
     },
     ".NETFramework,Version=v4.0/win7-x86": {
-      "Dccelerator.Core/0.0.4-alfa": {
+      "Dccelerator.Core/0.0.5-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -63,7 +63,7 @@
           "System.Xml"
         ]
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa": {
+      "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -85,7 +85,7 @@
       }
     },
     ".NETFramework,Version=v4.0/win7-x64": {
-      "Dccelerator.Core/0.0.4-alfa": {
+      "Dccelerator.Core/0.0.5-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -104,7 +104,7 @@
           "System.Xml"
         ]
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa": {
+      "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -127,7 +127,7 @@
     }
   },
   "libraries": {
-    "Dccelerator.Core/0.0.4-alfa": {
+    "Dccelerator.Core/0.0.5-alfa2": {
       "type": "project",
       "path": "../../Dccelerator.Core/project.json"
     },
@@ -135,7 +135,7 @@
       "type": "project",
       "path": "../Dccelerator.DataAccess.AdoNet/project.json"
     },
-    "Dccelerator.DataAccess.Common/0.0.1-alfa": {
+    "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
       "type": "project",
       "path": "../Dccelerator.DataAccess.Common/project.json"
     },
