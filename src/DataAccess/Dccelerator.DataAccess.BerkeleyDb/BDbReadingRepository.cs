@@ -22,7 +22,8 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
             var databaseEnvironmentConfig = new DatabaseEnvironmentConfig {
                 Create = true,
                 UseMPool = true,
-                SystemMemory = true,
+                Private = true,
+                /*SystemMemory = true,*/
                 /*Lockdown = true*/
             };
             databaseEnvironmentConfig.SetEncryption(_password, EncryptionAlgorithm.AES);

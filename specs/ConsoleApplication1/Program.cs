@@ -65,10 +65,14 @@ namespace ConsoleApplication1
             var factory = new BDbDataManagerFactory(_home, Path.Combine(_home, "btree.bdb"), "asdasdd");
             var manager = new DataManager(factory);
 
-            var entityId = entities.Shuffle().First().Id;
-            var getter = manager.Get<SomeOtherEntity>();
+            var allEntities = manager.Get<SomeEntity>().All().ToArray();
 
-            var twoOtherEntities = getter.Where(x => x.SomeEntityId, entityId).ToList();
+            var allOtherEntities = new List<SomeOtherEntity>();
+
+
+            foreach (var someEntity in allEntities) {
+                allOtherEntities.AddRange(manager.Get<SomeOtherEntity>().Where(x => x.SomeEntityId, someEntity.Id));
+            }
 
 
 
@@ -377,7 +381,7 @@ namespace ConsoleApplication1
                     Create = true,
                     UseMPool = true,
                     SystemMemory = true,
-                    Lockdown = true,
+                    /*Lockdown = true,*/
                    // ErrorPrefix = "Environment: ",
                    // ErrorFeedback = (prefix, message) => File.AppendAllText(_logTxt, prefix + message + "\n"),
                 };
@@ -601,8 +605,9 @@ namespace ConsoleApplication1
             var databaseEnvironmentConfig = new DatabaseEnvironmentConfig {
                 Create = true,
                 UseMPool = true,
-                SystemMemory = true,
-                Lockdown = true,
+                Private = true,
+                /*SystemMemory = true,*/
+                /*Lockdown = true,*/
                 ErrorPrefix = "Environment: ",
                 ErrorFeedback = (prefix, message) => File.AppendAllText(_logTxt, prefix + message + "\n"),
             };
@@ -799,6 +804,8 @@ namespace ConsoleApplication1
             entitiesDb.Close();
             entitiesDb.Dispose();
             GC.Collect();
+
+            env.Close();
         }
 
 
