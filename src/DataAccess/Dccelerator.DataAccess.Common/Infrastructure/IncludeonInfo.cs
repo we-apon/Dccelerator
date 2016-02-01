@@ -39,11 +39,11 @@ namespace Dccelerator.DataAccess.Infrastructure {
 
 #if NET40
         public Type TypeInfo => Type;
-        public IEntityInfo[] Children { get; } = null;
 #else
         public TypeInfo TypeInfo => _typeInfo ?? (_typeInfo = Type.GetInfo());
         TypeInfo _typeInfo;
 #endif
+        public IEntityInfo[] Children { get; } = null;
 
 
         public string EntityName { get; }

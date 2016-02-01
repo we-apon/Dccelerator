@@ -13,8 +13,17 @@
       },
       "frameworkAssemblies": {
       }
+    },
+
+    "net45": {
+      "compilationOptions": { "define": [ "JETBRAINS_ANNOTATIONS" ] },
+      "dependencies": {
+      },
+      "frameworkAssemblies": {
+      }
     }
   },
+
   "dependencies": {
     "Dccelerator.Core": "",
     "Dccelerator.DataAccess.Common": "",

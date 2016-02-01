@@ -40,6 +40,44 @@
         }
       }
     },
+    ".NETFramework,Version=v4.5": {
+      "BerkleyDB/6.1.26-debug": {
+        "type": "package",
+        "compile": {
+          "lib/net40/libdb_dotnet61.dll": {}
+        },
+        "runtime": {
+          "lib/net40/libdb_dotnet61.dll": {}
+        }
+      },
+      "Dccelerator.Core/0.0.5-alfa2": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5",
+        "dependencies": {
+          "JetBrains.Annotations": "10.0.0"
+        }
+      },
+      "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5",
+        "dependencies": {
+          "Dccelerator.Core": null
+        },
+        "frameworkAssemblies": [
+          "System.Data",
+          "System.Xml"
+        ]
+      },
+      "JetBrains.Annotations/10.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        },
+        "runtime": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        }
+      }
+    },
     ".NETFramework,Version=v4.0/win7-x86": {
       "BerkleyDB/6.1.26-debug": {
         "type": "package",
@@ -115,6 +153,82 @@
           "lib/net20/JetBrains.Annotations.dll": {}
         }
       }
+    },
+    ".NETFramework,Version=v4.5/win7-x86": {
+      "BerkleyDB/6.1.26-debug": {
+        "type": "package",
+        "compile": {
+          "lib/net40/libdb_dotnet61.dll": {}
+        },
+        "runtime": {
+          "lib/net40/libdb_dotnet61.dll": {}
+        }
+      },
+      "Dccelerator.Core/0.0.5-alfa2": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5",
+        "dependencies": {
+          "JetBrains.Annotations": "10.0.0"
+        }
+      },
+      "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5",
+        "dependencies": {
+          "Dccelerator.Core": null
+        },
+        "frameworkAssemblies": [
+          "System.Data",
+          "System.Xml"
+        ]
+      },
+      "JetBrains.Annotations/10.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        },
+        "runtime": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.5/win7-x64": {
+      "BerkleyDB/6.1.26-debug": {
+        "type": "package",
+        "compile": {
+          "lib/net40/libdb_dotnet61.dll": {}
+        },
+        "runtime": {
+          "lib/net40/libdb_dotnet61.dll": {}
+        }
+      },
+      "Dccelerator.Core/0.0.5-alfa2": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5",
+        "dependencies": {
+          "JetBrains.Annotations": "10.0.0"
+        }
+      },
+      "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5",
+        "dependencies": {
+          "Dccelerator.Core": null
+        },
+        "frameworkAssemblies": [
+          "System.Data",
+          "System.Xml"
+        ]
+      },
+      "JetBrains.Annotations/10.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        },
+        "runtime": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        }
+      }
     }
   },
   "libraries": {
@@ -164,6 +278,7 @@
       "Dccelerator.DataAccess.Common ",
       "BerkleyDB >= 6.1.26-debug"
     ],
-    ".NETFramework,Version=v4.0": []
+    ".NETFramework,Version=v4.0": [],
+    ".NETFramework,Version=v4.5": []
   }
 }

@@ -13,6 +13,17 @@
         }
       }
     },
+    ".NETFramework,Version=v4.5": {
+      "JetBrains.Annotations/10.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        },
+        "runtime": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        }
+      }
+    },
     ".NETPlatform,Version=v5.0": {
       "Microsoft.CSharp/4.0.0": {
         "type": "package",
@@ -299,6 +310,28 @@
       }
     },
     ".NETFramework,Version=v4.0/win7-x64": {
+      "JetBrains.Annotations/10.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        },
+        "runtime": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.5/win7-x86": {
+      "JetBrains.Annotations/10.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        },
+        "runtime": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.5/win7-x64": {
       "JetBrains.Annotations/10.0.0": {
         "type": "package",
         "compile": {
@@ -1799,6 +1832,9 @@
   "projectFileDependencyGroups": {
     "": [],
     ".NETFramework,Version=v4.0": [
+      "JetBrains.Annotations >= 10.0.0"
+    ],
+    ".NETFramework,Version=v4.5": [
       "JetBrains.Annotations >= 10.0.0"
     ],
     ".NETPlatform,Version=v5.0": [
