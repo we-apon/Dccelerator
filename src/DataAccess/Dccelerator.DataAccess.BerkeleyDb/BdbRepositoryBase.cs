@@ -15,7 +15,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
         protected abstract SecondaryDatabase OpenReadOnlySecondaryDb(Database primaryDb, string dbName, DatabaseEnvironment environment);
 
-        protected abstract SecondaryDatabase OpenForeignKeyDatabase(Database primaryDb, Database foreignDb, BDbMapping mapping, DatabaseEnvironment environment);
+        protected abstract SecondaryDatabase OpenForeignKeyDatabase(Database primaryDb, Database foreignDb, ForeignKeyAttribute mapping, DatabaseEnvironment environment);
 
         protected abstract DatabaseEntry KeyOf(object entity);
 
@@ -118,24 +118,24 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        public bool Insert(object entity, string name, ICollection<BDbMapping> mappings) {
+        public bool Insert(object entity, string name, ICollection<ForeignKeyAttribute> foreignKeys) {
             DatabaseEnvironment environment = null;
             Database primaryDb = null;
-            IList<Database> foreignDatabases = new List<Database>(mappings.Count);
-            IList<SecondaryDatabase> foreignKeyDatabases = new List<SecondaryDatabase>(mappings.Count);
+            IList<Database> foreignDatabases = new List<Database>(foreignKeys.Count);
+            IList<SecondaryDatabase> foreignKeyDatabases = new List<SecondaryDatabase>(foreignKeys.Count);
 
             try {
                 environment = OpenEnvironment();
                 primaryDb = OpenPrimaryDb(name, environment);
 
-                foreach (var mapping in mappings) {
-                    if (mapping.Relationship != Relationship.ManyToOne)
+                foreach (var foreignKeyMapping in foreignKeys) {
+                    if (foreignKeyMapping.Relationship != Relationship.ManyToOne)
                         continue;
 
-                    var foreignDb = OpenReadOnlyPrimaryDb(mapping.Name, environment);
+                    var foreignDb = OpenReadOnlyPrimaryDb(foreignKeyMapping.ForeignEntityName, environment);
                     foreignDatabases.Add(foreignDb);
 
-                    var foreignKey = OpenForeignKeyDatabase(primaryDb, foreignDb, mapping, environment);
+                    var foreignKey = OpenForeignKeyDatabase(primaryDb, foreignDb, foreignKeyMapping, environment);
                     foreignKeyDatabases.Add(foreignKey);
                 }
                 

@@ -11,6 +11,6 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
         IEnumerable<DatabaseEntry> GetFromSecondaryDb(DatabaseEntry key, string entityName, string secondarySubName, DuplicatesPolicy duplicatesPolicy);
 
-        bool Insert(object entity, string name, ICollection<BDbMapping> mappings);
+        bool Insert(object entity, string name, ICollection<ForeignKeyAttribute> mappings);
     }
 }

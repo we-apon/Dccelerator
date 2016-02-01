@@ -112,7 +112,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
                 foreach (var transactionElement in _elements) {
                     if (transactionElement.ActionType != ActionType.Insert) {
-                        if (!transactionElement.Info.Repository.Insert(transactionElement.Entity, transactionElement.Info.Type.Name, transactionElement.Info.Mappings.Values))
+                        if (!transactionElement.Info.Repository.Insert(transactionElement.Entity, transactionElement.Info.Type.Name, transactionElement.Info.ForeignKeyMappings.Values))
                             return false;
 
                         continue;

@@ -65,10 +65,10 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        protected override SecondaryDatabase OpenForeignKeyDatabase(Database primaryDb, Database foreignDb, BDbMapping mapping, DatabaseEnvironment environment) {
+        protected override SecondaryDatabase OpenForeignKeyDatabase(Database primaryDb, Database foreignDb, ForeignKeyAttribute foreignKeyMapping, DatabaseEnvironment environment) {
             var foreignKeyConfig = new SecondaryBTreeDatabaseConfig(
                 primaryDb,
-                GetForeignKeyGenerator(mapping)) {
+                GetForeignKeyGenerator(foreignKeyMapping)) {
                     Env = environment,
                     Encrypted = environment?.EncryptAlgorithm == EncryptionAlgorithm.AES,
                     Duplicates = DuplicatesPolicy.UNSORTED,
@@ -84,12 +84,12 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         
 
 
-        public virtual SecondaryKeyGenDelegate GetForeignKeyGenerator(BDbMapping mapping) {
+        public virtual SecondaryKeyGenDelegate GetForeignKeyGenerator(ForeignKeyAttribute foreignKeyMapping) {
             return (pKey, pData) => {
                 var entity = pData.Data.FromBytes();
 
                 object foreingKey;
-                if (!entity.TryGetValueOnPath(mapping.ForeignKeyPath, out foreingKey))
+                if (!entity.TryGetValueOnPath(foreignKeyMapping.ForeignKeyPath, out foreingKey))
                     throw new InvalidOperationException();
 
                 return new DatabaseEntry(foreingKey.ToBinnary());
