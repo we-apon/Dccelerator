@@ -32,7 +32,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        static BTreeDatabase OpenReadOnlyPrimaryDb(string filePath, string dbName, DatabaseEnvironment environment) {
+        static Database OpenReadOnlyPrimaryDb(string filePath, string dbName, DatabaseEnvironment environment) {
             return BTreeDatabase.Open(filePath, dbName, new BTreeDatabaseConfig {
                 Env = environment,
                 Encrypted = environment?.EncryptAlgorithm == EncryptionAlgorithm.AES,
@@ -42,7 +42,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        static SecondaryBTreeDatabase OpenReadOnlySecondaryDb(BTreeDatabase primaryDb, string filePath, string dbName, DatabaseEnvironment environment) {
+        static SecondaryBTreeDatabase OpenReadOnlySecondaryDb(Database primaryDb, string filePath, string dbName, DatabaseEnvironment environment) {
             return SecondaryBTreeDatabase.Open(filePath, $"{primaryDb.DatabaseName}.{dbName}", new SecondaryBTreeDatabaseConfig(primaryDb, (key, data) => null) {
                 Env = environment,
                 ReadOnly = true,
@@ -55,8 +55,8 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
         IEnumerable<DatabaseEntry> ContinuouslyReadToEnd(string entityName) {
             DatabaseEnvironment environment = null;
-            BTreeDatabase primaryDb = null;
-            BTreeCursor cursor = null;
+            Database primaryDb = null;
+            Cursor cursor = null;
             try {
                 environment = OpenEnvironment();
                 primaryDb = OpenReadOnlyPrimaryDb(_dbFilePath, entityName, environment);
@@ -83,7 +83,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
         IEnumerable<DatabaseEntry> GetByKeyFromPrimaryDb(DatabaseEntry key, string entityName) {
             DatabaseEnvironment environment = null;
-            BTreeDatabase primaryDb = null;
+            Database primaryDb = null;
             try {
                 environment = OpenEnvironment();
                 primaryDb = OpenReadOnlyPrimaryDb(_dbFilePath, entityName, environment);
@@ -105,7 +105,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
         IEnumerable<DatabaseEntry> GetFromSecondaryDb(DatabaseEntry key, string entityName, string secondarySubName) {
             DatabaseEnvironment environment = null;
-            BTreeDatabase primaryDb = null;
+            Database primaryDb = null;
             SecondaryBTreeDatabase secondaryDb = null;
             Cursor cursor = null;
             try {
@@ -151,7 +151,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
         IEnumerable<DatabaseEntry> GetByJoin(string entityName, ICollection<IDataCriterion> criteria) {
             DatabaseEnvironment environment = null;
-            BTreeDatabase primaryDb = null;
+            Database primaryDb = null;
 
             var length = 0;
 

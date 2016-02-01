@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq.Expressions;
+using Dccelerator.DataAccess.Implementations.Schedulers;
 using Dccelerator.DataAccess.Infrastructure;
 
 
@@ -26,7 +26,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called one time for each <typeparamref name="TEntity"/> requested in each data manager.
         /// </summary>
         public IDataGetter<TEntity> GetterFor<TEntity>() where TEntity : class, new() {
-            return new BDbDataGetter<TEntity>(typeof(TEntity).Name, _environmentPath, _dbFilePath, _password);
+            return NotCachedGetterFor<TEntity>();
         }
 
 
@@ -35,7 +35,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called on each request of any not cached entity.
         /// </summary>
         public IDataGetter<TEntity> NotCachedGetterFor<TEntity>() where TEntity : class, new() {
-            throw new NotImplementedException();
+            return new BDbDataGetter<TEntity>(typeof(TEntity).Name, _environmentPath, _dbFilePath, _password);
         }
 
 
@@ -80,7 +80,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called on each <see cref="IDataManager.BeginTransaction"/> call.
         /// </summary>
         public IDataTransaction DataTransaction(ITransactionScheduler scheduler, IsolationLevel isolationLevel) {
-            throw new NotImplementedException();
+            return new NotScheduledBDbTransaction();
         }
 
 
@@ -89,7 +89,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called one time in every <see cref="IDataManager"/>.
         /// </summary>
         public ITransactionScheduler Scheduler() {
-            throw new NotImplementedException();
+            return new DummyScheduler(); //todo: test it!
         }
 
 

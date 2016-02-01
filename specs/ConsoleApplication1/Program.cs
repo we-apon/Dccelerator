@@ -10,7 +10,6 @@ using BerkeleyDB;
 using Dccelerator;
 using Dccelerator.DataAccess.BerkeleyDb;
 using Dccelerator.DataAccess.Implementations;
-using Dccelerator.Reflection;
 using ServiceStack;
 
 
@@ -46,6 +45,10 @@ namespace ConsoleApplication1
 
                     var other1 = RandomMaker.Make<SomeOtherEntity>(true, x => x.SomeEntityId = someEntity.Id);
                     var other2 = RandomMaker.Make<SomeOtherEntity>(true, x => x.SomeEntityId = someEntity.Id);
+
+                    someEntity.SomeEntities = new List<SomeOtherEntity>(2) {other1, other2};
+                    other1.SomeEntity = someEntity;
+                    other2.SomeEntity = someEntity;
 
                     otherEntities[i*2] = other1;
                     otherEntities[i*2 + 1] = other2;
