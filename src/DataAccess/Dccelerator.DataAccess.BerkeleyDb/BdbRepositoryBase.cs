@@ -13,13 +13,22 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         protected abstract Database OpenPrimaryDb(string dbName, DatabaseEnvironment environment);
 
 
-        protected abstract SecondaryDatabase OpenReadOnlySecondaryDb(Database primaryDb, string dbName, DatabaseEnvironment environment);
+        protected abstract SecondaryDatabase OpenReadOnlySecondaryDb(Database primaryDb, string indexSubName, DatabaseEnvironment environment);
 
         protected abstract SecondaryDatabase OpenForeignKeyDatabase(Database primaryDb, Database foreignDb, ForeignKeyAttribute mapping, DatabaseEnvironment environment);
 
         protected abstract DatabaseEntry KeyOf(object entity);
 
         protected abstract DatabaseEntry DataOf(object entity);
+
+        protected virtual string SecondaryDbName(Database primaryDb, string indexSubName) {
+            return $"{primaryDb.DatabaseName}-->{indexSubName}";
+        }
+
+        protected virtual string ForeignKeyDbName(Database primaryDb, Database foreignDb) {
+            return $"{primaryDb.DatabaseName}-->{foreignDb.DatabaseName}";
+        }
+
 
         #region Implementation of IBDbRepository
 
@@ -81,7 +90,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        public IEnumerable<DatabaseEntry> GetFromSecondaryDb(DatabaseEntry key, string entityName, string secondarySubName, DuplicatesPolicy duplicatesPolicy) {
+        public IEnumerable<DatabaseEntry> GetFromSecondaryDb(DatabaseEntry key, string entityName, string indexSubName, DuplicatesPolicy duplicatesPolicy) {
             DatabaseEnvironment environment = null;
             Database primaryDb = null;
             SecondaryDatabase secondaryDb = null;
@@ -89,7 +98,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
             try {
                 environment = OpenEnvironment();
                 primaryDb = OpenReadOnlyPrimaryDb(entityName, environment);
-                secondaryDb = OpenReadOnlySecondaryDb(primaryDb, secondarySubName, environment);
+                secondaryDb = OpenReadOnlySecondaryDb(primaryDb, indexSubName, environment);
 
                 if (duplicatesPolicy == DuplicatesPolicy.NONE) {
                     if (secondaryDb.Exists(key))

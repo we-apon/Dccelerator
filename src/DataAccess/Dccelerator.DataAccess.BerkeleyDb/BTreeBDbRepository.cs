@@ -54,8 +54,8 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        protected override SecondaryDatabase OpenReadOnlySecondaryDb(Database primaryDb, string dbName, DatabaseEnvironment environment) {
-            return SecondaryBTreeDatabase.Open(_dbPath, $"{primaryDb.DatabaseName}.{dbName}", new SecondaryBTreeDatabaseConfig(primaryDb, (key, data) => null) {
+        protected override SecondaryDatabase OpenReadOnlySecondaryDb(Database primaryDb, string indexSubName, DatabaseEnvironment environment) {
+            return SecondaryBTreeDatabase.Open(_dbPath, SecondaryDbName(primaryDb, indexSubName), new SecondaryBTreeDatabaseConfig(primaryDb, (key, data) => null) {
                 Env = environment,
                 ReadOnly = true,
                 Encrypted = environment?.EncryptAlgorithm == EncryptionAlgorithm.AES,
@@ -63,6 +63,8 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 Creation = CreatePolicy.NEVER
             });
         }
+
+
 
 
         protected override SecondaryDatabase OpenForeignKeyDatabase(Database primaryDb, Database foreignDb, ForeignKeyAttribute foreignKeyMapping, DatabaseEnvironment environment) {
@@ -77,11 +79,11 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
             foreignKeyConfig.SetForeignKeyConstraint(foreignDb, ForeignKeyDeleteAction.ABORT);
 
-            var secondary = SecondaryBTreeDatabase.Open(_dbPath, $"{primaryDb.DatabaseName}.{foreignDb.DatabaseName}", foreignKeyConfig);
+            var secondary = SecondaryBTreeDatabase.Open(_dbPath, ForeignKeyDbName(primaryDb, foreignDb), foreignKeyConfig);
             return secondary;
         }
 
-        
+
 
 
         public virtual SecondaryKeyGenDelegate GetForeignKeyGenerator(ForeignKeyAttribute foreignKeyMapping) {

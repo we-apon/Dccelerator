@@ -4,6 +4,8 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using BerkeleyDB;
+using Dccelerator.DataAccess.BerkeleyDb;
 using Dccelerator.DataAccess.Entities;
 
 
@@ -45,6 +47,10 @@ namespace ConsoleApplication1 {
 
         public Guid Id { get; set; }
 
+        [ForeignKey(Relationship = Relationship.ManyToOne, 
+            DuplicatesPolicy = DuplicatesPolicy.UNSORTED, 
+            ForeignEntityName = "SomeEntity", 
+            ForeignEntityNavigationPath = "SomeEntity")]
         public Guid SomeEntityId { get; set; }
 
         public string Name { get; set; }

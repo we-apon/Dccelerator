@@ -110,12 +110,30 @@ namespace ConsoleApplication1
 
 
 
-            TestBTreehDb(length, ids, entities, otherEntities);
+            //TestBTreehDb(length, ids, entities, otherEntities);
 
             //TestBTreehDbMt(length, ids, entities, otherEntities);
 
             var factory = new BdbFactory(_home, Path.Combine(_home, "btree.bdb"), "asdasdd");
             var manager = new DataManager(factory);
+
+            bool result;
+            using (var transaction = manager.BeginTransaction()) {
+                foreach (var someEntity in entities) {
+                    transaction.Insert(someEntity);
+                }
+
+                foreach (var someOtherEntity in otherEntities) {
+                    transaction.Insert(someOtherEntity);
+                }
+
+                result = transaction.Commit();
+            }
+
+
+            if (!result)
+                return;
+
 
             var allEntities = manager.Get<SomeEntity>().All().ToArray();
 

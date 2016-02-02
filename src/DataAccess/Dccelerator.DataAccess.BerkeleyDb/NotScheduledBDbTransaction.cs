@@ -39,7 +39,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose() {
-            throw new NotImplementedException();
+            Commit();
         }
 
         #endregion
@@ -113,9 +113,10 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
                 _isCommited = true;
 
+                //todo: store every performed action, and if some fails - all performed should be rolled back
 
                 foreach (var transactionElement in _elements) {
-                    if (transactionElement.ActionType != ActionType.Insert) {
+                    if (transactionElement.ActionType == ActionType.Insert) {
                         if (!transactionElement.Info.Repository.Insert(transactionElement.Entity, transactionElement.Info))
                             return false;
 

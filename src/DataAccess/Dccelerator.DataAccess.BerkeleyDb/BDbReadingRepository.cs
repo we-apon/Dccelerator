@@ -27,12 +27,22 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 if (repository.IsPrimaryKey(criterion))
                     return repository.GetByKeyFromPrimaryDb(entry, entityName);
 
+
+                DuplicatesPolicy policy;
+                string indexSubName;
+
                 ForeignKeyAttribute foreignKeyInfo;
-                var policy = _info.ForeignKeys.TryGetValue(criterion.Name, out foreignKeyInfo)
-                    ? foreignKeyInfo.DuplicatesPolicy
-                    : DuplicatesPolicy.UNSORTED;
+                if (_info.ForeignKeys.TryGetValue(criterion.Name, out foreignKeyInfo)) {
+                    policy = foreignKeyInfo.DuplicatesPolicy;
+                    indexSubName = foreignKeyInfo.ForeignEntityNavigationPath;
+                }
+                else {
+                    policy = DuplicatesPolicy.UNSORTED;
+                    indexSubName = criterion.Name;
+                }
                 
-                return repository.GetFromSecondaryDb(entry, entityName, criterion.Name, policy);
+                
+                return repository.GetFromSecondaryDb(entry, entityName, indexSubName, policy);
             }
 
             return repository.GetByJoin(entityName, criteria);
