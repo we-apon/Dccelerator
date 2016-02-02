@@ -13,11 +13,11 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         protected abstract Database OpenPrimaryDb(string dbName, DatabaseEnvironment environment);
 
 
-        protected abstract SecondaryDatabase OpenReadOnlySecondaryDb(Database primaryDb, string indexSubName, DatabaseEnvironment environment);
+        protected abstract SecondaryDatabase OpenReadOnlySecondaryDb(Database primaryDb, string indexSubName, DatabaseEnvironment environment, DuplicatesPolicy duplicatesPolicy);
 
         protected abstract SecondaryDatabase OpenForeignKeyDatabase(Database primaryDb, Database foreignDb, ForeignKeyAttribute mapping, DatabaseEnvironment environment);
 
-        protected abstract DatabaseEntry KeyOf(object entity);
+        protected abstract DatabaseEntry KeyOf(object entity, IBDbEntityInfo info);
 
         protected abstract DatabaseEntry DataOf(object entity);
 
@@ -28,6 +28,31 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         protected virtual string ForeignKeyDbName(Database primaryDb, Database foreignDb) {
             return $"{primaryDb.DatabaseName}-->{foreignDb.DatabaseName}";
         }
+
+
+        protected virtual void Insert(TransactionElement element, Database primaryDb, Transaction transaction) {
+            var key = KeyOf(element.Entity, element.Info);
+            var data = DataOf(element.Entity);
+            primaryDb.PutNoOverwrite(key, data, transaction);
+        }
+
+        protected virtual void Update(TransactionElement element, Database primaryDb, Transaction transaction) {
+            var key = KeyOf(element.Entity, element.Info);
+            var data = DataOf(element.Entity);
+            primaryDb.Put(key, data, transaction);
+        }
+
+        protected virtual void Delete(TransactionElement element, Database primaryDb, Transaction transaction) {
+            var key = KeyOf(element.Entity, element.Info);
+            primaryDb.Delete(key, transaction);
+        }
+
+
+        protected virtual Transaction BeginTransaction(DatabaseEnvironment environment) {
+            return environment.BeginTransaction();
+        }
+
+
 
 
         #region Implementation of IBDbRepository
@@ -98,7 +123,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
             try {
                 environment = OpenEnvironment();
                 primaryDb = OpenReadOnlyPrimaryDb(entityName, environment);
-                secondaryDb = OpenReadOnlySecondaryDb(primaryDb, indexSubName, environment);
+                secondaryDb = OpenReadOnlySecondaryDb(primaryDb, indexSubName, environment, duplicatesPolicy);
 
                 if (duplicatesPolicy == DuplicatesPolicy.NONE) {
                     if (secondaryDb.Exists(key))
@@ -135,7 +160,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        public IEnumerable<DatabaseEntry> GetByJoin(string entityName, ICollection<IDataCriterion> criteria) {
+        public IEnumerable<DatabaseEntry> GetByJoin(string entityName, ICollection<IDataCriterion> criteria, IBDbEntityInfo info) {
             DatabaseEnvironment environment = null;
             Database primaryDb = null;
 
@@ -151,7 +176,12 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 primaryDb = OpenReadOnlyPrimaryDb(entityName, environment);
 
                 foreach (var criterion in criteria) {
-                    var secondaryDb = OpenReadOnlySecondaryDb(primaryDb, criterion.Name, environment);
+                    ForeignKeyAttribute foreignKeyMapping;
+                    var duplicatesPolicy = info.ForeignKeys.TryGetValue(criterion.Name, out foreignKeyMapping)
+                        ? foreignKeyMapping.DuplicatesPolicy
+                        : DefaulDuplicatesPolicy;
+
+                    var secondaryDb = OpenReadOnlySecondaryDb(primaryDb, criterion.Name, environment, duplicatesPolicy);
                     secondaryDbs[dbsLength++] = secondaryDb;
 
                     var cursor = secondaryDb.SecondaryCursor();
@@ -192,6 +222,11 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
+        protected virtual DuplicatesPolicy DefaulDuplicatesPolicy => DuplicatesPolicy.UNSORTED;
+
+
+/*
+
         public bool Insert(object entity, IBDbEntityInfo info) {
             DatabaseEnvironment environment = null;
             Database primaryDb = null;
@@ -213,7 +248,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                     foreignKeyDatabases.Add(foreignKey);
                 }
                 
-                var key = KeyOf(entity);
+                var key = KeyOf(entity, info);
                 var data = DataOf(entity);
 
                 primaryDb.PutNoOverwrite(key, data);
@@ -237,6 +272,99 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 if (primaryDb != null) {
                     primaryDb.Close(true);
                     primaryDb.Dispose();
+                }
+
+                environment?.Close();
+            }
+        }
+*/
+
+
+        public bool PerformInTransaction(IEnumerable<TransactionElement> elements) {
+            DatabaseEnvironment environment = null;
+
+            Transaction transaction = null;
+
+            var primaryDatabases = new Dictionary<string, Database>();
+            var foreignDatabases = new Dictionary<string, Database>();
+            var foreignKeyDatabases = new Dictionary<string, SecondaryDatabase>();
+
+            var performedCount = 0;
+
+            try {
+                environment = OpenEnvironment();
+
+                transaction = BeginTransaction(environment);
+
+                foreach (var element in elements) {
+                    Database primaryDb;
+
+                    if (!primaryDatabases.TryGetValue(element.Info.EntityName, out primaryDb)) {
+                        primaryDb = OpenPrimaryDb(element.Info.EntityName, environment);
+                        primaryDatabases.Add(element.Info.EntityName, primaryDb);
+                    }
+
+
+                    foreach (var keyMapping in element.Info.ForeignKeys.Values) {
+                        Database foreignDb;
+
+                        if (!foreignDatabases.TryGetValue(keyMapping.ForeignEntityName, out foreignDb)) {
+                            foreignDb = OpenPrimaryDb(keyMapping.ForeignEntityName, environment);
+                            foreignDatabases.Add(keyMapping.ForeignEntityName, foreignDb);
+                        }
+
+                        SecondaryDatabase keyDatabase;
+                        var foreignKeyDbName = ForeignKeyDbName(primaryDb, foreignDb);
+                        if (!foreignKeyDatabases.TryGetValue(foreignKeyDbName, out keyDatabase)) {
+                            keyDatabase = OpenForeignKeyDatabase(primaryDb, foreignDb, keyMapping, environment);
+                            foreignKeyDatabases.Add(foreignKeyDbName, keyDatabase);
+                        }
+                    }
+
+
+                    switch (element.ActionType) {
+                        case ActionType.Insert:
+                            Insert(element, primaryDb, transaction);
+                            break;
+
+                        case ActionType.Update:
+                            Update(element, primaryDb, transaction);
+                            break;
+
+                        case ActionType.Delete:
+                            Delete(element, primaryDb, transaction);
+                            break;
+
+                        default: throw new NotImplementedException();
+                    }
+
+                    performedCount++;
+                }
+                
+                transaction.Commit();
+                return true;
+            }
+            catch (Exception e) {
+                //todo: write log
+
+                transaction.Abort();
+                return false;
+            }
+            finally {
+
+                foreach (var foreignKeyDatabase in foreignKeyDatabases) {
+                    foreignKeyDatabase.Value.Close(true);
+                    foreignKeyDatabase.Value.Dispose();
+                }
+
+                foreach (var foreignDatabase in foreignDatabases) {
+                    foreignDatabase.Value.Close(true);
+                    foreignDatabase.Value.Dispose();
+                }
+
+                foreach (var primaryDatabase in primaryDatabases) {
+                    primaryDatabase.Value.Close(true);
+                    primaryDatabase.Value.Dispose();
                 }
 
                 environment?.Close();

@@ -24,6 +24,9 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 Create = true,
                 UseMPool = true,
                 Private = true,
+                UseLogging = true,
+                UseLocking = true,
+                UseTxns = true
             };
 
             if (_encryptionAlgorithm != EncryptionAlgorithm.DEFAULT)
@@ -40,6 +43,8 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 Encrypted = environment?.EncryptAlgorithm == EncryptionAlgorithm.AES,
                 Creation = CreatePolicy.NEVER,
                 ReadOnly = true,
+                AutoCommit = true,
+                ReadUncommitted = true
             });
         }
 
@@ -50,17 +55,21 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 Encrypted = environment?.EncryptAlgorithm == EncryptionAlgorithm.AES,
                 Creation = CreatePolicy.IF_NEEDED,
                 ReadOnly = false,
+                AutoCommit = true,
+                ReadUncommitted = true
             });
         }
 
 
-        protected override SecondaryDatabase OpenReadOnlySecondaryDb(Database primaryDb, string indexSubName, DatabaseEnvironment environment) {
+        protected override SecondaryDatabase OpenReadOnlySecondaryDb(Database primaryDb, string indexSubName, DatabaseEnvironment environment, DuplicatesPolicy duplicatesPolicy) {
             return SecondaryBTreeDatabase.Open(_dbPath, SecondaryDbName(primaryDb, indexSubName), new SecondaryBTreeDatabaseConfig(primaryDb, (key, data) => null) {
                 Env = environment,
                 ReadOnly = true,
                 Encrypted = environment?.EncryptAlgorithm == EncryptionAlgorithm.AES,
-                Duplicates = DuplicatesPolicy.UNSORTED,
-                Creation = CreatePolicy.NEVER
+                Duplicates = duplicatesPolicy,
+                Creation = CreatePolicy.NEVER,
+                AutoCommit = true,
+                ReadUncommitted = true
             });
         }
 
@@ -73,8 +82,10 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 GetForeignKeyGenerator(foreignKeyMapping)) {
                     Env = environment,
                     Encrypted = environment?.EncryptAlgorithm == EncryptionAlgorithm.AES,
-                    Duplicates = DuplicatesPolicy.UNSORTED,
-                    Creation = CreatePolicy.IF_NEEDED
+                    Duplicates = foreignKeyMapping.DuplicatesPolicy,
+                    Creation = CreatePolicy.IF_NEEDED,
+                    ReadUncommitted = true,
+                    AutoCommit = true,
                 };
 
             foreignKeyConfig.SetForeignKeyConstraint(foreignDb, ForeignKeyDeleteAction.ABORT);

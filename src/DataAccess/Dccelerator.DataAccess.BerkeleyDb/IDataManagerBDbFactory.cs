@@ -2,5 +2,7 @@
     public interface IDataManagerBDbFactory : IDataManagerFactory {
         IBDbEntityInfo InfoAbout<TEntity>();
 
+
+        IBDbRepository Repository();
     }
 }

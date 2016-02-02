@@ -20,6 +20,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
             if (criteria.Count == 0)
                 return repository.ContinuouslyReadToEnd(entityName);
 
+            
             if (criteria.Count == 1) {
                 var criterion = criteria.First();
                 var entry = repository.EntryFrom(criterion);
@@ -45,7 +46,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 return repository.GetFromSecondaryDb(entry, entityName, indexSubName, policy);
             }
 
-            return repository.GetByJoin(entityName, criteria);
+            return repository.GetByJoin(entityName, criteria, _info);
         }
 
         

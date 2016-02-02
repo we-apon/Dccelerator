@@ -1,6 +1,7 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
@@ -8,22 +9,10 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         readonly IDataManagerBDbFactory _factory;
 
 
-        enum ActionType {
-            Insert,
-            Update,
-            Delete
-        }
+        readonly ConcurrentQueue<TransactionElement> _elements = new ConcurrentQueue<TransactionElement>();
 
-        class TransactionElement {
-            public ActionType ActionType { get; set; }
-
-            public IBDbEntityInfo Info { get; set; }
-
-            public object Entity { get; set; }
-        }
 
         
-        readonly ConcurrentQueue<TransactionElement> _elements = new ConcurrentQueue<TransactionElement>();
 
         readonly object _lock = new object();
 
@@ -32,6 +21,16 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
             _factory = factory;
         }
 
+        void AppendTransactionElement<TEntity>(TEntity entity, ActionType actionType) where TEntity : class {
+            var info = _factory.InfoAbout<TEntity>();
+            _elements.Enqueue(new TransactionElement {
+                ActionType = actionType,
+                Entity = entity,
+                Info = info
+            });
+        }
+
+        
 
         #region Implementation of IDisposable
 
@@ -51,21 +50,19 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// Inserts <paramref name="entity"/> into database.
         /// </summary>
         public void Insert<TEntity>(TEntity entity) where TEntity : class {
-            var element = new TransactionElement {
-                ActionType = ActionType.Insert,
-                Entity = entity,
-                Info = _factory.InfoAbout<TEntity>()
-            };
-            
-            _elements.Enqueue(element);
+            AppendTransactionElement(entity, ActionType.Insert);
         }
+
+
 
 
         /// <summary>
         /// Inserts <paramref name="entities"/> into database.
         /// </summary>
         public void InsertMany<TEntity>(IEnumerable<TEntity> entities) where TEntity : class {
-            throw new NotImplementedException();
+            foreach (var entity in entities) {
+                AppendTransactionElement(entity, ActionType.Insert);
+            }
         }
 
 
@@ -73,7 +70,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// Updates <paramref name="entity"/> in database.
         /// </summary>
         public void Update<TEntity>(TEntity entity) where TEntity : class {
-            throw new NotImplementedException();
+            AppendTransactionElement(entity, ActionType.Update);
         }
 
 
@@ -81,7 +78,9 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// Updates <paramref name="entities"/> in database.
         /// </summary>
         public void UpdateMany<TEntity>(IEnumerable<TEntity> entities) where TEntity : class {
-            throw new NotImplementedException();
+            foreach (var entity in entities) {
+                AppendTransactionElement(entity, ActionType.Update);
+            }
         }
 
 
@@ -89,7 +88,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// Removes <paramref name="entity"/> from database.
         /// </summary>
         public void Delete<TEntity>(TEntity entity) where TEntity : class {
-            throw new NotImplementedException();
+            AppendTransactionElement(entity, ActionType.Delete);
         }
 
 
@@ -97,7 +96,9 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// Removes <paramref name="entities"/> from database.
         /// </summary>
         public void DeleteMany<TEntity>(IEnumerable<TEntity> entities) where TEntity : class {
-            throw new NotImplementedException();
+            foreach (var entity in entities) {
+                AppendTransactionElement(entity, ActionType.Delete);
+            }
         }
 
 
@@ -107,26 +108,16 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// </summary>
         /// <returns>Result of performed transaction.</returns>
         public bool Commit() {
+            if (_isCommited)
+                return true;
+
             lock (_lock) {
                 if (_isCommited)
                     return true;
 
                 _isCommited = true;
 
-                //todo: store every performed action, and if some fails - all performed should be rolled back
-
-                foreach (var transactionElement in _elements) {
-                    if (transactionElement.ActionType == ActionType.Insert) {
-                        if (!transactionElement.Info.Repository.Insert(transactionElement.Entity, transactionElement.Info))
-                            return false;
-
-                        continue;
-                    }
-
-                    throw new NotImplementedException();
-                }
-
-                return true;
+                return _factory.Repository().PerformInTransaction(_elements);
             }
         }
 
@@ -140,5 +131,21 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         bool _isCommited;
 
         #endregion
+    }
+
+
+    public enum ActionType {
+        Insert,
+        Update,
+        Delete
+    }
+
+
+    public class TransactionElement {
+        internal ActionType ActionType { get; set; }
+
+        public IBDbEntityInfo Info { get; set; }
+
+        public object Entity { get; set; }
     }
 }

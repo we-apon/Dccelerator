@@ -23,7 +23,7 @@ namespace ConsoleApplication1
 
         #region Overrides of BDbRepositoryBase
 
-        protected override DatabaseEntry KeyOf(object entity) {
+        protected override DatabaseEntry KeyOf(object entity, IBDbEntityInfo info) {
             var identifiedEntity = entity as IIdentifiedEntity;
             if (identifiedEntity == null)
                 throw new InvalidOperationException();
@@ -113,6 +113,8 @@ namespace ConsoleApplication1
             //TestBTreehDb(length, ids, entities, otherEntities);
 
             //TestBTreehDbMt(length, ids, entities, otherEntities);
+
+
 
             var factory = new BdbFactory(_home, Path.Combine(_home, "btree.bdb"), "asdasdd");
             var manager = new DataManager(factory);
@@ -676,6 +678,9 @@ namespace ConsoleApplication1
                 Create = true,
                 UseMPool = true,
                 Private = true,
+                UseLocking = true,
+                UseLogging = true,
+                UseTxns = true,
                 /*SystemMemory = true,*/
                 /*Lockdown = true,*/
                 ErrorPrefix = "Environment: ",
@@ -683,7 +688,6 @@ namespace ConsoleApplication1
             };
             databaseEnvironmentConfig.SetEncryption("asdasdd", EncryptionAlgorithm.AES);
             var env = DatabaseEnvironment.Open(_home, databaseEnvironmentConfig);
-
 
             var otherEntitiesDb = OpenBTreeDb(bTreeDbPath, nameof(SomeOtherEntity), env); //primary
             var entitiesDb = OpenBTreeDb(bTreeDbPath, nameof(SomeEntity), env); // foreign
@@ -720,22 +724,26 @@ namespace ConsoleApplication1
 
             var watch = new Stopwatch();
             watch.Restart();
+
+            var transaction = env.BeginTransaction();
+
             for (int i = 0; i < length; i++) {
                 var id = new DatabaseEntry(ids[i]);
                 var data = new DatabaseEntry(entities[i].ToBinnary());
-                entitiesDb.Put(id, data);
+                entitiesDb.Put(id, data, transaction);
 
                 var other1 = otherEntities[i * 2];
                 var other1Id = new DatabaseEntry(other1.Id.ToByteArray());
                 var other1Data = new DatabaseEntry(other1.ToBinnary());
-                otherEntitiesDb.Put(other1Id, other1Data);
+                otherEntitiesDb.Put(other1Id, other1Data, transaction);
 
                 var other2 = otherEntities[i * 2 + 1];
                 var other2Id = new DatabaseEntry(other2.Id.ToByteArray());
                 var other2Data = new DatabaseEntry(other2.ToBinnary());
-                otherEntitiesDb.Put(other2Id, other2Data);
-
+                otherEntitiesDb.Put(other2Id, other2Data, transaction);
             }
+            transaction.Commit();
+
             watch.Stop();
             File.AppendAllText(_logTxt, "Put in b-tree: " + watch.Elapsed + "\n");
 
@@ -892,6 +900,8 @@ namespace ConsoleApplication1
                     Encrypted = env?.EncryptAlgorithm == EncryptionAlgorithm.AES,
                     Duplicates = DuplicatesPolicy.UNSORTED,
                     Creation = CreatePolicy.IF_NEEDED,
+                    AutoCommit = true,
+                    ReadUncommitted = true,
                     ErrorPrefix = $"{otherEntitiesDb.DatabaseName}.{nameof(SomeOtherEntity.SomeEntityId)} Db:",
                     ErrorFeedback = (prefix, message) => 
                     File.AppendAllText(_logTxt, prefix + message + "\n")
@@ -906,16 +916,18 @@ namespace ConsoleApplication1
 
 
         static BTreeDatabase OpenBTreeDb(string filePath, string dbName, DatabaseEnvironment environment) {
-            var db = BTreeDatabase.Open(filePath, dbName,
-                new BTreeDatabaseConfig {
-                    Env = environment,
-                    Encrypted = environment?.EncryptAlgorithm == EncryptionAlgorithm.AES,
-                    Creation = CreatePolicy.IF_NEEDED,
-                    ReadOnly = false,
-                    ErrorPrefix = $"{dbName}Db: ",
-                    ErrorFeedback = (prefix, message) => 
-                    File.AppendAllText(_logTxt, prefix + message + "\n"),
-                });
+            var config = new BTreeDatabaseConfig {
+                Env = environment,
+                Encrypted = environment?.EncryptAlgorithm == EncryptionAlgorithm.AES,
+                Creation = CreatePolicy.IF_NEEDED,
+                ReadOnly = false,
+                AutoCommit = true,
+                ReadUncommitted = true,
+                ErrorPrefix = $"{dbName}Db: ",
+                ErrorFeedback = (prefix, message) => File.AppendAllText(_logTxt, prefix + message + "\n"),
+            };
+            var db = BTreeDatabase.Open(filePath, dbName, config);
+            
             return db;
         }
 
