@@ -1,4 +1,5 @@
 using System;
+using BerkeleyDB;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
@@ -12,6 +13,13 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// Reletionship of key and entity.
         /// </summary>
         public Relationship Relationship { get; set; }
+
+
+
+        /// <summary>
+        /// Duplication policy between current entity and marked secondary key
+        /// </summary>
+        public DuplicatesPolicy DuplicatesPolicy { get; set; }
 
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using BerkeleyDB;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
@@ -9,10 +10,20 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
     /// </summary>
     public class ForeignKeyAttribute : Attribute {
 
+        public static readonly Type Type = typeof (ForeignKeyAttribute);
+
+
         /// <summary>
         /// Reletionship of key and entity.
         /// </summary>
         public Relationship Relationship { get; set; }
+
+
+        /// <summary>
+        /// Duplication policy between current entity and marked secondary key
+        /// </summary>
+        public DuplicatesPolicy DuplicatesPolicy { get; set; }
+
 
         /// <summary>
         /// Name of the other entity, that is referenced by the current

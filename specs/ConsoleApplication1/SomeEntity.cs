@@ -4,15 +4,13 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using ServiceStack;
+using Dccelerator.DataAccess.Entities;
 
 
 namespace ConsoleApplication1 {
 
     [Serializable]
-    public class SomeEntity {
-
-
+    public class SomeEntity : IIdentifiedEntity {
 
         /// <summary>
         /// Id of <see cref="SomeEntity"/>
@@ -43,7 +41,8 @@ namespace ConsoleApplication1 {
 
 
     [Serializable]
-    public class SomeOtherEntity {
+    public class SomeOtherEntity : IIdentifiedEntity {
+
         public Guid Id { get; set; }
 
         public Guid SomeEntityId { get; set; }

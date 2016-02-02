@@ -8,13 +8,62 @@ using System.Text;
 using System.Threading.Tasks;
 using BerkeleyDB;
 using Dccelerator;
+using Dccelerator.DataAccess;
 using Dccelerator.DataAccess.BerkeleyDb;
+using Dccelerator.DataAccess.Entities;
 using Dccelerator.DataAccess.Implementations;
 using ServiceStack;
 
 
 namespace ConsoleApplication1
 {
+    class Repository : BTreeBDbRepository {
+        public Repository(string environmentPath, string dbPath, string password, EncryptionAlgorithm encryptionAlgorithm) : base(environmentPath, dbPath, password, encryptionAlgorithm) {}
+
+
+        #region Overrides of BDbRepositoryBase
+
+        protected override DatabaseEntry KeyOf(object entity) {
+            var identifiedEntity = entity as IIdentifiedEntity;
+            if (identifiedEntity == null)
+                throw new InvalidOperationException();
+
+            return new DatabaseEntry(identifiedEntity.Id.ToBinnary());
+        }
+
+
+        public override bool IsPrimaryKey(IDataCriterion criterion) {
+            return criterion.Name == nameof(IIdentifiedEntity.Id);
+        }
+
+        #endregion
+    }
+
+
+    class BdbFactory : BDbDataManagerFactoryBase {
+        readonly string _environmentPath;
+        readonly string _dbFilePath;
+        readonly string _password;
+
+
+        public BdbFactory(string environmentPath, string dbFilePath, string password) {
+            _environmentPath = environmentPath;
+            _dbFilePath = dbFilePath;
+            _password = password;
+        }
+
+
+        #region Overrides of BDbDataManagerFactoryBase
+
+        public override IBDbRepository Repository() {
+            return new Repository(_environmentPath, _dbFilePath, _password, EncryptionAlgorithm.AES);
+        }
+
+        #endregion
+    }
+
+
+
     class Program
     {
         static readonly string _home = AppDomain.CurrentDomain.BaseDirectory;
@@ -65,7 +114,7 @@ namespace ConsoleApplication1
 
             //TestBTreehDbMt(length, ids, entities, otherEntities);
 
-            var factory = new BDbDataManagerFactory(_home, Path.Combine(_home, "btree.bdb"), "asdasdd");
+            var factory = new BdbFactory(_home, Path.Combine(_home, "btree.bdb"), "asdasdd");
             var manager = new DataManager(factory);
 
             var allEntities = manager.Get<SomeEntity>().All().ToArray();

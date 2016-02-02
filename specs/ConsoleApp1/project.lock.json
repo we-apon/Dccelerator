@@ -21,7 +21,7 @@
       },
       "Dccelerator.DataAccess.BerkeleyDb/0.0.1-alfa2": {
         "type": "project",
-        "framework": ".NETFramework,Version=v4.5",
+        "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "BerkleyDB": "6.1.26-debug",
           "Dccelerator.Core": null,
@@ -68,7 +68,7 @@
       },
       "Dccelerator.DataAccess.BerkeleyDb/0.0.1-alfa2": {
         "type": "project",
-        "framework": ".NETFramework,Version=v4.5",
+        "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "BerkleyDB": "6.1.26-debug",
           "Dccelerator.Core": null,
@@ -115,7 +115,7 @@
       },
       "Dccelerator.DataAccess.BerkeleyDb/0.0.1-alfa2": {
         "type": "project",
-        "framework": ".NETFramework,Version=v4.5",
+        "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "BerkleyDB": "6.1.26-debug",
           "Dccelerator.Core": null,

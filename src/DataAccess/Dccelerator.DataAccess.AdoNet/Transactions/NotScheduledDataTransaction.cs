@@ -5,14 +5,14 @@ using System.Data;
 using System.Diagnostics;
 
 
-namespace Dccelerator.DataAccess.Implementations.Transactions {
+namespace Dccelerator.DataAccess.Ado.Transactions {
     /// <summary>
     /// An realization of <see cref="IDataTransaction"/> that is not deferring anything.
     /// Once methods like <see cref="Insert{TEntity}"/> or <see cref="UpdateMany{TEntity}"/> called - in just doing it and no waits for anyone.
     /// <see cref="Dispose"/> and <see cref="Commit"/> is unused. They're doing nothing.
     /// </summary>
     public abstract class NotScheduledDataTransaction : IDataTransaction {
-        readonly IDataManagerFactory _factory;
+        readonly IDataManagerAdoFactory _factory;
         readonly IsolationLevel _isolationLevel;
         readonly object _lock = new object();
 
@@ -20,7 +20,7 @@ namespace Dccelerator.DataAccess.Implementations.Transactions {
         bool _isCommited;
 
 
-        public NotScheduledDataTransaction(IDataManagerFactory factory, IsolationLevel isolationLevel) {
+        public NotScheduledDataTransaction(IDataManagerAdoFactory factory, IsolationLevel isolationLevel) {
             _factory = factory;
             _isolationLevel = isolationLevel;
         }

@@ -4,7 +4,7 @@ using Dccelerator.Reflection;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
-    public abstract class BTreeBDbRepository : BdbRepositoryBase {
+    public abstract class BTreeBDbRepository : BDbRepositoryBase {
         readonly string _environmentPath;
         readonly string _dbPath;
         readonly string _password;

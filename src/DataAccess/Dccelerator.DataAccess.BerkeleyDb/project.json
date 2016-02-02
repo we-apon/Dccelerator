@@ -13,14 +13,6 @@
       },
       "frameworkAssemblies": {
       }
-    },
-
-    "net45": {
-      "compilationOptions": { "define": [ "JETBRAINS_ANNOTATIONS" ] },
-      "dependencies": {
-      },
-      "frameworkAssemblies": {
-      }
     }
   },
 

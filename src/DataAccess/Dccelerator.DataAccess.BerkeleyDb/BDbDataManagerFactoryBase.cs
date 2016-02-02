@@ -1,22 +1,10 @@
 ﻿using System;
 using System.Data;
-using System.Linq.Expressions;
 using Dccelerator.DataAccess.Implementations.Schedulers;
-using Dccelerator.DataAccess.Infrastructure;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
-    public class BDbDataManagerFactory : IDataManagerFactory {
-        readonly string _environmentPath;
-        readonly string _dbFilePath;
-        readonly string _password;
-
-
-        public BDbDataManagerFactory(string environmentPath, string dbFilePath, string password) {
-            _environmentPath = environmentPath;
-            _dbFilePath = dbFilePath;
-            _password = password;
-        }
+    public abstract class BDbDataManagerFactoryBase : IDataManagerBDbFactory {
 
 
         #region Implementation of IDataManagerFactory
@@ -35,7 +23,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called on each request of any not cached entity.
         /// </summary>
         public IDataGetter<TEntity> NotCachedGetterFor<TEntity>() where TEntity : class, new() {
-            return new BDbDataGetter<TEntity>(typeof(TEntity).Name, _environmentPath, _dbFilePath, _password);
+            return new BDbDataGetter<TEntity>(InfoAbout<TEntity>());
         }
 
 
@@ -80,7 +68,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called on each <see cref="IDataManager.BeginTransaction"/> call.
         /// </summary>
         public IDataTransaction DataTransaction(ITransactionScheduler scheduler, IsolationLevel isolationLevel) {
-            return new NotScheduledBDbTransaction();
+            return new NotScheduledBDbTransaction(this);
         }
 
 
@@ -92,10 +80,18 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
             return new DummyScheduler(); //todo: test it!
         }
 
+        
+        public IBDbEntityInfo InfoAbout<TEntity>() {
+            var info = BDbInfoAbout<TEntity>.Info;
+            if (info.Repository == null)
+                info.Repository = Repository();
 
-        public IEntityInfo InfoAbout<TEntity>() {
-            throw new NotImplementedException();
+            return info;
         }
+
+
+        public abstract IBDbRepository Repository();
+
 
         #endregion
     }

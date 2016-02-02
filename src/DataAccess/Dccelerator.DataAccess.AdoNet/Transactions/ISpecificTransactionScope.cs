@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Dccelerator.DataAccess.Implementations.Transactions {
+namespace Dccelerator.DataAccess.Ado.Transactions {
     public interface ISpecificTransactionScope : IDisposable {
         void Complete();
     }

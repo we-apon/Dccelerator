@@ -32,8 +32,8 @@ namespace Dccelerator.DataAccess
         public EntityAttribute(Type repository) {
             Repository = repository;
 
-            if (!(Repository is IDataAccessRepository))
-                throw new InvalidOperationException($"{nameof(Repository)} should implement {nameof(IDataAccessRepository)} interface.");
+/*            if (!(Repository is IDataAccessRepository))
+                throw new InvalidOperationException($"{nameof(Repository)} should implement {nameof(IDataAccessRepository)} interface.");*/
         }
 
 

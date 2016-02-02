@@ -4,7 +4,7 @@ using BerkeleyDB;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
-    public abstract class BdbRepositoryBase : IBDbRepository {
+    public abstract class BDbRepositoryBase : IBDbRepository {
         
         protected abstract DatabaseEnvironment OpenEnvironment();
 
@@ -22,6 +22,14 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         protected abstract DatabaseEntry DataOf(object entity);
 
         #region Implementation of IBDbRepository
+
+        public abstract bool IsPrimaryKey(IDataCriterion criterion);
+
+
+        public virtual DatabaseEntry EntryFrom(IDataCriterion criterion) {
+            return new DatabaseEntry(criterion.Value.ToBinnary());
+        }
+
 
         public IEnumerable<DatabaseEntry> ContinuouslyReadToEnd(string entityName) {
             DatabaseEnvironment environment = null;
@@ -118,17 +126,74 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        public bool Insert(object entity, string name, ICollection<ForeignKeyAttribute> foreignKeys) {
+        public IEnumerable<DatabaseEntry> GetByJoin(string entityName, ICollection<IDataCriterion> criteria) {
             DatabaseEnvironment environment = null;
             Database primaryDb = null;
-            IList<Database> foreignDatabases = new List<Database>(foreignKeys.Count);
-            IList<SecondaryDatabase> foreignKeyDatabases = new List<SecondaryDatabase>(foreignKeys.Count);
+
+            var dbsLength = 0;
+            var cursorsLength = 0;
+
+            var secondaryDbs = new SecondaryDatabase[criteria.Count];
+            var secondaryCursors = new SecondaryCursor[criteria.Count];
+            JoinCursor joinCursor = null;
 
             try {
                 environment = OpenEnvironment();
-                primaryDb = OpenPrimaryDb(name, environment);
+                primaryDb = OpenReadOnlyPrimaryDb(entityName, environment);
 
-                foreach (var foreignKeyMapping in foreignKeys) {
+                foreach (var criterion in criteria) {
+                    var secondaryDb = OpenReadOnlySecondaryDb(primaryDb, criterion.Name, environment);
+                    secondaryDbs[dbsLength++] = secondaryDb;
+
+                    var cursor = secondaryDb.SecondaryCursor();
+                    secondaryCursors[cursorsLength++] = cursor;
+
+                    var key = new DatabaseEntry(criterion.Value.ToBinnary());
+                    if (!cursor.Move(key, true))
+                        yield break;
+                }
+
+                joinCursor = primaryDb.Join(secondaryCursors, true);
+                while (joinCursor.MoveNext())
+                    yield return joinCursor.Current.Value;
+            }
+            finally {
+                if (joinCursor != null) {
+                    joinCursor.Close();
+                    joinCursor.Dispose();
+                }
+
+                for (var i = 0; i < cursorsLength; i++) {
+                    secondaryCursors[i].Close();
+                    secondaryCursors[i].Dispose();
+                }
+
+                for (var i = 0; i < dbsLength; i++) {
+                    secondaryDbs[i].Close(true);
+                    secondaryDbs[i].Dispose();
+                }
+
+                if (primaryDb != null) {
+                    primaryDb.Close(true);
+                    primaryDb.Dispose();
+                }
+
+                environment?.Close();
+            }
+        }
+
+
+        public bool Insert(object entity, IBDbEntityInfo info) {
+            DatabaseEnvironment environment = null;
+            Database primaryDb = null;
+            IList<Database> foreignDatabases = new List<Database>(info.ForeignKeys.Count);
+            IList<SecondaryDatabase> foreignKeyDatabases = new List<SecondaryDatabase>(info.ForeignKeys.Count);
+
+            try {
+                environment = OpenEnvironment();
+                primaryDb = OpenPrimaryDb(info.EntityName, environment);
+
+                foreach (var foreignKeyMapping in info.ForeignKeys.Values) {
                     if (foreignKeyMapping.Relationship != Relationship.ManyToOne)
                         continue;
 

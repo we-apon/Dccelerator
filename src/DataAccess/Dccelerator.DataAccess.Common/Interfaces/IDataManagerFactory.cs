@@ -64,8 +64,6 @@ namespace Dccelerator.DataAccess {
         /// This method will be called one time in every <see cref="IDataManager"/>.
         /// </summary>
         ITransactionScheduler Scheduler();
-
         
-        IEntityInfo InfoAbout<TEntity>();
     }
 }

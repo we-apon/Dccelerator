@@ -96,7 +96,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
             Type = type;
             TypeInfo = type.GetInfo();
 
-            EntityAttribute = TypeInfo.GetEntityAttribute();
+            EntityAttribute = TypeInfo.GetConfigurationForRepository();
 
 
 

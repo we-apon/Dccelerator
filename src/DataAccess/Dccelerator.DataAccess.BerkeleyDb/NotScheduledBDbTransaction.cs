@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
     public class NotScheduledBDbTransaction : IDataTransaction {
+        readonly IDataManagerBDbFactory _factory;
+
 
         enum ActionType {
             Insert,
@@ -15,7 +17,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         class TransactionElement {
             public ActionType ActionType { get; set; }
 
-            public BDbEntityInfo Info { get; set; }
+            public IBDbEntityInfo Info { get; set; }
 
             public object Entity { get; set; }
         }
@@ -26,6 +28,9 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         readonly object _lock = new object();
 
 
+        public NotScheduledBDbTransaction(IDataManagerBDbFactory factory) {
+            _factory = factory;
+        }
 
 
         #region Implementation of IDisposable
@@ -49,10 +54,9 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
             var element = new TransactionElement {
                 ActionType = ActionType.Insert,
                 Entity = entity,
-                Info = new BDbEntityInfo() //todo something with it
+                Info = _factory.InfoAbout<TEntity>()
             };
             
-
             _elements.Enqueue(element);
         }
 
@@ -112,7 +116,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
                 foreach (var transactionElement in _elements) {
                     if (transactionElement.ActionType != ActionType.Insert) {
-                        if (!transactionElement.Info.Repository.Insert(transactionElement.Entity, transactionElement.Info.Type.Name, transactionElement.Info.ForeignKeyMappings.Values))
+                        if (!transactionElement.Info.Repository.Insert(transactionElement.Entity, transactionElement.Info))
                             return false;
 
                         continue;

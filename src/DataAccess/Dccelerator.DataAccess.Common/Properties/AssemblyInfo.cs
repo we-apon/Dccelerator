@@ -24,3 +24,4 @@ using System.Runtime.InteropServices;
 
 
 [assembly: InternalsVisibleTo("Dccelerator.DataAccess.AdoNet")]
+[assembly: InternalsVisibleTo("Dccelerator.DataAccess.BerkeleyDb")]

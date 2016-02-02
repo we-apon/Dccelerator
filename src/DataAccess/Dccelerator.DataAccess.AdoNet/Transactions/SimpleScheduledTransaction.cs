@@ -1,12 +1,12 @@
 using System.Data;
 
 
-namespace Dccelerator.DataAccess.Implementations.Transactions {
+namespace Dccelerator.DataAccess.Ado.Transactions {
     public abstract class SimpleScheduledTransaction : NotScheduledDataTransaction {
         readonly ITransactionScheduler _scheduler;
 
 
-        protected SimpleScheduledTransaction(ITransactionScheduler scheduler, IDataManagerFactory factory, IsolationLevel isolationLevel) : base(factory, isolationLevel) {
+        protected SimpleScheduledTransaction(ITransactionScheduler scheduler, IDataManagerAdoFactory factory, IsolationLevel isolationLevel) : base(factory, isolationLevel) {
             _scheduler = scheduler;
         }
 
