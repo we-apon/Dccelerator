@@ -5,8 +5,17 @@ using BerkeleyDB;
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
     public abstract class BDbRepositoryBase : IBDbRepository {
-        
-        protected abstract DatabaseEnvironment OpenEnvironment();
+        readonly string _environmentPath;
+        readonly string _password;
+        readonly EncryptionAlgorithm _encryptionAlgorithm;
+
+
+        protected BDbRepositoryBase(string environmentPath, string password, EncryptionAlgorithm encryptionAlgorithm) {
+            _environmentPath = environmentPath;
+            _password = password;
+            _encryptionAlgorithm = encryptionAlgorithm;
+        }
+
 
         protected abstract Database OpenReadOnlyPrimaryDb(string dbName, DatabaseEnvironment environment);
 
@@ -55,6 +64,35 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
 
 
+        protected virtual DatabaseEnvironment OpenEnvironment() {
+            var databaseEnvironmentConfig = new DatabaseEnvironmentConfig {
+                Create = true,
+                UseMPool = true,
+                Private = true,
+                UseLogging = true,
+                UseLocking = true,
+                UseTxns = true,/*
+                LockSystemCfg = new LockingConfig {
+                    DeadlockResolution = DeadlockPolicy.MIN_WRITE
+                },
+                LogSystemCfg = new LogConfig {
+                    InMemory = true,
+                    BufferSize = 100 * 1024 * 1024
+                },
+                MPoolSystemCfg = new MPoolConfig {
+                    CacheSize = new CacheInfo(0, 100 * 1024 * 1024, 1)
+                },
+                RunRecovery = true*/
+            };
+
+            if (_encryptionAlgorithm != EncryptionAlgorithm.DEFAULT)
+                databaseEnvironmentConfig.SetEncryption(_password, EncryptionAlgorithm.AES);
+
+            return DatabaseEnvironment.Open(_environmentPath, databaseEnvironmentConfig);
+        }
+
+
+
         #region Implementation of IBDbRepository
 
         public abstract bool IsPrimaryKey(IDataCriterion criterion);
@@ -84,7 +122,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 }
                 
                 if (primaryDb != null) {
-                    primaryDb.Close(true);
+                    primaryDb.Close();
                     primaryDb.Dispose();
                 }
 
@@ -106,7 +144,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
             }
             finally {
                 if (primaryDb != null) {
-                    primaryDb.Close(true);
+                    primaryDb.Close();
                     primaryDb.Dispose();
                 }
 
@@ -146,12 +184,12 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 }
 
                 if (secondaryDb != null) {
-                    secondaryDb.Close(true);
+                    secondaryDb.Close();
                     secondaryDb.Dispose();
                 }
 
                 if (primaryDb != null) {
-                    primaryDb.Close(true);
+                    primaryDb.Close();
                     primaryDb.Dispose();
                 }
 
@@ -208,12 +246,12 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 }
 
                 for (var i = 0; i < dbsLength; i++) {
-                    secondaryDbs[i].Close(true);
+                    secondaryDbs[i].Close();
                     secondaryDbs[i].Dispose();
                 }
 
                 if (primaryDb != null) {
-                    primaryDb.Close(true);
+                    primaryDb.Close();
                     primaryDb.Dispose();
                 }
 
@@ -280,7 +318,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 */
 
 
-        public bool PerformInTransaction(IEnumerable<TransactionElement> elements) {
+        public bool PerformInTransaction(ICollection<IBDbEntityInfo> entityInfos, IEnumerable<TransactionElement> elements) {
             DatabaseEnvironment environment = null;
 
             Transaction transaction = null;
@@ -296,10 +334,27 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
                 transaction = BeginTransaction(environment);
 
+                foreach (var info in entityInfos) {
+                    var primaryDb = OpenPrimaryDb(info.EntityName, environment);
+                    primaryDatabases.Add(info.EntityName, primaryDb);
+
+                    foreach (var keyMapping in info.ForeignKeys.Values) {
+                        var foreignDb = OpenPrimaryDb(keyMapping.ForeignEntityName, environment);
+                        foreignDatabases.Add(keyMapping.ForeignEntityName, foreignDb);
+
+                        var keyDatabase = OpenForeignKeyDatabase(primaryDb, foreignDb, keyMapping, environment);
+                        foreignKeyDatabases.Add(ForeignKeyDbName(primaryDb, foreignDb), keyDatabase);
+                    }
+                }
+
+
                 foreach (var element in elements) {
                     Database primaryDb;
+                    if (!primaryDatabases.TryGetValue(element.Info.EntityName, out primaryDb))
+                        throw new InvalidOperationException($"Primary Db '{element.Info.EntityName}' is not opened");
 
-                    if (!primaryDatabases.TryGetValue(element.Info.EntityName, out primaryDb)) {
+
+/*                    if (!primaryDatabases.TryGetValue(element.Info.EntityName, out primaryDb)) {
                         primaryDb = OpenPrimaryDb(element.Info.EntityName, environment);
                         primaryDatabases.Add(element.Info.EntityName, primaryDb);
                     }
@@ -319,7 +374,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                             keyDatabase = OpenForeignKeyDatabase(primaryDb, foreignDb, keyMapping, environment);
                             foreignKeyDatabases.Add(foreignKeyDbName, keyDatabase);
                         }
-                    }
+                    }*/
 
 
                     switch (element.ActionType) {
@@ -347,7 +402,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
             catch (Exception e) {
                 //todo: write log
 
-                transaction.Abort();
+                transaction?.Abort();
                 return false;
             }
             finally {

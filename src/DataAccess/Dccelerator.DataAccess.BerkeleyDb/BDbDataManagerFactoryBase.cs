@@ -4,7 +4,15 @@ using Dccelerator.DataAccess.Implementations.Schedulers;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
-    public abstract class BDbDataManagerFactoryBase : IDataManagerBDbFactory {
+    public abstract class BDbDataManagerFactoryBase : IDataManagerBDbFactory, IDisposable {
+        readonly IBDbSchema _schema;
+
+
+        protected BDbDataManagerFactoryBase(string environmentPath, string dbFilePath, string password) {
+            _schema = new BDbSchema(environmentPath, dbFilePath, password);
+        }
+
+        protected BDbDataManagerFactoryBase(string environmentPath, string dbFilePath) : this(environmentPath, dbFilePath, null) { }
 
 
         #region Implementation of IDataManagerFactory
@@ -92,6 +100,22 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
         public abstract IBDbRepository Repository();
 
+
+        public IBDbSchema Schema() {
+            return _schema;
+        }
+
+        #endregion
+
+
+        #region Implementation of IDisposable
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose() {
+            _schema.Dispose();
+        }
 
         #endregion
     }

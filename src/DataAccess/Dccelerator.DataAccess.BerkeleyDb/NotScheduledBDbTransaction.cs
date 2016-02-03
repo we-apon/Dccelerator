@@ -10,7 +10,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
 
         readonly ConcurrentQueue<TransactionElement> _elements = new ConcurrentQueue<TransactionElement>();
-
+        readonly HashSet<IBDbEntityInfo> _entityInfos = new HashSet<IBDbEntityInfo>();
 
         
 
@@ -23,6 +23,10 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
         void AppendTransactionElement<TEntity>(TEntity entity, ActionType actionType) where TEntity : class {
             var info = _factory.InfoAbout<TEntity>();
+            lock (_entityInfos) {
+                _entityInfos.Add(info);
+            }
+
             _elements.Enqueue(new TransactionElement {
                 ActionType = actionType,
                 Entity = entity,
@@ -117,7 +121,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
                 _isCommited = true;
 
-                return _factory.Repository().PerformInTransaction(_elements);
+                return _factory.Repository().PerformInTransaction(_entityInfos, _elements);
             }
         }
 

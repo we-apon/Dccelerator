@@ -77,9 +77,9 @@ namespace ConsoleApplication1
                 File.Delete(_logTxt);
 
 #if DEBUG
-            var length = 100;
+            var length = 500;
 #else
-            var length = 100000;
+            var length = 10000;
 #endif
             File.AppendAllText(_logTxt, $"Entities count: {length}\nOther entities count: {length*2}\n\n");
 
@@ -110,7 +110,7 @@ namespace ConsoleApplication1
 
 
 
-            //TestBTreehDb(length, ids, entities, otherEntities);
+            TestBTreehDb(length, ids, entities, otherEntities);
 
             //TestBTreehDbMt(length, ids, entities, otherEntities);
 
@@ -119,6 +119,9 @@ namespace ConsoleApplication1
             var factory = new BdbFactory(_home, Path.Combine(_home, "btree.bdb"), "asdasdd");
             var manager = new DataManager(factory);
 
+            var watch = new Stopwatch();
+
+            watch.Restart();
             bool result;
             using (var transaction = manager.BeginTransaction()) {
                 foreach (var someEntity in entities) {
@@ -131,21 +134,28 @@ namespace ConsoleApplication1
 
                 result = transaction.Commit();
             }
-
+            watch.Stop();
+            File.AppendAllText(_logTxt, $"Put {entities.Length + otherEntities.Length} elements in b-tree, with Dccelerator, transactions and {(result ? "valid" : "fail")} result: " + watch.Elapsed + "\n");
 
             if (!result)
                 return;
 
 
+            watch.Restart();
             var allEntities = manager.Get<SomeEntity>().All().ToArray();
+            watch.Stop();
+            File.AppendAllText(_logTxt, $"Continuously read {entities.Length} elements in b-tree, with Dccelerator: " + watch.Elapsed + "\n");
+
+
 
             var allOtherEntities = new List<SomeOtherEntity>();
 
-
+            watch.Restart();
             foreach (var someEntity in allEntities) {
                 allOtherEntities.AddRange(manager.Get<SomeOtherEntity>().Where(x => x.SomeEntityId, someEntity.Id));
             }
-
+            watch.Stop();
+            File.AppendAllText(_logTxt, $"Search elements {entities.Length} times by foreign key with Dccelerator: " + watch.Elapsed + "\n");
 
 
 
@@ -669,7 +679,7 @@ namespace ConsoleApplication1
 
             GC.Collect();
 
-            var bTreeDbPath = Path.Combine(_home, "btree.bdb");
+            var bTreeDbPath = Path.Combine(_home, "btreeTest.bdb");
 /*            if (File.Exists(bTreeDbPath))
                 File.Delete(bTreeDbPath);*/
 
@@ -681,6 +691,13 @@ namespace ConsoleApplication1
                 UseLocking = true,
                 UseLogging = true,
                 UseTxns = true,
+                LogSystemCfg = new LogConfig {
+                    InMemory = true,
+                    BufferSize = 100 * 1024 * 1024
+                },
+                MPoolSystemCfg = new MPoolConfig {
+                    CacheSize = new CacheInfo(0, 100 * 1024 * 1024, 1)
+                },
                 /*SystemMemory = true,*/
                 /*Lockdown = true,*/
                 ErrorPrefix = "Environment: ",

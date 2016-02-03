@@ -5,34 +5,12 @@ using Dccelerator.Reflection;
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
     public abstract class BTreeBDbRepository : BDbRepositoryBase {
-        readonly string _environmentPath;
         readonly string _dbPath;
-        readonly string _password;
-        readonly EncryptionAlgorithm _encryptionAlgorithm;
 
 
-        protected BTreeBDbRepository(string environmentPath, string dbPath, string password, EncryptionAlgorithm encryptionAlgorithm) { 
-            _environmentPath = environmentPath;
+        protected BTreeBDbRepository(string environmentPath, string dbPath, string password, EncryptionAlgorithm encryptionAlgorithm)
+            : base(environmentPath, password, encryptionAlgorithm) {
             _dbPath = dbPath;
-            _password = password;
-            _encryptionAlgorithm = encryptionAlgorithm;
-        }
-
-
-        protected override DatabaseEnvironment OpenEnvironment() {
-            var databaseEnvironmentConfig = new DatabaseEnvironmentConfig {
-                Create = true,
-                UseMPool = true,
-                Private = true,
-                UseLogging = true,
-                UseLocking = true,
-                UseTxns = true
-            };
-
-            if (_encryptionAlgorithm != EncryptionAlgorithm.DEFAULT)
-                databaseEnvironmentConfig.SetEncryption(_password, EncryptionAlgorithm.AES);
-
-            return DatabaseEnvironment.Open(_environmentPath, databaseEnvironmentConfig);
         }
 
 

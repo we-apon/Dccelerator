@@ -4,5 +4,8 @@
 
 
         IBDbRepository Repository();
+
+
+        IBDbSchema Schema();
     }
 }

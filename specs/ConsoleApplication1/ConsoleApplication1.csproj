@@ -33,17 +33,14 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dccelerator.Core, Version=0.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\artifacts\bin\Dccelerator.Core\Debug\net40\Dccelerator.Core.dll</HintPath>
+    <Reference Include="Dccelerator.Core">
+      <HintPath>..\..\artifacts\bin\Dccelerator.Core\Release\net45\Dccelerator.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Dccelerator.DataAccess.BerkeleyDb, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\artifacts\bin\Dccelerator.DataAccess.BerkeleyDb\Debug\net40\Dccelerator.DataAccess.BerkeleyDb.dll</HintPath>
+    <Reference Include="Dccelerator.DataAccess.BerkeleyDb">
+      <HintPath>..\..\artifacts\bin\Dccelerator.DataAccess.BerkeleyDb\Release\net40\Dccelerator.DataAccess.BerkeleyDb.dll</HintPath>
     </Reference>
-    <Reference Include="Dccelerator.DataAccess.Common, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\artifacts\bin\Dccelerator.DataAccess.Common\Debug\net40\Dccelerator.DataAccess.Common.dll</HintPath>
+    <Reference Include="Dccelerator.DataAccess.Common">
+      <HintPath>..\..\artifacts\bin\Dccelerator.DataAccess.Common\Release\net45\Dccelerator.DataAccess.Common.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
