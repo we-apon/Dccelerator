@@ -5,30 +5,22 @@ using BerkeleyDB;
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
     public abstract class BDbRepositoryBase : IBDbRepository {
-        readonly string _environmentPath;
-        readonly string _password;
-        readonly EncryptionAlgorithm _encryptionAlgorithm;
+        readonly IBDbSchema _schema;
 
 
-        protected BDbRepositoryBase(string environmentPath, string password, EncryptionAlgorithm encryptionAlgorithm) {
-            _environmentPath = environmentPath;
-            _password = password;
-            _encryptionAlgorithm = encryptionAlgorithm;
+        protected BDbRepositoryBase(IBDbSchema schema) {
+            _schema = schema;
         }
-
-
-        protected abstract Database OpenReadOnlyPrimaryDb(string dbName, DatabaseEnvironment environment);
-
-        protected abstract Database OpenPrimaryDb(string dbName, DatabaseEnvironment environment);
-
-
-        protected abstract SecondaryDatabase OpenReadOnlySecondaryDb(Database primaryDb, string indexSubName, DatabaseEnvironment environment, DuplicatesPolicy duplicatesPolicy);
-
-        protected abstract SecondaryDatabase OpenForeignKeyDatabase(Database primaryDb, Database foreignDb, ForeignKeyAttribute mapping, DatabaseEnvironment environment);
 
         protected abstract DatabaseEntry KeyOf(object entity, IBDbEntityInfo info);
 
-        protected abstract DatabaseEntry DataOf(object entity);
+
+        protected virtual DatabaseEntry DataOf(object entity) {
+            if (entity == null)
+                return null;
+
+            return new DatabaseEntry(entity.ToBinnary());
+        }
 
         protected virtual string SecondaryDbName(Database primaryDb, string indexSubName) {
             return $"{primaryDb.DatabaseName}-->{indexSubName}";
@@ -62,36 +54,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-
-
-        protected virtual DatabaseEnvironment OpenEnvironment() {
-            var databaseEnvironmentConfig = new DatabaseEnvironmentConfig {
-                Create = true,
-                UseMPool = true,
-                Private = true,
-                UseLogging = true,
-                UseLocking = true,
-                UseTxns = true,/*
-                LockSystemCfg = new LockingConfig {
-                    DeadlockResolution = DeadlockPolicy.MIN_WRITE
-                },
-                LogSystemCfg = new LogConfig {
-                    InMemory = true,
-                    BufferSize = 100 * 1024 * 1024
-                },
-                MPoolSystemCfg = new MPoolConfig {
-                    CacheSize = new CacheInfo(0, 100 * 1024 * 1024, 1)
-                },
-                RunRecovery = true*/
-            };
-
-            if (_encryptionAlgorithm != EncryptionAlgorithm.DEFAULT)
-                databaseEnvironmentConfig.SetEncryption(_password, EncryptionAlgorithm.AES);
-
-            return DatabaseEnvironment.Open(_environmentPath, databaseEnvironmentConfig);
-        }
-
-
+        
 
         #region Implementation of IBDbRepository
 
@@ -104,64 +67,32 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
 
         public IEnumerable<DatabaseEntry> ContinuouslyReadToEnd(string entityName) {
-            DatabaseEnvironment environment = null;
-            Database primaryDb = null;
             Cursor cursor = null;
             try {
-                environment = OpenEnvironment();
-                primaryDb = OpenReadOnlyPrimaryDb(entityName, environment);
+                var primaryDb = _schema.GetPrimaryDb(entityName, readOnly: true);
 
                 cursor = primaryDb.Cursor();
                 while (cursor.MoveNext())
                     yield return cursor.Current.Value;
             }
             finally {
-                if (cursor != null) {
-                    cursor.Close();
-                    cursor.Dispose();
-                }
-                
-                if (primaryDb != null) {
-                    primaryDb.Close();
-                    primaryDb.Dispose();
-                }
-
-                environment?.Close();
+                cursor?.Close();
             }
         }
 
 
         public IEnumerable<DatabaseEntry> GetByKeyFromPrimaryDb(DatabaseEntry key, string entityName) {
-            DatabaseEnvironment environment = null;
-            Database primaryDb = null;
-            try {
-                environment = OpenEnvironment();
-                primaryDb = OpenReadOnlyPrimaryDb(entityName, environment);
-
-                if (primaryDb.Exists(key))
-                    yield return primaryDb.Get(key).Value;
-
-            }
-            finally {
-                if (primaryDb != null) {
-                    primaryDb.Close();
-                    primaryDb.Dispose();
-                }
-
-                environment?.Close();
-            }
+            var primaryDb = _schema.GetPrimaryDb(entityName, readOnly: true);
+            if (primaryDb.Exists(key))
+                yield return primaryDb.Get(key).Value;
         }
 
 
         public IEnumerable<DatabaseEntry> GetFromSecondaryDb(DatabaseEntry key, string entityName, string indexSubName, DuplicatesPolicy duplicatesPolicy) {
-            DatabaseEnvironment environment = null;
-            Database primaryDb = null;
-            SecondaryDatabase secondaryDb = null;
             Cursor cursor = null;
             try {
-                environment = OpenEnvironment();
-                primaryDb = OpenReadOnlyPrimaryDb(entityName, environment);
-                secondaryDb = OpenReadOnlySecondaryDb(primaryDb, indexSubName, environment, duplicatesPolicy);
+                var primaryDb = _schema.GetPrimaryDb(entityName, readOnly: true);
+                var secondaryDb = _schema.GetReadOnlySecondaryDb(primaryDb, indexSubName, duplicatesPolicy);
 
                 if (duplicatesPolicy == DuplicatesPolicy.NONE) {
                     if (secondaryDb.Exists(key))
@@ -178,49 +109,27 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                     yield return cursor.Current.Value;
             }
             finally {
-                if (cursor != null) {
-                    cursor.Close();
-                    cursor.Dispose();
-                }
-
-                if (secondaryDb != null) {
-                    secondaryDb.Close();
-                    secondaryDb.Dispose();
-                }
-
-                if (primaryDb != null) {
-                    primaryDb.Close();
-                    primaryDb.Dispose();
-                }
-
-                environment?.Close();
+                cursor?.Close();
             }
         }
 
 
         public IEnumerable<DatabaseEntry> GetByJoin(string entityName, ICollection<IDataCriterion> criteria, IBDbEntityInfo info) {
-            DatabaseEnvironment environment = null;
-            Database primaryDb = null;
 
-            var dbsLength = 0;
             var cursorsLength = 0;
-
-            var secondaryDbs = new SecondaryDatabase[criteria.Count];
             var secondaryCursors = new SecondaryCursor[criteria.Count];
             JoinCursor joinCursor = null;
 
             try {
-                environment = OpenEnvironment();
-                primaryDb = OpenReadOnlyPrimaryDb(entityName, environment);
+                var primaryDb = _schema.GetPrimaryDb(entityName, readOnly: true);
 
                 foreach (var criterion in criteria) {
                     ForeignKeyAttribute foreignKeyMapping;
                     var duplicatesPolicy = info.ForeignKeys.TryGetValue(criterion.Name, out foreignKeyMapping)
                         ? foreignKeyMapping.DuplicatesPolicy
-                        : DefaulDuplicatesPolicy;
+                        : DefaultDuplicatesPolicy;
 
-                    var secondaryDb = OpenReadOnlySecondaryDb(primaryDb, criterion.Name, environment, duplicatesPolicy);
-                    secondaryDbs[dbsLength++] = secondaryDb;
+                    var secondaryDb = _schema.GetReadOnlySecondaryDb(primaryDb, criterion.Name, duplicatesPolicy);
 
                     var cursor = secondaryDb.SecondaryCursor();
                     secondaryCursors[cursorsLength++] = cursor;
@@ -235,147 +144,28 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                     yield return joinCursor.Current.Value;
             }
             finally {
-                if (joinCursor != null) {
-                    joinCursor.Close();
-                    joinCursor.Dispose();
-                }
+                joinCursor?.Close();
 
                 for (var i = 0; i < cursorsLength; i++) {
                     secondaryCursors[i].Close();
-                    secondaryCursors[i].Dispose();
                 }
-
-                for (var i = 0; i < dbsLength; i++) {
-                    secondaryDbs[i].Close();
-                    secondaryDbs[i].Dispose();
-                }
-
-                if (primaryDb != null) {
-                    primaryDb.Close();
-                    primaryDb.Dispose();
-                }
-
-                environment?.Close();
             }
         }
 
 
-        protected virtual DuplicatesPolicy DefaulDuplicatesPolicy => DuplicatesPolicy.UNSORTED;
+        protected virtual DuplicatesPolicy DefaultDuplicatesPolicy => DuplicatesPolicy.UNSORTED;
 
-
-/*
-
-        public bool Insert(object entity, IBDbEntityInfo info) {
-            DatabaseEnvironment environment = null;
-            Database primaryDb = null;
-            IList<Database> foreignDatabases = new List<Database>(info.ForeignKeys.Count);
-            IList<SecondaryDatabase> foreignKeyDatabases = new List<SecondaryDatabase>(info.ForeignKeys.Count);
-
-            try {
-                environment = OpenEnvironment();
-                primaryDb = OpenPrimaryDb(info.EntityName, environment);
-
-                foreach (var foreignKeyMapping in info.ForeignKeys.Values) {
-                    if (foreignKeyMapping.Relationship != Relationship.ManyToOne)
-                        continue;
-
-                    var foreignDb = OpenReadOnlyPrimaryDb(foreignKeyMapping.ForeignEntityName, environment);
-                    foreignDatabases.Add(foreignDb);
-
-                    var foreignKey = OpenForeignKeyDatabase(primaryDb, foreignDb, foreignKeyMapping, environment);
-                    foreignKeyDatabases.Add(foreignKey);
-                }
-                
-                var key = KeyOf(entity, info);
-                var data = DataOf(entity);
-
-                primaryDb.PutNoOverwrite(key, data);
-                return true;
-            }
-            catch (Exception e) {
-                //todo: write log
-                return false;
-            }
-            finally {
-                foreach (var foreignKeyDatabase in foreignKeyDatabases) {
-                    foreignKeyDatabase.Close(true);
-                    foreignKeyDatabase.Dispose();
-                }
-
-                foreach (var foreignDatabase in foreignDatabases) {
-                    foreignDatabase.Close(true);
-                    foreignDatabase.Dispose();
-                }
-
-                if (primaryDb != null) {
-                    primaryDb.Close(true);
-                    primaryDb.Dispose();
-                }
-
-                environment?.Close();
-            }
-        }
-*/
-
-
+        
         public bool PerformInTransaction(ICollection<IBDbEntityInfo> entityInfos, IEnumerable<TransactionElement> elements) {
-            DatabaseEnvironment environment = null;
 
             Transaction transaction = null;
 
-            var primaryDatabases = new Dictionary<string, Database>();
-            var foreignDatabases = new Dictionary<string, Database>();
-            var foreignKeyDatabases = new Dictionary<string, SecondaryDatabase>();
-
-            var performedCount = 0;
-
             try {
-                environment = OpenEnvironment();
 
-                transaction = BeginTransaction(environment);
-
-                foreach (var info in entityInfos) {
-                    var primaryDb = OpenPrimaryDb(info.EntityName, environment);
-                    primaryDatabases.Add(info.EntityName, primaryDb);
-
-                    foreach (var keyMapping in info.ForeignKeys.Values) {
-                        var foreignDb = OpenPrimaryDb(keyMapping.ForeignEntityName, environment);
-                        foreignDatabases.Add(keyMapping.ForeignEntityName, foreignDb);
-
-                        var keyDatabase = OpenForeignKeyDatabase(primaryDb, foreignDb, keyMapping, environment);
-                        foreignKeyDatabases.Add(ForeignKeyDbName(primaryDb, foreignDb), keyDatabase);
-                    }
-                }
-
-
+                transaction = _schema.BeginTransactionFor(entityInfos);
+                
                 foreach (var element in elements) {
-                    Database primaryDb;
-                    if (!primaryDatabases.TryGetValue(element.Info.EntityName, out primaryDb))
-                        throw new InvalidOperationException($"Primary Db '{element.Info.EntityName}' is not opened");
-
-
-/*                    if (!primaryDatabases.TryGetValue(element.Info.EntityName, out primaryDb)) {
-                        primaryDb = OpenPrimaryDb(element.Info.EntityName, environment);
-                        primaryDatabases.Add(element.Info.EntityName, primaryDb);
-                    }
-
-
-                    foreach (var keyMapping in element.Info.ForeignKeys.Values) {
-                        Database foreignDb;
-
-                        if (!foreignDatabases.TryGetValue(keyMapping.ForeignEntityName, out foreignDb)) {
-                            foreignDb = OpenPrimaryDb(keyMapping.ForeignEntityName, environment);
-                            foreignDatabases.Add(keyMapping.ForeignEntityName, foreignDb);
-                        }
-
-                        SecondaryDatabase keyDatabase;
-                        var foreignKeyDbName = ForeignKeyDbName(primaryDb, foreignDb);
-                        if (!foreignKeyDatabases.TryGetValue(foreignKeyDbName, out keyDatabase)) {
-                            keyDatabase = OpenForeignKeyDatabase(primaryDb, foreignDb, keyMapping, environment);
-                            foreignKeyDatabases.Add(foreignKeyDbName, keyDatabase);
-                        }
-                    }*/
-
+                    var primaryDb = _schema.GetPrimaryDb(element.Info.EntityName, readOnly: false);
 
                     switch (element.ActionType) {
                         case ActionType.Insert:
@@ -392,8 +182,6 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
                         default: throw new NotImplementedException();
                     }
-
-                    performedCount++;
                 }
                 
                 transaction.Commit();
@@ -405,26 +193,6 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 transaction?.Abort();
                 return false;
             }
-            finally {
-
-                foreach (var foreignKeyDatabase in foreignKeyDatabases) {
-                    foreignKeyDatabase.Value.Close(true);
-                    foreignKeyDatabase.Value.Dispose();
-                }
-
-                foreach (var foreignDatabase in foreignDatabases) {
-                    foreignDatabase.Value.Close(true);
-                    foreignDatabase.Value.Dispose();
-                }
-
-                foreach (var primaryDatabase in primaryDatabases) {
-                    primaryDatabase.Value.Close(true);
-                    primaryDatabase.Value.Dispose();
-                }
-
-                environment?.Close();
-            }
-
         }
 
         #endregion

@@ -17,8 +17,8 @@ using ServiceStack;
 
 namespace ConsoleApplication1
 {
-    class Repository : BTreeBDbRepository {
-        public Repository(string environmentPath, string dbPath, string password, EncryptionAlgorithm encryptionAlgorithm) : base(environmentPath, dbPath, password, encryptionAlgorithm) {}
+    class Repository : BDbRepositoryBase {
+        public Repository(IBDbSchema schema) : base(schema) {}
 
 
         #region Overrides of BDbRepositoryBase
@@ -41,22 +41,14 @@ namespace ConsoleApplication1
 
 
     class BdbFactory : BDbDataManagerFactoryBase {
-        readonly string _environmentPath;
-        readonly string _dbFilePath;
-        readonly string _password;
 
-
-        public BdbFactory(string environmentPath, string dbFilePath, string password) {
-            _environmentPath = environmentPath;
-            _dbFilePath = dbFilePath;
-            _password = password;
-        }
+        public BdbFactory(string environmentPath, string dbFilePath, string password) : base(environmentPath, dbFilePath, password) { }
 
 
         #region Overrides of BDbDataManagerFactoryBase
 
         public override IBDbRepository Repository() {
-            return new Repository(_environmentPath, _dbFilePath, _password, EncryptionAlgorithm.AES);
+            return new Repository(Schema());
         }
 
         #endregion
@@ -77,9 +69,9 @@ namespace ConsoleApplication1
                 File.Delete(_logTxt);
 
 #if DEBUG
-            var length = 500;
+            var length = 1000;
 #else
-            var length = 10000;
+            var length = 100;
 #endif
             File.AppendAllText(_logTxt, $"Entities count: {length}\nOther entities count: {length*2}\n\n");
 
@@ -110,54 +102,54 @@ namespace ConsoleApplication1
 
 
 
-            TestBTreehDb(length, ids, entities, otherEntities);
+            //TestBTreehDb(length, ids, entities, otherEntities);
 
             //TestBTreehDbMt(length, ids, entities, otherEntities);
 
 
 
-            var factory = new BdbFactory(_home, Path.Combine(_home, "btree.bdb"), "asdasdd");
-            var manager = new DataManager(factory);
+            using (var factory = new BdbFactory(_home, Path.Combine(_home, "btree.bdb"), "asdasdd")) {
+                var manager = new DataManager(factory);
 
-            var watch = new Stopwatch();
+                var watch = new Stopwatch();
 
-            watch.Restart();
-            bool result;
-            using (var transaction = manager.BeginTransaction()) {
-                foreach (var someEntity in entities) {
-                    transaction.Insert(someEntity);
+                watch.Restart();
+                bool result;
+                using (var transaction = manager.BeginTransaction()) {
+                    foreach (var someEntity in entities) {
+                        transaction.Insert(someEntity);
+                    }
+
+                    foreach (var someOtherEntity in otherEntities) {
+                        transaction.Insert(someOtherEntity);
+                    }
+
+                    result = transaction.Commit();
                 }
+                watch.Stop();
+                File.AppendAllText(_logTxt, $"Put {entities.Length + otherEntities.Length} elements in b-tree, with Dccelerator, transactions and {(result ? "valid" : "fail")} result: " + watch.Elapsed + "\n");
 
-                foreach (var someOtherEntity in otherEntities) {
-                    transaction.Insert(someOtherEntity);
+                if (!result)
+                    return;
+
+
+                watch.Restart();
+                var allEntities = manager.Get<SomeEntity>().All().ToArray();
+                watch.Stop();
+                File.AppendAllText(_logTxt, $"Continuously read {allEntities.Length} elements in b-tree, with Dccelerator: " + watch.Elapsed + "\n");
+
+
+
+                var allOtherEntities = new List<SomeOtherEntity>();
+
+                watch.Restart();
+                foreach (var someEntity in allEntities) {
+                    allOtherEntities.AddRange(manager.Get<SomeOtherEntity>().Where(x => x.SomeEntityId, someEntity.Id));
                 }
+                watch.Stop();
+                File.AppendAllText(_logTxt, $"Search elements {allEntities.Length} times by foreign key with Dccelerator: " + watch.Elapsed + "\n");
 
-                result = transaction.Commit();
             }
-            watch.Stop();
-            File.AppendAllText(_logTxt, $"Put {entities.Length + otherEntities.Length} elements in b-tree, with Dccelerator, transactions and {(result ? "valid" : "fail")} result: " + watch.Elapsed + "\n");
-
-            if (!result)
-                return;
-
-
-            watch.Restart();
-            var allEntities = manager.Get<SomeEntity>().All().ToArray();
-            watch.Stop();
-            File.AppendAllText(_logTxt, $"Continuously read {entities.Length} elements in b-tree, with Dccelerator: " + watch.Elapsed + "\n");
-
-
-
-            var allOtherEntities = new List<SomeOtherEntity>();
-
-            watch.Restart();
-            foreach (var someEntity in allEntities) {
-                allOtherEntities.AddRange(manager.Get<SomeOtherEntity>().Where(x => x.SomeEntityId, someEntity.Id));
-            }
-            watch.Stop();
-            File.AppendAllText(_logTxt, $"Search elements {entities.Length} times by foreign key with Dccelerator: " + watch.Elapsed + "\n");
-
-
 
 /*
 
@@ -693,10 +685,10 @@ namespace ConsoleApplication1
                 UseTxns = true,
                 LogSystemCfg = new LogConfig {
                     InMemory = true,
-                    BufferSize = 100 * 1024 * 1024
+                    BufferSize = 500 * 1024 * 1024
                 },
                 MPoolSystemCfg = new MPoolConfig {
-                    CacheSize = new CacheInfo(0, 100 * 1024 * 1024, 1)
+                    CacheSize = new CacheInfo(0, 500 * 1024 * 1024, 1)
                 },
                 /*SystemMemory = true,*/
                 /*Lockdown = true,*/

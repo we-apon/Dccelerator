@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using BerkeleyDB;
 using Dccelerator.Reflection;
 
@@ -9,14 +11,19 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         readonly string _environmentPath;
         readonly string _dbPath;
         string _password;
-        readonly ConcurrentDictionary<string, Database> _primaryReadOnlyDbs = new ConcurrentDictionary<string, Database>();
+        //readonly ConcurrentDictionary<string, Database> _primaryReadOnlyDbs = new ConcurrentDictionary<string, Database>();
         readonly ConcurrentDictionary<string, SecondaryDatabase> _secondaryReadOnlyDbs = new ConcurrentDictionary<string, SecondaryDatabase>();
 
         readonly ConcurrentDictionary<string, Database> _primaryWritableDbs = new ConcurrentDictionary<string, Database>();
         readonly ConcurrentDictionary<string, SecondaryDatabase> _foreignKeyWritableDbs = new ConcurrentDictionary<string, SecondaryDatabase>();
 
+        readonly HashSet<string> _transactionPreparedEntities = new HashSet<string>(); 
+
+
 
         public bool IsEncrypted { get; private set; }
+
+        public bool IsFreeThreaded { get; private set; }
 
         public virtual DatabaseEnvironment Environment {
             get {
@@ -27,6 +34,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 _password = null;
 
                 IsEncrypted = _environment.EncryptAlgorithm == EncryptionAlgorithm.AES;
+                IsFreeThreaded = _environment.FreeThreaded;
 
                 return _environment;
             }
@@ -44,18 +52,16 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
 
         public Database GetPrimaryDb(string dbName, bool readOnly) {
-            var cache = readOnly ? _primaryReadOnlyDbs : _primaryWritableDbs;
-
             Database database;
-            if (cache.TryGetValue(dbName, out database))
+            if (_primaryWritableDbs.TryGetValue(dbName, out database))
                 return database;
 
-            database = OpenDatabase(dbName, readOnly);
-            if (cache.TryAdd(dbName, database))
+            database = OpenDatabase(dbName);
+            if (_primaryWritableDbs.TryAdd(dbName, database))
                 return database;
 
             database.Close();
-            database = cache[dbName];
+            database = _primaryWritableDbs[dbName];
             return database;
         }
 
@@ -96,7 +102,28 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
+        public virtual Transaction BeginTransactionFor(ICollection<IBDbEntityInfo> entityInfos) {
+            var needToPrepare = new List<IBDbEntityInfo>();
 
+            lock (_transactionPreparedEntities) {
+                needToPrepare.AddRange(entityInfos.Where(info => !_transactionPreparedEntities.Contains(info.EntityName)));
+            }
+
+            foreach (var info in needToPrepare) {
+                var primaryDb = GetPrimaryDb(info.EntityName, readOnly:false);
+
+                foreach (var keyMapping in info.ForeignKeys.Values) {
+                    var foreignDb = GetPrimaryDb(keyMapping.ForeignEntityName, readOnly:false);
+                    GetWritableForeignKeyDatabase(primaryDb, foreignDb, keyMapping);
+                }
+
+                lock (_transactionPreparedEntities) {
+                    _transactionPreparedEntities.Add(info.EntityName);
+                }
+            }
+
+            return Environment.BeginTransaction();
+        }
 
 
         protected virtual SecondaryDatabase OpenWritableForeignKeyDatabase(Database primaryDb, Database foreignDb, ForeignKeyAttribute foreignKeyMapping, string dbName) {
@@ -106,6 +133,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 Duplicates = foreignKeyMapping.DuplicatesPolicy,
                 Creation = CreatePolicy.IF_NEEDED,
                 ReadUncommitted = true,
+                FreeThreaded = IsFreeThreaded,
                 AutoCommit = true,
             };
 
@@ -125,6 +153,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                     Creation = CreatePolicy.NEVER,
                     ReadOnly = true,
                     AutoCommit = true,
+                    FreeThreaded = IsFreeThreaded,
                     ReadUncommitted = true
                 });
         }
@@ -148,17 +177,17 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 UseLogging = true,
                 UseLocking = true,
                 FreeThreaded = true,
-                UseTxns = true,/*
+                UseTxns = true,
                 LockSystemCfg = new LockingConfig {
                     DeadlockResolution = DeadlockPolicy.MIN_WRITE
                 },
                 LogSystemCfg = new LogConfig {
-                    InMemory = true,
-                    BufferSize = 100 * 1024 * 1024
+                    InMemory = false,
+                    BufferSize = 500 * 1024 * 1024
                 },
                 MPoolSystemCfg = new MPoolConfig {
-                    CacheSize = new CacheInfo(0, 100 * 1024 * 1024, 1)
-                }*/
+                    CacheSize = new CacheInfo(0, 500 * 1024 * 1024, 1)
+                }
             };
             if (!string.IsNullOrWhiteSpace(password)) {
                 environmentConfig.SetEncryption(_password, EncryptionAlgorithm.AES);
@@ -168,12 +197,12 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        protected virtual Database OpenDatabase(string dbName, bool readOnly) {
+        protected virtual Database OpenDatabase(string dbName) {
             return BTreeDatabase.Open(_dbPath, dbName, new BTreeDatabaseConfig {
                 Env = Environment,
                 Encrypted = IsEncrypted,
                 Creation = CreatePolicy.IF_NEEDED,
-                ReadOnly = readOnly,
+                FreeThreaded = IsFreeThreaded,
                 AutoCommit = true,
                 ReadUncommitted = true
             });
@@ -199,10 +228,27 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose() {
-            Environment.CloseForceSyncAndForceSyncEnv();
+            foreach (var db in _secondaryReadOnlyDbs) {
+                db.Value.Close(true);
+                db.Value.Dispose();
+            }
+
+            foreach (var db in _foreignKeyWritableDbs) {
+                db.Value.Close(true);
+                db.Value.Dispose();
+            }
+
+            foreach (var db in _primaryWritableDbs) {
+                db.Value.Close(true);
+                db.Value.Dispose();
+            }
+
+
+
+            Environment.Close();
             _secondaryReadOnlyDbs.Clear();
             _foreignKeyWritableDbs.Clear();
-            _primaryReadOnlyDbs.Clear();
+            /*_primaryReadOnlyDbs.Clear();*/
             _primaryWritableDbs.Clear();
         }
 
