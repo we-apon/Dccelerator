@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BerkeleyDB;
+using Dccelerator.DataAccess.Attributes;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {

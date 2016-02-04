@@ -1,8 +1,7 @@
 ﻿using System;
-using BerkeleyDB;
 
 
-namespace Dccelerator.DataAccess.BerkeleyDb {
+namespace Dccelerator.DataAccess.Attributes {
 
     /// <summary>
     /// Means what marked property will be used as for searching and maps current entity to another.
@@ -29,6 +28,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// Name of the other entity, that is referenced by the current
         /// </summary>
         public string ForeignEntityName { get; set; }
+
 
         /// <summary>
         /// Name of navigation property, that navigates to the other entity, from the current.

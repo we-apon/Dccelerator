@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using BerkeleyDB;
+using Dccelerator.DataAccess.Attributes;
 using Dccelerator.Reflection;
 
 
@@ -39,6 +40,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 return _environment;
             }
         }
+
         DatabaseEnvironment _environment;
 
         public BDbSchema(string environmentPath, string dbPath) : this(environmentPath, dbPath, null) { }
@@ -130,7 +132,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
             var foreignKeyConfig = new SecondaryBTreeDatabaseConfig(primaryDb, GetForeignKeyGenerator(foreignKeyMapping)) {
                 Env = Environment,
                 Encrypted = IsEncrypted,
-                Duplicates = foreignKeyMapping.DuplicatesPolicy,
+                Duplicates = (BerkeleyDB.DuplicatesPolicy)foreignKeyMapping.DuplicatesPolicy,
                 Creation = CreatePolicy.IF_NEEDED,
                 ReadUncommitted = true,
                 FreeThreaded = IsFreeThreaded,
@@ -149,7 +151,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 new SecondaryBTreeDatabaseConfig(primaryDb, (key, data) => null) {
                     Env = Environment,
                     Encrypted = IsEncrypted,
-                    Duplicates = duplicatesPolicy,
+                    Duplicates = (BerkeleyDB.DuplicatesPolicy)duplicatesPolicy,
                     Creation = CreatePolicy.NEVER,
                     ReadOnly = true,
                     AutoCommit = true,
@@ -178,22 +180,37 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 UseLocking = true,
                 FreeThreaded = true,
                 UseTxns = true,
-                LockSystemCfg = new LockingConfig {
-                    DeadlockResolution = DeadlockPolicy.MIN_WRITE
-                },
-                LogSystemCfg = new LogConfig {
-                    InMemory = false,
-                    BufferSize = 500 * 1024 * 1024
-                },
-                MPoolSystemCfg = new MPoolConfig {
-                    CacheSize = new CacheInfo(0, 500 * 1024 * 1024, 1)
-                }
+                LockSystemCfg = GetLockSystemConfig(),
+                LogSystemCfg = GetLogSystemConfig(),
+                MPoolSystemCfg = GetMPoolSystemConfig()
             };
             if (!string.IsNullOrWhiteSpace(password)) {
                 environmentConfig.SetEncryption(_password, EncryptionAlgorithm.AES);
             }
 
             return DatabaseEnvironment.Open(_environmentPath, environmentConfig);
+        }
+
+
+        protected virtual LockingConfig GetLockSystemConfig() {
+            return new LockingConfig {
+                DeadlockResolution = DeadlockPolicy.MIN_WRITE,
+            };
+        }
+
+
+        protected virtual MPoolConfig GetMPoolSystemConfig() {
+            return new MPoolConfig {
+                CacheSize = new CacheInfo(0, 500 * 1024 * 1024, 1)
+            };
+        }
+
+
+        protected virtual LogConfig GetLogSystemConfig() {
+            return new LogConfig {
+                InMemory = false,
+                BufferSize = 500 * 1024 * 1024
+            };
         }
 
 

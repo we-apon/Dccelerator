@@ -1,9 +1,7 @@
 using System;
-using BerkeleyDB;
 
 
-namespace Dccelerator.DataAccess.BerkeleyDb {
-
+namespace Dccelerator.DataAccess.Attributes {
     /// <summary>
     /// Means what marked property will be used as for searching, and for that property should be generated an secondary index.
     /// </summary>

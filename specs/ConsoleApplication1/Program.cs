@@ -13,6 +13,7 @@ using Dccelerator.DataAccess.BerkeleyDb;
 using Dccelerator.DataAccess.Entities;
 using Dccelerator.DataAccess.Implementations;
 using ServiceStack;
+using DuplicatesPolicy = Dccelerator.DataAccess.DuplicatesPolicy;
 
 
 namespace ConsoleApplication1
@@ -71,7 +72,7 @@ namespace ConsoleApplication1
 #if DEBUG
             var length = 1000;
 #else
-            var length = 100;
+            var length = 100000;
 #endif
             File.AppendAllText(_logTxt, $"Entities count: {length}\nOther entities count: {length*2}\n\n");
 
@@ -907,7 +908,7 @@ namespace ConsoleApplication1
                 }) {
                     Env = env,
                     Encrypted = env?.EncryptAlgorithm == EncryptionAlgorithm.AES,
-                    Duplicates = DuplicatesPolicy.UNSORTED,
+                    Duplicates = (BerkeleyDB.DuplicatesPolicy)DuplicatesPolicy.UNSORTED,
                     Creation = CreatePolicy.IF_NEEDED,
                     AutoCommit = true,
                     ReadUncommitted = true,

@@ -4,8 +4,8 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using BerkeleyDB;
-using Dccelerator.DataAccess.BerkeleyDb;
+using Dccelerator.DataAccess;
+using Dccelerator.DataAccess.Attributes;
 using Dccelerator.DataAccess.Entities;
 
 

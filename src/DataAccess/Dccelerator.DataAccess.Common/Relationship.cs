@@ -1,4 +1,4 @@
-﻿namespace Dccelerator.DataAccess.BerkeleyDb {
+﻿namespace Dccelerator.DataAccess {
     public enum Relationship {
 
         /// <summary>
