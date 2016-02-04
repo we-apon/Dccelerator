@@ -1,5 +1,5 @@
 ﻿
-#if DOTNET
+#if !NET40 && !NEt45
 
     using System;
     using System.Diagnostics;

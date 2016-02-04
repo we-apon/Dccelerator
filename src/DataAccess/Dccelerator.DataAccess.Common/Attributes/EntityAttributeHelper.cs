@@ -10,12 +10,9 @@ namespace Dccelerator.DataAccess.Attributes {
 
 
         [CanBeNull]
-#if NET40
         public static EntityAttribute GetConfigurationForRepository(this Type info, Type repositoryType) {
-#else
-        public static EntityAttribute GetEntityAttribute(this TypeInfo info, Type repositoryType) {
-#endif
-            var attributes = info.GetCustomAttributes<EntityAttribute>().Where(x => repositoryType.IsAssignableFrom(x.Repository)).ToList();
+
+            var attributes = info.GetInfo().GetCustomAttributes<EntityAttribute>().Where(x => repositoryType.IsAssignableFrom(x.Repository)).ToList();
             if (attributes.Count == 0)
                 return null;
 
