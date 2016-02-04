@@ -33,7 +33,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dccelerator.Core, Version=0.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Dccelerator.Core, Version=0.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\artifacts\bin\Dccelerator.Core\Debug\net40\Dccelerator.Core.dll</HintPath>
     </Reference>

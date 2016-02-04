@@ -22,6 +22,7 @@ namespace Dccelerator.DataAccess.Implementations.Schedulers {
             }
 
             var result = true;
+#if !DOTNET
             Parallel.ForEach(preparedTransactions, transaction => {
                 if (transaction.Commit())
                     return;
@@ -29,6 +30,15 @@ namespace Dccelerator.DataAccess.Implementations.Schedulers {
                 result = false;
                 Append(transaction);
             });
+#else
+            foreach (var transaction in preparedTransactions) {
+                if (transaction.Commit())
+                    continue;
+
+                result = false;
+                Append(transaction);
+            };
+#endif
 
             return result;
         }
@@ -52,6 +62,6 @@ namespace Dccelerator.DataAccess.Implementations.Schedulers {
                 _transactions.Add(transaction);
         }
 
-        #endregion
+#endregion
     }
 }
