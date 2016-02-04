@@ -59,7 +59,7 @@ namespace Dccelerator
         /// <returns>An random string for passed criteria</returns>
         
         public static string MakeString(int? length = null, short? minCharIdx = 1040, short? maxCharIdx = 1071, bool includeDigits = false) {
-            length = length ?? _random.Next(4, 32);
+            length = length ?? StaticRandom.Next(4, 32);
             var minChar = minCharIdx.GetValueOrDefault();
             var maxChar = maxCharIdx.GetValueOrDefault();
 
@@ -68,15 +68,15 @@ namespace Dccelerator
             while (idx++ < length) {
                 char next;
 
-                if (includeDigits && _random.Next().IsOdd())
-                    next = (char) _random.Next(48, 57);
+                if (includeDigits && StaticRandom.Next().IsOdd())
+                    next = (char) StaticRandom.Next(48, 57);
                 else {
                     do {
-                        next = (char) _random.Next(minChar, maxChar);
+                        next = (char) StaticRandom.Next(minChar, maxChar);
                     } while (!char.IsLetter(next));
                 }
 
-                builder.Append(_random.Next().IsOdd() ? next : char.ToLower(next));
+                builder.Append(StaticRandom.Next().IsOdd() ? next : char.ToLower(next));
             }
             return builder.ToString();
         }
@@ -88,7 +88,7 @@ namespace Dccelerator
         /// <param name="length">Length of array. If not specified - random length from 9999 to 999999 will be used.</param>
         
         public static byte[] MakeByteArray(int? length = null) {
-            length = length ?? _random.Next(9999, 999999);
+            length = length ?? StaticRandom.Next(9999, 999999);
             return MakeString(length)
 #if PORTABLE
                 .Cast<char>()
@@ -102,7 +102,7 @@ namespace Dccelerator
         /// </summary>
         
         public static string MakePhone() {
-            return (9999999999 - _random.Next(1, 999999999)).ToString(CultureInfo.InvariantCulture);
+            return (9999999999 - StaticRandom.Next(1, 999999999)).ToString(CultureInfo.InvariantCulture);
         }
 
 
@@ -112,12 +112,12 @@ namespace Dccelerator
         /// <param name="length">Length or string. Default is '3 to 10'</param>
         
         public static string MakeNumber(int? length = null) {
-            length = length ?? _random.Next(3, 10);
+            length = length ?? StaticRandom.Next(3, 10);
 
-            var builder = new StringBuilder(length.GetValueOrDefault()).Append(_random.Next(1, 9));
+            var builder = new StringBuilder(length.GetValueOrDefault()).Append(StaticRandom.Next(1, 9));
             var idx = 1;
             while (idx++ < length) {
-                builder.Append(_random.Next(0, 9));
+                builder.Append(StaticRandom.Next(0, 9));
             }
             return builder.ToString();
         }
@@ -125,7 +125,7 @@ namespace Dccelerator
 
         #region private
 
-        private static readonly Random _random = new Random();
+
         private static readonly Type _stringType = typeof (string);
         private static readonly Type _guidType = typeof (Guid);
         private static readonly Type _intType = typeof (int);
@@ -143,15 +143,15 @@ namespace Dccelerator
             if (_stringType.IsAssignableFrom(type))
                 value = prop.Name.ToLowerInvariant().Contains("phone") ? MakePhone() : MakeString();
             else if (_doubleType.IsAssignableFrom(type))
-                value = _random.NextDouble()*_random.Next(1, int.MaxValue);
+                value = StaticRandom.NextDouble()*StaticRandom.Next(1, int.MaxValue);
             else if (_decimalType.IsAssignableFrom(type))
-                value = (decimal) (_random.NextDouble()*_random.Next(1, int.MaxValue));
+                value = (decimal) (StaticRandom.NextDouble()*StaticRandom.Next(1, int.MaxValue));
             else if (_intType.IsAssignableFrom(type))
-                value = _random.Next();
+                value = StaticRandom.Next();
             else if (_boolType.IsAssignableFrom(type))
-                value = _random.Next().IsOdd();
+                value = StaticRandom.Next().IsOdd();
             else if (_dateTimeType.IsAssignableFrom(type))
-                value = DateTime.UtcNow.AddMinutes(-(_random.Next(0, 95*365*24*60)));
+                value = DateTime.UtcNow.AddMinutes(-(StaticRandom.Next(0, 95*365*24*60)));
             else if (includeGuids && _guidType.IsAssignableFrom(type))
                 value = Guid.NewGuid();
 

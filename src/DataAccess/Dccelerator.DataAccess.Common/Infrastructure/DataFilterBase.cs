@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 
 namespace Dccelerator.DataAccess.Infrastructure {
-    abstract class DataFilterBase<TEntity, TResult> : CriterionGeneratorBase<TEntity>, IDataFilter<TEntity, TResult> where TEntity : class {
+    public abstract class DataFilterBase<TEntity, TResult> : CriterionGeneratorBase<TEntity>, IDataFilter<TEntity, TResult> where TEntity : class {
 
         // ReSharper disable once StaticMemberInGenericType
         static readonly IDataCriterion[] _emptyCriteria = new IDataCriterion[0];

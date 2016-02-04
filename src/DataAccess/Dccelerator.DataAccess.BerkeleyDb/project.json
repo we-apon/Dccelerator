@@ -1,0 +1,24 @@
+﻿{
+  "version": "0.0.1-alfa2",
+  "description": "Dccelerator.DataAccess.BerkeleyDb Class Library",
+  "authors": [ "we_apon" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "frameworks": {
+    "net40": {
+      "compilationOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] },
+      "dependencies": {
+      },
+      "frameworkAssemblies": {
+      }
+    }
+  },
+
+  "dependencies": {
+    "Dccelerator.Core": "",
+    "Dccelerator.DataAccess.Common": "",
+    "BerkleyDB": "6.1.26-debug"
+  }
+}

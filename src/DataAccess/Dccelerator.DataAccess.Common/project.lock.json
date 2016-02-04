@@ -3,7 +3,7 @@
   "version": 2,
   "targets": {
     ".NETFramework,Version=v4.0": {
-      "Dccelerator.Core/0.0.4-alfa": {
+      "Dccelerator.Core/0.0.5-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -20,8 +20,26 @@
         }
       }
     },
+    ".NETFramework,Version=v4.5": {
+      "Dccelerator.Core/0.0.5-alfa2": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5",
+        "dependencies": {
+          "JetBrains.Annotations": "10.0.0"
+        }
+      },
+      "JetBrains.Annotations/10.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        },
+        "runtime": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        }
+      }
+    },
     ".NETFramework,Version=v4.0/win7-x86": {
-      "Dccelerator.Core/0.0.4-alfa": {
+      "Dccelerator.Core/0.0.5-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -39,9 +57,45 @@
       }
     },
     ".NETFramework,Version=v4.0/win7-x64": {
-      "Dccelerator.Core/0.0.4-alfa": {
+      "Dccelerator.Core/0.0.5-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
+        "dependencies": {
+          "JetBrains.Annotations": "10.0.0"
+        }
+      },
+      "JetBrains.Annotations/10.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        },
+        "runtime": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.5/win7-x86": {
+      "Dccelerator.Core/0.0.5-alfa2": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5",
+        "dependencies": {
+          "JetBrains.Annotations": "10.0.0"
+        }
+      },
+      "JetBrains.Annotations/10.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        },
+        "runtime": {
+          "lib/net20/JetBrains.Annotations.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.5/win7-x64": {
+      "Dccelerator.Core/0.0.5-alfa2": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
@@ -58,7 +112,7 @@
     }
   },
   "libraries": {
-    "Dccelerator.Core/0.0.4-alfa": {
+    "Dccelerator.Core/0.0.5-alfa2": {
       "type": "project",
       "path": "../../Dccelerator.Core/project.json"
     },
@@ -81,6 +135,11 @@
   "projectFileDependencyGroups": {
     "": [],
     ".NETFramework,Version=v4.0": [
+      "Dccelerator.Core ",
+      "fx/System.Data >= 4.0.0",
+      "fx/System.Xml >= 4.0.0"
+    ],
+    ".NETFramework,Version=v4.5": [
       "Dccelerator.Core ",
       "fx/System.Data >= 4.0.0",
       "fx/System.Xml >= 4.0.0"

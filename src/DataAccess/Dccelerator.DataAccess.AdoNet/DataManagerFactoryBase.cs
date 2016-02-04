@@ -8,7 +8,7 @@ using Dccelerator.DataAccess.Infrastructure;
 
 
 namespace Dccelerator.DataAccess.Ado {
-    public abstract class DataManagerFactoryBase : IDataManagerFactory {
+    public abstract class DataManagerFactoryBase : IDataManagerAdoFactory {
 
         /// <summary>
         /// Instantinate an <see cref="ForcedCacheDataGetter{TEntity}"/>, that will be used in cached context.

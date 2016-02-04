@@ -8,7 +8,7 @@ namespace Dccelerator.DataAccess.Implementations.DataGetters {
     /// </summary>
     /// <typeparam name="TEntity">Entity that will be getted with current getter instance.</typeparam>
     sealed class ConfigurationRespectfullDataGetter<TEntity> : DataGetterBase<TEntity> where TEntity : class, new() {
-        public ConfigurationRespectfullDataGetter(IInternalReadingRepository internalReadingRepository) : base(internalReadingRepository) {}
+        public ConfigurationRespectfullDataGetter(IInternalReadingRepository internalReadingRepository, string entityName) : base(internalReadingRepository, entityName) {}
 
     }
 }

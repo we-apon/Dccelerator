@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0-*",
+  "description": "ConsoleApp1 Console Application",
+  "authors": [ "we_apon" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "BerkleyDB": "6.1.26-debug",
+    "Dccelerator.Core": "0.0.5-alfa2"
+  },
+
+  "commands": {
+    "ConsoleApp1": "ConsoleApp1"
+  },
+
+
+  "packInclude": {
+    "content/":  "lib*.dll"
+  },
+
+  "frameworks": {
+    "dnx451": {
+      "dependencies": {
+        "Dccelerator.DataAccess.BerkeleyDb": "0.0.1-alfa2",
+        "Dccelerator.DataAccess.Common": "0.0.1-alfa2"
+      }
+    }
+  }
+}

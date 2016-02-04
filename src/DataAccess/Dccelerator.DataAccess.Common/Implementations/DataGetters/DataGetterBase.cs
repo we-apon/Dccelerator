@@ -12,19 +12,14 @@ namespace Dccelerator.DataAccess.Implementations.DataGetters {
     /// Basic implementation of manager, that can get something from <seealso cref="IDataAccessRepository"/>, using some <see cref="IDataCriterion"/>.
     /// </summary>
     /// <typeparam name="TEntity">Entity that will be getted with current getter instance.</typeparam>
-    abstract class DataGetterBase<TEntity> : DataFilterBase<TEntity, IEnumerable<TEntity>>, IDataGetter<TEntity> where TEntity : class, new() {
+    public abstract class DataGetterBase<TEntity> : DataFilterBase<TEntity, IEnumerable<TEntity>>, IDataGetter<TEntity> where TEntity : class, new() {
         readonly string _entityName;
         protected internal readonly IInternalReadingRepository Repository;
 
-        protected DataGetterBase(IInternalReadingRepository repository) {
+        protected DataGetterBase(IInternalReadingRepository repository, string entityName) {
             Repository = repository;
-        }
-
-
-        protected DataGetterBase(string entityName) {
             _entityName = entityName;
         }
-
 
         #region Implementations of IDataGetter<TEntity>
 

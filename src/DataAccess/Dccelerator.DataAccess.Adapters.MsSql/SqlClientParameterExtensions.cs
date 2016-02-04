@@ -12,9 +12,7 @@ using JetBrains.Annotations;
 
 namespace Dccelerator.DataAccess.Ado.SqlClient {
     public static class SqlClientParameterExtensions {
-
-        
-        private static readonly ConcurrentDictionary<Type, SqlDbType> _sqlDbTypes = new ConcurrentDictionary<Type, SqlDbType>();
+        static readonly ConcurrentDictionary<Type, SqlDbType> _sqlDbTypes = new ConcurrentDictionary<Type, SqlDbType>();
         
         public static SqlDbType SqlType([NotNull] this Type type) {
             SqlDbType sqlType;
@@ -29,6 +27,10 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
                 sqlType = SqlDbType.DateTime;
             else if (type.IsAssignableFrom(_booleanType))
                 sqlType = SqlDbType.Bit;
+            else if (type.IsAssignableFrom(_intType))
+                sqlType = SqlDbType.Int;
+            else if (type.IsAssignableFrom(_longType))
+                sqlType = SqlDbType.BigInt;
             else if (type.IsAssignableFrom(_floatType) || type.IsAssignableFrom(_doubleType))
                 sqlType = SqlDbType.Float;
             else if (type.IsAssignableFrom(_decimalType))
@@ -94,6 +96,8 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
         static readonly Type _booleanType = typeof (bool);
         static readonly Type _dateTimeType = typeof (DateTime);
         static readonly Type _guidType = typeof (Guid);
+        static readonly Type _intType = typeof(int);
+        static readonly Type _longType = typeof(long);
         static readonly Type _floatType = typeof (float);
         static readonly Type _doubleType = typeof (double);
         static readonly Type _decimalType = typeof (decimal);

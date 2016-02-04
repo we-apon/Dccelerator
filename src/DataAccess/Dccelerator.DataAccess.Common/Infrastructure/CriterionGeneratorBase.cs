@@ -7,7 +7,7 @@ using Dccelerator.DataAccess.Entities;
 using Dccelerator.Reflection;
 
 namespace Dccelerator.DataAccess.Infrastructure {
-    abstract class CriterionGeneratorBase<TEntity> where TEntity : class {
+    public abstract class CriterionGeneratorBase<TEntity> where TEntity : class {
 
         protected static readonly Type EntityType = RUtils<TEntity>.Type;
 
