@@ -1,17 +1,15 @@
 ﻿using System;
-using Dccelerator.DataAccess.Implementations.Schedulers;
 
 
-namespace Dccelerator.DataAccess.BerkeleyDb {
-    public abstract class BDbDataManagerFactoryBase : IDataManagerBDbFactory, IDisposable {
-        readonly IBDbSchema _schema;
+namespace Dccelerator.DataAccess.Lazy
+{
+    public class DataManagerFactoryLazyDecorator : IDataManagerFactory {
+        readonly IDataManagerFactory _factory;
 
 
-        protected BDbDataManagerFactoryBase(string environmentPath, string dbFilePath, string password) {
-            _schema = new BDbSchema(environmentPath, dbFilePath, password);
+        public DataManagerFactoryLazyDecorator(IDataManagerFactory factory) {
+            _factory = factory;
         }
-
-        protected BDbDataManagerFactoryBase(string environmentPath, string dbFilePath) : this(environmentPath, dbFilePath, null) { }
 
 
         #region Implementation of IDataManagerFactory
@@ -30,7 +28,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called on each request of any not cached entity.
         /// </summary>
         public IDataGetter<TEntity> NotCachedGetterFor<TEntity>() where TEntity : class, new() {
-            return new BDbDataGetter<TEntity>(ReadingRepository(), InfoAbout<TEntity>());
+            return new LazyDataGetter<TEntity>(_factory.GetterFor<TEntity>(), this);
         }
 
 
@@ -39,7 +37,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called one time for every <typeparamref name="TEntity"/>.
         /// </summary>
         public IDataExistenceChecker<TEntity> DataExistenceChecker<TEntity>() where TEntity : class {
-            throw new NotImplementedException();
+            return _factory.DataExistenceChecker<TEntity>();
         }
 
 
@@ -48,7 +46,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called on each delete request.
         /// </summary>
         public IDataExistenceChecker<TEntity> NoCachedExistenceChecker<TEntity>() where TEntity : class {
-            throw new NotImplementedException();
+            return _factory.NoCachedExistenceChecker<TEntity>();
         }
 
 
@@ -57,7 +55,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called one time for every <typeparamref name="TEntity"/>.
         /// </summary>
         public IDataCountChecker<TEntity> DataCountChecker<TEntity>() where TEntity : class {
-            throw new NotImplementedException();
+            return _factory.DataCountChecker<TEntity>();
         }
 
 
@@ -66,7 +64,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called on each delete request.
         /// </summary>
         public IDataCountChecker<TEntity> NoCachedDataCountChecker<TEntity>() where TEntity : class {
-            throw new NotImplementedException();
+            return _factory.NoCachedDataCountChecker<TEntity>();
         }
 
 
@@ -75,7 +73,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called on each <see cref="IDataManager.BeginTransaction"/> call.
         /// </summary>
         public IDataTransaction DataTransaction(ITransactionScheduler scheduler, IsolationLevel isolationLevel) {
-            return new NotScheduledBDbTransaction(this);
+            return _factory.DataTransaction(scheduler, isolationLevel);
         }
 
 
@@ -84,15 +82,15 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called one time in every <see cref="IDataManager"/>.
         /// </summary>
         public ITransactionScheduler Scheduler() {
-            return new DummyScheduler(); //todo: test it!
+            return _factory.Scheduler();
         }
 
 
         /// <summary>
         /// Returns information about <typeparamref name="TEntity"/>.
         /// </summary>
-        IEntityInfo IDataManagerFactory.InfoAbout<TEntity>() {
-            return InfoAbout<TEntity>();
+        public IEntityInfo InfoAbout<TEntity>() {
+            return _factory.InfoAbout<TEntity>();
         }
 
 
@@ -101,50 +99,15 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// </summary>
         /// <seealso cref="IDataManagerFactory.InfoAbout{TEntity}"/>
         public IEntityInfo InfoAbout(Type entityType) {
-            var info = new BdbInfoAboutEntity(entityType).Info;
-            if (info.Repository == null)
-                info.Repository = Repository();
-
-            return info;
+            return _factory.InfoAbout(entityType);
         }
 
 
         public IInternalReadingRepository ReadingRepository() {
-            return BDbReadingRepository.Instance;
-        }
-
-
-        /// <summary>
-        /// Returns information about <typeparamref name="TEntity"/>.
-        /// </summary>
-        public IBDbEntityInfo InfoAbout<TEntity>() {
-            var info = BDbInfoAbout<TEntity>.Info;
-            if (info.Repository == null)
-                info.Repository = Repository();
-
-            return info;
-        }
-
-
-        public abstract IBDbRepository Repository();
-
-
-        public IBDbSchema Schema() {
-            return _schema;
-        }
-
-        #endregion
-
-
-        #region Implementation of IDisposable
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose() {
-            _schema.Dispose();
+            return _factory.ReadingRepository();
         }
 
         #endregion
     }
+
 }

@@ -2,24 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using BerkeleyDB;
-using Dccelerator.DataAccess.Attributes;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
     public class BDbReadingRepository : IInternalReadingRepository {
-        readonly IBDbEntityInfo _info;
+
+        public static IInternalReadingRepository Instance =>  _readingRepository ?? (_readingRepository = new BDbReadingRepository());
+        static IInternalReadingRepository _readingRepository;
 
 
-        public BDbReadingRepository(IBDbEntityInfo info) {
-            _info = info;
-        }
+        BDbReadingRepository() { }
 
-        
-        IEnumerable<DatabaseEntry> GetEntriesFor(string entityName, ICollection<IDataCriterion> criteria) {
-            var repository = _info.Repository;
+
+
+        IEnumerable<DatabaseEntry> GetEntriesFor(IEntityInfo info, ICollection<IDataCriterion> criteria) {
+            var dbdInfo = (IBDbEntityInfo) info;
+
+            var repository = dbdInfo.Repository;
 
             if (criteria.Count == 0)
-                return repository.ContinuouslyReadToEnd(entityName);
+                return repository.ContinuouslyReadToEnd(info.EntityName);
 
             
             if (criteria.Count == 1) {
@@ -27,14 +29,14 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 var entry = repository.EntryFrom(criterion);
 
                 if (repository.IsPrimaryKey(criterion))
-                    return repository.GetByKeyFromPrimaryDb(entry, entityName);
+                    return repository.GetByKeyFromPrimaryDb(entry, info.EntityName);
 
 
                 DuplicatesPolicy policy;
                 string indexSubName;
 
                 ForeignKeyAttribute foreignKeyInfo;
-                if (_info.ForeignKeys.TryGetValue(criterion.Name, out foreignKeyInfo)) {
+                if (info.ForeignKeys.TryGetValue(criterion.Name, out foreignKeyInfo)) {
                     policy = foreignKeyInfo.DuplicatesPolicy;
                     indexSubName = foreignKeyInfo.ForeignEntityNavigationPath;
                 }
@@ -44,10 +46,10 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 }
                 
                 
-                return repository.GetFromSecondaryDb(entry, entityName, indexSubName, policy);
+                return repository.GetFromSecondaryDb(entry, info.EntityName, indexSubName, policy);
             }
 
-            return repository.GetByJoin(entityName, criteria, _info);
+            return repository.GetByJoin(dbdInfo, criteria);
         }
 
         
@@ -57,8 +59,8 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// <summary>
         /// Reads entities by its <paramref name="entityName"/>, filtering they by <paramref name="criteria"/>
         /// </summary>
-        public IEnumerable<object> Read(string entityName, Type entityType, ICollection<IDataCriterion> criteria) {
-            return GetEntriesFor(entityName, criteria).Select(x => x.Data.FromBytes());
+        public IEnumerable<object> Read(IEntityInfo info, ICollection<IDataCriterion> criteria) {
+            return GetEntriesFor(info, criteria).Select(x => x.Data.FromBytes());
         }
 
 
@@ -66,8 +68,8 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// <summary>
         /// Checks it any entity with <paramref name="entityName"/> satisfies specified <paramref name="criteria"/>
         /// </summary>
-        public bool Any(string entityName, Type entityType, ICollection<IDataCriterion> criteria) {
-            return GetEntriesFor(entityName, criteria).Any();
+        public bool Any(IEntityInfo info, ICollection<IDataCriterion> criteria) {
+            return GetEntriesFor(info, criteria).Any();
         }
 
 
@@ -75,7 +77,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// Reads column with specified <paramref name="columnName"/> from entity with <paramref name="entityName"/>, filtered with specified <paramref name="criteria"/>.
         /// It's used to .Select() something. 
         /// </summary>
-        public IEnumerable<object> ReadColumn(string columnName, string entityName, Type entityType, ICollection<IDataCriterion> criteria) {
+        public IEnumerable<object> ReadColumn(string columnName, IEntityInfo info, ICollection<IDataCriterion> criteria) {
             throw new NotImplementedException();
         }
 
@@ -83,8 +85,8 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// <summary>
         /// Returns count of entities with <paramref name="entityName"/> that satisfies specified <paramref name="criteria"/>
         /// </summary>
-        public int CountOf(string entityName, Type entityType, ICollection<IDataCriterion> criteria) {
-            return GetEntriesFor(entityName, criteria).Count();
+        public int CountOf(IEntityInfo info, ICollection<IDataCriterion> criteria) {
+            return GetEntriesFor(info, criteria).Count();
         }
 
         #endregion

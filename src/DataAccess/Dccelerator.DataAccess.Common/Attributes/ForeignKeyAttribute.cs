@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Dccelerator.DataAccess.Attributes {
+namespace Dccelerator.DataAccess {
 
     /// <summary>
     /// Means what marked property will be used as for searching and maps current entity to another.

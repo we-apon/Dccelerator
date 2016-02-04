@@ -1,0 +1,34 @@
+﻿{
+  "version": "0.0.1-alfa",
+  "description": "Dccelerator.DataAccess.Lazy Class Library",
+  "authors": [ "we_apon" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "frameworks": {
+    
+    "net40": {
+      "compilationOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] }
+    },
+
+
+    "net45": {
+      "compilationOptions": { "define": [ "NET45", "JETBRAINS_ANNOTATIONS" ] }
+    },
+
+
+
+    "dnx45": {
+      "compilationOptions": { "define": [ "NET45", "JETBRAINS_ANNOTATIONS" ] }
+    }
+
+
+  },
+
+
+  "dependencies": {
+    "Dccelerator.DataAccess.Common": "",
+    "PostSharp": "4.2.20"
+  }
+}

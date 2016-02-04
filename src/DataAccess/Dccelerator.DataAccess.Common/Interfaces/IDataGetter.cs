@@ -16,6 +16,5 @@ namespace Dccelerator.DataAccess {
         /// <returns><see cref="IDataSelector{TEntity, TValue}"/>. Use some of 'Where' methods of <see cref="IDataSelector{TEntity,TResult}"/> to specify criteria</returns>
         IDataSelector<TEntity, TValue> Select<TValue>(Expression<Func<TEntity, TValue>> member);
 
-
     }
 }

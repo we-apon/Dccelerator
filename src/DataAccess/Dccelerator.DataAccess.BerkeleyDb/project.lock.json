@@ -12,7 +12,7 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.5-alfa2": {
+      "Dccelerator.Core/0.0.5-alfa": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -24,11 +24,7 @@
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "Dccelerator.Core": null
-        },
-        "frameworkAssemblies": [
-          "System.Data",
-          "System.Xml"
-        ]
+        }
       },
       "JetBrains.Annotations/10.0.0": {
         "type": "package",
@@ -50,7 +46,7 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.5-alfa2": {
+      "Dccelerator.Core/0.0.5-alfa": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -62,11 +58,7 @@
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "Dccelerator.Core": null
-        },
-        "frameworkAssemblies": [
-          "System.Data",
-          "System.Xml"
-        ]
+        }
       },
       "JetBrains.Annotations/10.0.0": {
         "type": "package",
@@ -88,7 +80,7 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.5-alfa2": {
+      "Dccelerator.Core/0.0.5-alfa": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -100,11 +92,7 @@
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "Dccelerator.Core": null
-        },
-        "frameworkAssemblies": [
-          "System.Data",
-          "System.Xml"
-        ]
+        }
       },
       "JetBrains.Annotations/10.0.0": {
         "type": "package",
@@ -118,7 +106,7 @@
     }
   },
   "libraries": {
-    "Dccelerator.Core/0.0.5-alfa2": {
+    "Dccelerator.Core/0.0.5-alfa": {
       "type": "project",
       "path": "../../Dccelerator.Core/project.json"
     },

@@ -5,7 +5,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
     public class BDbDataGetter<TEntity> : DataGetterBase<TEntity> where TEntity : class, new() {
         
 
-        public BDbDataGetter(IBDbEntityInfo info) : base(new BDbReadingRepository(info), info.EntityName) {
+        public BDbDataGetter(IInternalReadingRepository readingRepository, IBDbEntityInfo info) : base(readingRepository, info) {
 
         }
     }

@@ -1,5 +1,6 @@
 
 
+using System;
 using Dccelerator.DataAccess.Infrastructure;
 
 
@@ -64,6 +65,22 @@ namespace Dccelerator.DataAccess {
         /// This method will be called one time in every <see cref="IDataManager"/>.
         /// </summary>
         ITransactionScheduler Scheduler();
-        
+
+
+        /// <summary>
+        /// Returns information about <typeparamref name="TEntity"/>.
+        /// </summary>
+        /// <seealso cref="InfoAbout"/>
+        IEntityInfo InfoAbout<TEntity>();
+
+
+        /// <summary>
+        /// Returns information about <paramref name="entityType"/>.
+        /// </summary>
+        /// <seealso cref="InfoAbout{TEntity}"/>
+        IEntityInfo InfoAbout(Type entityType);
+
+
+        IInternalReadingRepository ReadingRepository();
     }
 }

@@ -15,7 +15,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
         IEnumerable<DatabaseEntry> GetFromSecondaryDb(DatabaseEntry key, string entityName, string indexSubName, DuplicatesPolicy duplicatesPolicy);
 
-        IEnumerable<DatabaseEntry> GetByJoin(string entityName, ICollection<IDataCriterion> criteria, IBDbEntityInfo info);
+        IEnumerable<DatabaseEntry> GetByJoin(IBDbEntityInfo info, ICollection<IDataCriterion> criteria);
 
         bool PerformInTransaction(ICollection<IBDbEntityInfo> entityInfos, IEnumerable<TransactionElement> elements);
     }

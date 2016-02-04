@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using BerkeleyDB;
-using Dccelerator.DataAccess.Attributes;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
@@ -115,14 +114,14 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        public IEnumerable<DatabaseEntry> GetByJoin(string entityName, ICollection<IDataCriterion> criteria, IBDbEntityInfo info) {
+        public IEnumerable<DatabaseEntry> GetByJoin(IBDbEntityInfo info, ICollection<IDataCriterion> criteria) {
 
             var cursorsLength = 0;
             var secondaryCursors = new SecondaryCursor[criteria.Count];
             JoinCursor joinCursor = null;
 
             try {
-                var primaryDb = _schema.GetPrimaryDb(entityName, readOnly: true);
+                var primaryDb = _schema.GetPrimaryDb(info.EntityName, readOnly: true);
 
                 foreach (var criterion in criteria) {
                     ForeignKeyAttribute foreignKeyMapping;

@@ -12,6 +12,7 @@ using Dccelerator.DataAccess;
 using Dccelerator.DataAccess.BerkeleyDb;
 using Dccelerator.DataAccess.Entities;
 using Dccelerator.DataAccess.Implementations;
+using Dccelerator.DataAccess.Lazy;
 using ServiceStack;
 using DuplicatesPolicy = Dccelerator.DataAccess.DuplicatesPolicy;
 
@@ -72,7 +73,7 @@ namespace ConsoleApplication1
 #if DEBUG
             var length = 1000;
 #else
-            var length = 100000;
+            var length = 10000;
 #endif
             File.AppendAllText(_logTxt, $"Entities count: {length}\nOther entities count: {length*2}\n\n");
 
@@ -110,7 +111,9 @@ namespace ConsoleApplication1
 
 
             using (var factory = new BdbFactory(_home, Path.Combine(_home, "btree.bdb"), "asdasdd")) {
-                var manager = new DataManager(factory);
+                var lazyFactory = new DataManagerFactoryLazyDecorator(factory);
+
+                var manager = new DataManager(lazyFactory);
 
                 var watch = new Stopwatch();
 
@@ -149,6 +152,15 @@ namespace ConsoleApplication1
                 }
                 watch.Stop();
                 File.AppendAllText(_logTxt, $"Search elements {allEntities.Length} times by foreign key with Dccelerator: " + watch.Elapsed + "\n");
+
+
+                watch.Restart();
+                var allLazyEntities = new List<SomeOtherEntity>();
+                foreach (var someEntity in allEntities) {
+                    allLazyEntities.AddRange(someEntity.SomeEntities);
+                }
+                watch.Stop();
+                File.AppendAllText(_logTxt, $"Lazy loade elements {allEntities.Length} times by Dccelerator: " + watch.Elapsed + "\n");
 
             }
 

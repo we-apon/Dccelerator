@@ -7,12 +7,14 @@ using System.Xml.Serialization;
 using Dccelerator.DataAccess;
 using Dccelerator.DataAccess.Attributes;
 using Dccelerator.DataAccess.Entities;
+using Dccelerator.DataAccess.Lazy;
 
 
 namespace ConsoleApplication1 {
 
+    [LazyLazyDataAccess]
     [Serializable]
-    public class SomeEntity : IIdentifiedEntity {
+    public class SomeEntity : LazyEntity, IIdentifiedEntity {
 
         /// <summary>
         /// Id of <see cref="SomeEntity"/>
@@ -42,8 +44,9 @@ namespace ConsoleApplication1 {
 
 
 
+    [LazyLazyDataAccess]
     [Serializable]
-    public class SomeOtherEntity : IIdentifiedEntity {
+    public class SomeOtherEntity : LazyEntity, IIdentifiedEntity {
 
         public Guid Id { get; set; }
 
