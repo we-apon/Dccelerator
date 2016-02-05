@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
-using Dccelerator.DataAccess.Infrastructure;
 using Dccelerator.Reflection;
 
 
@@ -11,19 +10,21 @@ namespace Dccelerator.DataAccess.Ado {
     
 
     /// <summary>
-    /// Am <see cref="IDataAccessRepository"/> what defines special names of CRUD-operation stored procedures.
+    /// Am <see cref="IAdoNetRepository"/> what defines special names of CRUD-operation stored procedures.
     /// </summary>
     /// <seealso cref="NameOfReadProcedureFor"/>
     /// <seealso cref="NameOfInsertProcedureFor"/>
     /// <seealso cref="NameOfUpdateProcedureFor"/>
     /// <seealso cref="NameOfDeleteProcedureFor"/>
-    public abstract class AdoNetRepository<TCommand, TParameter, TConnection> : IDataAccessRepository
+    public abstract class AdoNetRepository<TCommand, TParameter, TConnection> : IAdoNetRepository
         where TCommand : DbCommand
         where TParameter: DbParameter
         where TConnection : DbConnection {
 
 
-        protected abstract TConnection InstantinateConnection();
+        protected abstract TParameter PrimaryKeyParameterOf<TEntity>(IEntityInfo info, TEntity entity);
+
+        protected abstract TConnection GetConnection();
 
         protected abstract TParameter ParameterWith(string name, Type type, object value);
 
@@ -54,41 +55,17 @@ namespace Dccelerator.DataAccess.Ado {
         }
 
 
-        protected virtual IEnumerable<TParameter> ParametersFrom<TEntity>(TEntity entity) where TEntity : class {
-            var parameters = ConfigurationOf<TEntity>.Info.PersistedFields.Select(x => {
+        protected virtual IEnumerable<TParameter> ParametersFrom<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class {
+            return info.PersistedProperties.Select(x => {
                 object value;
-                if (!RUtils<TEntity>.TryGetValueOnPath(entity, x.Item1, out value))
-                    throw new InvalidOperationException($"Entity of type {entity.GetType()} should contain property '{x.Item1}', " +
+                if (!RUtils<TEntity>.TryGetValueOnPath(entity, x.Key, out value))
+                    throw new InvalidOperationException($"Entity of type {entity.GetType()} should contain property '{x.Key}', " +
                                                         $"but in some reason value or that property could not be getted.");
 
-                return ParameterWith(x.Item1, x.Item2, value);
+                return ParameterWith(x.Key, x.Value, value);
             });
-            return parameters;
         }
-
-
-/*
-
-        /// <summary>
-        /// Returns reader that can be used to get some data by <paramref name="entityName"/>, filtering it by <paramref name="criteria"/>.
-        /// </summary>
-        /// <param name="entityName">Database-specific name of some entity</param>
-        /// <param name="criteria">Filtering criteria</param>
-        /// <param name="reader">An data reader</param>
-        /// <returns>Connection of <paramref name="reader"/>. Reader and connection will be disposed just after all requested information are readed.</returns>
-        public virtual DbConnection Read(string entityName, ICollection<IDataCriterion> criteria, out DbDataReader reader) {
-
-            var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
-
-            var connection = InstantinateConnection();
-
-            using (var command = CommandFor(NameOfReadProcedureFor(entityName), connection, parameters)) {               
-                connection.Open();
-                reader = command.ExecuteReader();
-                return connection;
-            }
-        }
-*/
+        
 
 
         /// <summary>
@@ -96,11 +73,11 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <param name="entityName">Database-specific name of some entity</param>
         /// <param name="criteria">Filtering criteria</param>
-        public IEnumerable<object> Read(string entityName, ICollection<IDataCriterion> criteria, IEntityInfo info) {
+        public IEnumerable<object> Read(IEntityInfo info, ICollection<IDataCriterion> criteria) {
             var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
 
-            using (var connection = InstantinateConnection())
-            using (var command = CommandFor(NameOfReadProcedureFor(entityName), connection, parameters)) {
+            using (var connection = GetConnection())
+            using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
                 connection.Open();
                 using (var reader = command.ExecuteReader())
                     return reader.To(info);
@@ -108,11 +85,11 @@ namespace Dccelerator.DataAccess.Ado {
         }
 
 
-        public bool Any(string entityName, ICollection<IDataCriterion> criteria) {
+        public bool Any(IEntityInfo info, ICollection<IDataCriterion> criteria) {
             var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
 
-            using (var connection = InstantinateConnection())
-            using (var command = CommandFor(NameOfReadProcedureFor(entityName), connection, parameters)) {
+            using (var connection = GetConnection())
+            using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
                 connection.Open();
                 using (var reader = command.ExecuteReader())
                     return reader.Read();
@@ -120,11 +97,11 @@ namespace Dccelerator.DataAccess.Ado {
         }
 
 
-        public IEnumerable<object> ReadColumn(int columnIdx, string entityName, ICollection<IDataCriterion> criteria) {
+        public IEnumerable<object> ReadColumn(int columnIdx, IEntityInfo info, ICollection<IDataCriterion> criteria) {
             var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
 
-            using (var connection = InstantinateConnection())
-            using (var command = CommandFor(NameOfReadProcedureFor(entityName), connection, parameters)) {
+            using (var connection = GetConnection())
+            using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
                 connection.Open();
                 using (var reader = command.ExecuteReader())
                     return reader.SelectColumn(columnIdx);
@@ -132,11 +109,11 @@ namespace Dccelerator.DataAccess.Ado {
         }
 
 
-        public int CountOf(string entityName, ICollection<IDataCriterion> criteria) {
+        public int CountOf(IEntityInfo info, ICollection<IDataCriterion> criteria) {
             var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
 
-            using (var connection = InstantinateConnection())
-            using (var command = CommandFor(NameOfReadProcedureFor(entityName), connection, parameters)) {
+            using (var connection = GetConnection())
+            using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
                 connection.Open();
                 using (var reader = command.ExecuteReader())
                     return reader.RowsCount();
@@ -148,11 +125,11 @@ namespace Dccelerator.DataAccess.Ado {
         /// Inserts an <paramref name="entity"/> using it's database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        public virtual bool Insert<TEntity>(string entityName, TEntity entity) where TEntity : class {
-            var parameters = ParametersFrom(entity);
+        public virtual bool Insert<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class {
+            var parameters = ParametersFrom(info, entity);
 
-            using (var connection = InstantinateConnection()) {
-                using (var command = CommandFor(NameOfInsertProcedureFor(entityName), connection, parameters)) {
+            using (var connection = GetConnection()) {
+                using (var command = CommandFor(NameOfInsertProcedureFor(info.EntityName), connection, parameters)) {
                     connection.Open();
                     return command.ExecuteNonQuery() > 0;
                 }
@@ -165,13 +142,13 @@ namespace Dccelerator.DataAccess.Ado {
         /// Inserts an <paramref name="entities"/> using they database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        public virtual bool InsertMany<TEntity>(string entityName, IEnumerable<TEntity> entities) where TEntity : class {
-            var name = NameOfInsertProcedureFor(entityName);
-            using (var connection = InstantinateConnection()) {
+        public virtual bool InsertMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class {
+            var name = NameOfInsertProcedureFor(info.EntityName);
+            using (var connection = GetConnection()) {
                 connection.Open();
 
                 foreach (var entity in entities) {
-                    var parameters = ParametersFrom(entity);
+                    var parameters = ParametersFrom(info, entity);
 
                     using (var command = CommandFor(name, connection, parameters)) {
 
@@ -189,11 +166,11 @@ namespace Dccelerator.DataAccess.Ado {
         /// Updates an <paramref name="entity"/> using it's database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        public virtual bool Update<T>(string entityName, T entity) where T : class {
-            var parameters = ParametersFrom(entity);
+        public virtual bool Update<T>(IEntityInfo info, T entity) where T : class {
+            var parameters = ParametersFrom(info, entity);
 
-            using (var connection = InstantinateConnection()) {
-                using (var command = CommandFor(NameOfUpdateProcedureFor(entityName), connection, parameters)) {
+            using (var connection = GetConnection()) {
+                using (var command = CommandFor(NameOfUpdateProcedureFor(info.EntityName), connection, parameters)) {
                     connection.Open();
                     return command.ExecuteNonQuery() > 0;
                 }
@@ -205,13 +182,13 @@ namespace Dccelerator.DataAccess.Ado {
         /// Updates an <paramref name="entities"/> using they database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        public virtual bool UpdateMany<TEntity>(string entityName, IEnumerable<TEntity> entities) where TEntity : class {
-            var name = NameOfUpdateProcedureFor(entityName);
-            using (var connection = InstantinateConnection()) {
+        public virtual bool UpdateMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class {
+            var name = NameOfUpdateProcedureFor(info.EntityName);
+            using (var connection = GetConnection()) {
                 connection.Open();
 
                 foreach (var entity in entities) {
-                    var parameters = ParametersFrom(entity);
+                    var parameters = ParametersFrom(info, entity);
 
                     using (var command = CommandFor(name, connection, parameters)) {
 
@@ -229,21 +206,11 @@ namespace Dccelerator.DataAccess.Ado {
         /// Removes an <paramref name="entity"/> using it's database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        public virtual bool Delete<TEntity>(string entityName, TEntity entity) where TEntity : class {
-            var info = ConfigurationOf<TEntity>.Info;
-            if (info.KeyId == null)
-                throw new InvalidOperationException($"In order to delete entities of type {RUtils<TEntity>.Type}, you must specify {nameof(EntityAttribute.IdProperty)} in {nameof(EntityAttribute)} " +
-                                                            $"on entity {info.Type}, or use identifier in property named 'Id' or '{RUtils<TEntity>.Type.Name + "Id"}'.");
+        public virtual bool Delete<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class {
+            var parameters = new [] { PrimaryKeyParameterOf(info, entity) };
 
-            object id;
-            if (!RUtils<TEntity>.TryGetValueOnPath(entity, info.KeyId.Name, out id))
-                throw new InvalidOperationException($"Entity of type {entity.GetType()} should contain property '{info.KeyId.Name}', " +
-                                                    $"but in some reason value or that property could not be getted.");
-
-            var parameters = new [] {ParameterWith(info.KeyId.Name, info.KeyId.PropertyType, id)};
-
-            using (var connection = InstantinateConnection()) {
-                using (var command = CommandFor(NameOfDeleteProcedureFor(entityName), connection, parameters)) {
+            using (var connection = GetConnection()) {
+                using (var command = CommandFor(NameOfDeleteProcedureFor(info.EntityName), connection, parameters)) {
                     connection.Open();
                     return command.ExecuteNonQuery() > 0;
                 }
@@ -255,26 +222,14 @@ namespace Dccelerator.DataAccess.Ado {
         /// Removes an <paramref name="entities"/> using they database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        public virtual bool DeleteMany<TEntity>(string entityName, IEnumerable<TEntity> entities) where TEntity : class {
-                    var info = ConfigurationOf<TEntity>.Info;
-                    if (info.KeyId == null)
-                        throw new InvalidOperationException($"In order to delete entities of type {RUtils<TEntity>.Type}, you must specify {nameof(EntityAttribute.IdProperty)} in {nameof(EntityAttribute)} " +
-                                                                    $"on entity {info.Type}, or use identifier in property named 'Id' or '{RUtils<TEntity>.Type.Name + "Id"}'.");
-
-            var name = NameOfDeleteProcedureFor(entityName);
-            using (var connection = InstantinateConnection()) {
+        public virtual bool DeleteMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class {
+            var name = NameOfDeleteProcedureFor(info.EntityName);
+            using (var connection = GetConnection()) {
                 connection.Open();
 
                 foreach (var entity in entities) {
-
-                    object id;
-                    if (!RUtils<TEntity>.TryGetValueOnPath(entity, info.KeyId.Name, out id))
-                        throw new InvalidOperationException($"Entity of type {entity.GetType()} should contain property '{info.KeyId.Name}', " +
-                                                            $"but in some reason value or that property could not be getted.");
-
-                    var parameters = new[] {ParameterWith(info.KeyId.Name, info.KeyId.PropertyType, id)};
-
-
+                    
+                    var parameters = new[] { PrimaryKeyParameterOf(info, entity)};
 
                     using (var command = CommandFor(name, connection, parameters)) {
 

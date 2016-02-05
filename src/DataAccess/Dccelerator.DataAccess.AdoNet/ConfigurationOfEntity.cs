@@ -1,13 +1,11 @@
-﻿using Dccelerator.DataAccess.Infrastructure;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using Dccelerator.DataAccess.Ado.ReadingRepositories;
 using Dccelerator.Reflection;
 
 
 namespace Dccelerator.DataAccess.Ado {
-
-    class ConfigurationOf<TEntity> where TEntity : class {
+/*    class ConfigurationOf<TEntity> where TEntity : class {
 
         // ReSharper disable StaticMemberInGenericType
         static readonly ConfigurationOfEntity _configuration = new ConfigurationOfEntity(RUtils<TEntity>.Type);
@@ -42,5 +40,5 @@ namespace Dccelerator.DataAccess.Ado {
             Info = info;
         }
 
-    }
+    }*/
 }

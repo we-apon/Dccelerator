@@ -4,6 +4,9 @@
 namespace Dccelerator.DataAccess.Ado {
     public interface IDataManagerAdoFactory : IDataManagerFactory {
 
-        IEntityInfo AdoInfoAbout<TEntity>();
+        IAdoEntityInfo AdoInfoAbout<TEntity>();
+
+
+        IAdoNetRepository AdoNetRepository();
     }
 }

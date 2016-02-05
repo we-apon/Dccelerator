@@ -14,10 +14,10 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
         public string EntityName { get; set; }
 
-        public Type Type { get; set; }
+        public Type EntityType { get; set; }
 
 #if NET40
-        public Type TypeInfo => Type;
+        public Type TypeInfo => EntityType;
 
 #else
         public TypeInfo TypeInfo => _typeInfo ?? (_typeInfo = Type.GetInfo());
@@ -40,6 +40,10 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 return _mappings;
             }
         }
+
+
+        public Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get {throw new NotImplementedException(); } }
+        public Dictionary<string, Type> PersistedProperties { get {throw new NotImplementedException(); } }
 
 
 #if NET40
@@ -80,15 +84,15 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         static readonly Type _bdbRepositoryType = typeof (IBDbRepository);
 
         public BDbEntityInfo(Type type) {
-            Type = type;
+            EntityType = type;
 
             var entityAttribute = type.GetConfigurationForRepository(_bdbRepositoryType);
             if (entityAttribute != null) {
-                EntityName = entityAttribute.Name ?? Type.Name;
+                EntityName = entityAttribute.Name ?? EntityType.Name;
                 Repository = Activator.CreateInstance(entityAttribute.Repository) as IBDbRepository;
             }
             else {
-                EntityName = Type.Name;
+                EntityName = EntityType.Name;
             }
         }
 
@@ -110,7 +114,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         #region Equality members
 
         protected bool Equals(IBDbEntityInfo other) {
-            return string.Equals(EntityName, other.EntityName) && Equals(Type, other.Type) && Equals(Repository, other.Repository);
+            return string.Equals(EntityName, other.EntityName) && Equals(EntityType, other.EntityType) && Equals(Repository, other.Repository);
         }
 
 
@@ -123,7 +127,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         public override int GetHashCode() {
             unchecked {
                 var hashCode = EntityName?.GetHashCode() ?? 0;
-                hashCode = (hashCode*397) ^ (Type?.GetHashCode() ?? 0);
+                hashCode = (hashCode*397) ^ (EntityType?.GetHashCode() ?? 0);
                 hashCode = (hashCode*397) ^ (Repository?.GetHashCode() ?? 0);
                 return hashCode;
             }

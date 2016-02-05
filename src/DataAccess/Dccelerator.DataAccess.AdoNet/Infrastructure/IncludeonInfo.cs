@@ -8,6 +8,8 @@ using Dccelerator.Reflection.Abstract;
 
 
 namespace Dccelerator.DataAccess.Infrastructure {
+/*
+
     class IncludeonInfo : IEntityInfo {
         readonly EntityInfo _entityInfo;
         readonly IncludeChildrenAttribute _includeon;
@@ -18,9 +20,9 @@ namespace Dccelerator.DataAccess.Infrastructure {
             _entityInfo = entityInfo;
             _includeon = includeon;
 
-            _propertyPath = _entityInfo.Type.GetPropertyPath(includeon.PropertyName);
+            _propertyPath = _entityInfo.EntityType.GetPropertyPath(includeon.PropertyName);
             if (_propertyPath == null)
-                throw new InvalidOperationException($"Can't find property with PropertyName '{includeon.PropertyName}', specified in {nameof(IncludeChildrenAttribute)} on type {entityInfo.Type}");
+                throw new InvalidOperationException($"Can't find property with PropertyName '{includeon.PropertyName}', specified in {nameof(IncludeChildrenAttribute)} on type {entityInfo.EntityType}");
 
             _targetProperty = _propertyPath.GetTargetProperty();
 
@@ -32,13 +34,13 @@ namespace Dccelerator.DataAccess.Infrastructure {
 
         #region Implementation of IEntityInfo
 
-        public Type Type => _type ?? (_type = IsCollection ? _targetProperty.Info.PropertyType.ElementType() : _targetProperty.Info.PropertyType);
+        public Type EntityType => _type ?? (_type = IsCollection ? _targetProperty.Info.PropertyType.ElementType() : _targetProperty.Info.PropertyType);
         Type _type;
 
 
 
 #if NET40
-        public Type TypeInfo => Type;
+        public Type TypeInfo => EntityType;
 #else
         public TypeInfo TypeInfo => _typeInfo ?? (_typeInfo = Type.GetInfo());
         TypeInfo _typeInfo;
@@ -64,8 +66,8 @@ namespace Dccelerator.DataAccess.Infrastructure {
                 var declaringType = _targetProperty.Info.DeclaringType ?? _targetProperty.Info.ReflectedType;
 
                 var possibleNames = new List<string>(declaringType == null ? 4 : 6) {
-                    _entityInfo.Type.Name + "Id",
-                    _entityInfo.Type.Name + "_Id",
+                    _entityInfo.EntityType.Name + "Id",
+                    _entityInfo.EntityType.Name + "_Id",
                     _entityInfo.EntityName + "Id",
                     _entityInfo.EntityName + "_Id"
                 };
@@ -75,7 +77,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
                 }
 
 
-                var keyId = Type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                var keyId = EntityType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
                     .FirstOrDefault(x => possibleNames.Any(z => string.Compare(x.Name, z, StringComparison.InvariantCultureIgnoreCase) == 0));
 
                 if (keyId != null)
@@ -83,7 +85,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
 
                 throw new InvalidOperationException($"You must specify {nameof(IncludeChildrenAttribute.KeyIdName)} in {nameof(IncludeChildrenAttribute)} " +
                                                     $"with {nameof(IncludeChildrenAttribute.PropertyName)} '{_includeon.PropertyName}' " +
-                                                    $"on entity {_entityInfo.Type}, because it can't be finded automatically.");
+                                                    $"on entity {_entityInfo.EntityType}, because it can't be finded automatically.");
             }
             else {
                 var possibleNames = new [] {
@@ -91,13 +93,13 @@ namespace Dccelerator.DataAccess.Infrastructure {
                     _targetProperty.Info.Name + "_Id",                        
                 };
 
-                var keyId = _entityInfo.Type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                var keyId = _entityInfo.EntityType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                     .FirstOrDefault(x => possibleNames.Any(z => string.Compare(x.Name, z, StringComparison.InvariantCultureIgnoreCase) == 0));
 
                 if (keyId == null)
                     throw new InvalidOperationException($"You must specify {nameof(IncludeChildrenAttribute.KeyIdName)} in {nameof(IncludeChildrenAttribute)} " +
                                                         $"with {nameof(IncludeChildrenAttribute.PropertyName)} '{_includeon.PropertyName}' " +
-                                                        $"on entity {_entityInfo.Type}, because it can't be finded automatically.");
+                                                        $"on entity {_entityInfo.EntityType}, because it can't be finded automatically.");
 
                 return keyId;
             }
@@ -114,7 +116,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
         public TimeSpan CacheTimeout { get; }
         public Type RealRepositoryType { get; }
         public IInternalReadingRepository GlobalReadingRepository { get; }
-        public IDataAccessRepository RealRepository { get; }
+        public IAdoNetRepository RealRepository { get; }
         public EntityAttribute EntityAttribute { get; }
 
 
@@ -140,8 +142,8 @@ namespace Dccelerator.DataAccess.Infrastructure {
             if (_isOwnerReferenceGetted)
                 return _ownerReferenceName;
 
-            var ownerReference = Type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .FirstOrDefault(x => x.PropertyType.IsAssignableFrom(_entityInfo.Type) && x.Name == (_targetProperty.Info.DeclaringType ?? _targetProperty.Info.ReflectedType ?? Type).Name);
+            var ownerReference = EntityType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .FirstOrDefault(x => x.PropertyType.IsAssignableFrom(_entityInfo.EntityType) && x.Name == (_targetProperty.Info.DeclaringType ?? _targetProperty.Info.ReflectedType ?? EntityType).Name);
 
             _isOwnerReferenceGetted = true;
             return ownerReference?.Name;
@@ -161,11 +163,11 @@ namespace Dccelerator.DataAccess.Infrastructure {
             var targetType = _targetProperty.Info.PropertyType;
 
             if (targetType.IsArray)
-                return Type.MakeArrayType();
+                return EntityType.MakeArrayType();
 
             if (targetType.IsAbstract || targetType.IsInterface)
                 return targetType.IsGenericType
-                    ? typeof (List<>).MakeGenericType(Type)
+                    ? typeof (List<>).MakeGenericType(EntityType)
                     : typeof (ArrayList);
 
             return null;
@@ -177,4 +179,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
 
 
     }
+*/
+
+
 }

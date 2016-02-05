@@ -31,8 +31,8 @@ namespace Dccelerator.DataAccess.Ado {
         }
 
 
-        static IEnumerable<object> ToOneObject(this DbDataReader reader, IEntityInfo info) {
-            InitColumnNames(info, reader);
+        static IEnumerable<object> ToOneObject(this DbDataReader reader, IAdoEntityInfo info) {
+            info.InitReaderColumns(reader);
 
             while (reader.Read()) {
                 object keyId;
@@ -42,7 +42,7 @@ namespace Dccelerator.DataAccess.Ado {
 
 
 
-        public static IEnumerable<object> To(this DbDataReader reader, IEntityInfo mainObjectInfo) {
+        public static IEnumerable<object> To(this DbDataReader reader, IAdoEntityInfo mainObjectInfo) {
 
             if (mainObjectInfo.Children == null)
                 return reader.ToOneObject(mainObjectInfo);
@@ -50,7 +50,7 @@ namespace Dccelerator.DataAccess.Ado {
 
             var mainObjects = new Dictionary<object, object>();
 
-            InitColumnNames(mainObjectInfo, reader);
+            mainObjectInfo.InitReaderColumns(reader);
 
             while (reader.Read()) {
                 object keyId;
@@ -60,7 +60,7 @@ namespace Dccelerator.DataAccess.Ado {
                 }
                 catch (Exception e) {
                     Internal.TraceEvent(TraceEventType.Critical,
-                        $"On reading '{mainObjectInfo.Type}' using special name {mainObjectInfo.EntityName} getted exception, possibly because reader contains more then one object with same idenifier.\n" +
+                        $"On reading '{mainObjectInfo.EntityType}' using special name {mainObjectInfo.EntityName} getted exception, possibly because reader contains more then one object with same idenifier.\n" +
                         $"Identifier: {keyId}\n" +
                         $"Exception: {e}");
 
@@ -72,7 +72,7 @@ namespace Dccelerator.DataAccess.Ado {
 
             for (var resultIdx = 0; resultIdx < includeInformation.Length; resultIdx++) {
                 if (!reader.NextResult()) {
-                    Internal.TraceEvent(TraceEventType.Warning, $"Object {mainObjectInfo.Type.FullName} has includedInformation for #{includeInformation.Length} items, but reader returned only {reader.Depth} tables (including main objects)");
+                    Internal.TraceEvent(TraceEventType.Warning, $"Object {mainObjectInfo.EntityType.FullName} has includedInformation for #{includeInformation.Length} items, but reader returned only {reader.Depth} tables (including main objects)");
                     return mainObjects.Values;
                 }
 
@@ -89,7 +89,7 @@ namespace Dccelerator.DataAccess.Ado {
                     var item = ReadItem(reader, info, out keyId);
 
                     if (keyId == null) {
-                        Internal.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.Type}, {info.TargetPath} (used on entity {mainObjectInfo.Type}");
+                        Internal.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.Type}, {info.TargetPath} (used on entity {mainObjectInfo.EntityType}");
                         break;
                     }
 
@@ -101,7 +101,7 @@ namespace Dccelerator.DataAccess.Ado {
                                     return;
 
                                 if (!mainObject.TrySetValueOnPath(info.TargetPath, item))
-                                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.TargetPath} from '{mainObjectInfo.Type.FullName}' context.\nTarget path specified for child item {info.Type} in result set #{resultIdx}.");
+                                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.Type} in result set #{resultIdx}.");
                             });
 
 /*
@@ -151,7 +151,7 @@ namespace Dccelerator.DataAccess.Ado {
                             }
 
                             if (!mainObject.TrySetValueOnPath(info.TargetPath, child.Value))
-                                Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.TargetPath} from '{mainObjectInfo.Type.FullName}' context.\nTarget path specified for child item {info.Type} in result set #{resultIdx}.");
+                                Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {info.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.Type} in result set #{resultIdx}.");
 
                             if (string.IsNullOrWhiteSpace(info.OwnerReferenceName))
                                 return;
@@ -169,43 +169,44 @@ namespace Dccelerator.DataAccess.Ado {
         }
 
 
-        static object ReadItem(this DbDataReader reader, IEntityInfo info, out object keyId) {
-            var item = Activator.CreateInstance(info.Type);
+        static object ReadItem(this DbDataReader reader, IAdoEntityInfo info, out object keyId) {
+            var item = Activator.CreateInstance(info.EntityType);
 
             keyId = null;
 
-            for (var i = 0; i < info.ColumnNames.Length; i++) {
-                var name = info.ColumnNames[i];
+            for (var i = 0; i < info.ReaderColumns.Length; i++) {
+                var name = info.ReaderColumns[i];
                 var value = reader.GetValue(i);
                 if (value == null || value.GetType().FullName == "System.DBNull")
                     continue;
 
-                if (name == info.KeyId.Name)
+                if (name == info.KeyId.Name) //todo: move all of these methods to base AdoNetRepository
                     keyId = value;
 
                 if (!item.TrySetValueOnPath(name, value))
-                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {name} from '{info.Type.FullName}' context.");
+                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {name} from '{info.EntityType.FullName}' context.");
             }
             return item;
         }
 
 
-
-        static void InitColumnNames(IEntityInfo info, DbDataReader reader) {
-            if (info.ColumnNames != null)
+/*
+        static void InitColumnNames(IAdoEntityInfo info, DbDataReader reader) {
+            if (info.ReaderColumns != null)
                 return;
 
             lock (info) {
-                if (info.ColumnNames != null)
+                if (info.ReaderColumns != null)
                     return;
 
 #if NET40
-                info.ColumnNames = reader.GetSchemaTable()?.Rows.Cast<DataRow>().Select(x => (string)x[0]).ToArray();
+                info.ReaderColumns = reader.GetSchemaTable()?.Rows.Cast<DataRow>().Select(x => (string)x[0]).ToArray();
 #else
                 throw new NotImplementedException();
 #endif
             }
         }
+*/
 
     }
 

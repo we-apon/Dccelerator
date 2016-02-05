@@ -8,64 +8,63 @@ namespace Dccelerator.DataAccess {
     /// <summary>
     /// Interface of an repository that holds database-specific CRUD actions.
     /// </summary>
-    public interface IDataAccessRepository {
+    public interface IAdoNetRepository {
 
         /// <summary>
         /// Returns reader that can be used to get some data by <paramref name="entityName"/>, filtering it by <paramref name="criteria"/>.
         /// </summary>
-        /// <param name="entityName">Database-specific name of some entity</param>
         /// <param name="criteria">Filtering criteria</param>
-        IEnumerable<object> Read(string entityName,  ICollection<IDataCriterion> criteria, IEntityInfo info);
+        IEnumerable<object> Read(IEntityInfo info, ICollection<IDataCriterion> criteria);
 
 
-        bool Any(string entityName, ICollection<IDataCriterion> criteria);
+        bool Any(IEntityInfo info, ICollection<IDataCriterion> criteria);
 
 
-        IEnumerable<object> ReadColumn(int columnIdx, string entityName, ICollection<IDataCriterion> criteria);
+        IEnumerable<object> ReadColumn(int columnIdx, IEntityInfo info, ICollection<IDataCriterion> criteria);
 
 
-        int CountOf(string entityName, ICollection<IDataCriterion> criteria);
+        int CountOf(IEntityInfo info, ICollection<IDataCriterion> criteria);
 
 
         /// <summary>
         /// Inserts an <paramref name="entity"/> using it's database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        bool Insert<TEntity>( string entityName,  TEntity entity) where TEntity : class;
+        bool Insert<TEntity>(IEntityInfo info,  TEntity entity) where TEntity : class;
 
 
         /// <summary>
         /// Inserts an <paramref name="entities"/> using they database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        bool InsertMany<TEntity>( string entityName,  IEnumerable<TEntity> entities) where TEntity : class;
+        bool InsertMany<TEntity>(IEntityInfo info,  IEnumerable<TEntity> entities) where TEntity : class;
 
 
         /// <summary>
         /// Updates an <paramref name="entity"/> using it's database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        bool Update<TEntity>( string entityName,  TEntity entity) where TEntity : class;
+        bool Update<TEntity>(IEntityInfo info,  TEntity entity) where TEntity : class;
 
 
         /// <summary>
         /// Updates an <paramref name="entities"/> using they database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        bool UpdateMany<TEntity>( string entityName,  IEnumerable<TEntity> entities) where TEntity : class;
+        bool UpdateMany<TEntity>(IEntityInfo info,  IEnumerable<TEntity> entities) where TEntity : class;
 
 
         /// <summary>
         /// Removes an <paramref name="entity"/> using it's database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        bool Delete<TEntity>( string entityName,  TEntity entity) where TEntity : class;
+        bool Delete<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class;
 
 
         /// <summary>
         /// Removes an <paramref name="entities"/> using they database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        bool DeleteMany<TEntity>( string entityName,  IEnumerable<TEntity> entities) where TEntity : class;
+        bool DeleteMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class;
     }
 }

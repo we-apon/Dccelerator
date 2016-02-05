@@ -1,8 +1,25 @@
 using System;
+using System.Data.Common;
 using System.Reflection;
 
 
 namespace Dccelerator.DataAccess.Infrastructure {
+
+
+    public interface IAdoEntityInfo : IEntityInfo {
+        
+        IAdoNetRepository Repository { get; }
+
+        TimeSpan CacheTimeout { get; }
+        string[] ReaderColumns { get; }
+
+        int IndexOf(string columnName);
+
+        void InitReaderColumns(DbDataReader reader);
+    }
+
+/*
+
     public interface IEntityInfo {
 
 
@@ -40,7 +57,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
 
         IInternalReadingRepository GlobalReadingRepository { get; }
 
-        IDataAccessRepository RealRepository { get; }
+        IAdoNetRepository RealRepository { get; }
         EntityAttribute EntityAttribute { get; }
 
 
@@ -56,4 +73,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
          string OwnerReferenceName { get; }
          Type TargetCollectionType { get; }
     }
+
+*/
+
 }
