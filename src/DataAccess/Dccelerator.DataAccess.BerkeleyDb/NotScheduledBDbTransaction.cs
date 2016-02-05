@@ -22,7 +22,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
         void AppendTransactionElement<TEntity>(TEntity entity, ActionType actionType) where TEntity : class {
-            var info = _factory.InfoAbout<TEntity>();
+            var info = _factory.BerkeleyInfoAbout<TEntity>();
             lock (_entityInfos) {
                 _entityInfos.Add(info);
             }

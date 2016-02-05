@@ -30,7 +30,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// This method will be called on each request of any not cached entity.
         /// </summary>
         public IDataGetter<TEntity> NotCachedGetterFor<TEntity>() where TEntity : class, new() {
-            return new BDbDataGetter<TEntity>(ReadingRepository(), InfoAbout<TEntity>());
+            return new BDbDataGetter<TEntity>(ReadingRepository(), BerkeleyInfoAbout<TEntity>());
         }
 
 
@@ -91,8 +91,9 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         /// <summary>
         /// Returns information about <typeparamref name="TEntity"/>.
         /// </summary>
-        IEntityInfo IDataManagerFactory.InfoAbout<TEntity>() {
-            return InfoAbout<TEntity>();
+        /// <seealso cref="IDataManagerFactory.InfoAbout"/>
+        public IEntityInfo InfoAbout<TEntity>() {
+            return BerkeleyInfoAbout<TEntity>();
         }
 
 
@@ -112,12 +113,12 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         public IInternalReadingRepository ReadingRepository() {
             return BDbReadingRepository.Instance;
         }
-
+        
 
         /// <summary>
         /// Returns information about <typeparamref name="TEntity"/>.
         /// </summary>
-        public IBDbEntityInfo InfoAbout<TEntity>() {
+        public IBDbEntityInfo BerkeleyInfoAbout<TEntity>() {
             var info = BDbInfoAbout<TEntity>.Info;
             if (info.Repository == null)
                 info.Repository = Repository();
