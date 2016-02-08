@@ -1,8 +1,14 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
+using System.Threading.Tasks;
+using Dccelerator.DataAccess.Ado.Infrastructure;
+using Dccelerator.DataAccess.Infrastructure;
 using Dccelerator.Reflection;
 
 
@@ -74,13 +80,17 @@ namespace Dccelerator.DataAccess.Ado {
         /// <param name="entityName">Database-specific name of some entity</param>
         /// <param name="criteria">Filtering criteria</param>
         public IEnumerable<object> Read(IEntityInfo info, ICollection<IDataCriterion> criteria) {
+            return Read((IAdoEntityInfo) info, criteria);
+        }
+
+        protected virtual IEnumerable<object> Read(IAdoEntityInfo info, ICollection<IDataCriterion> criteria) {
             var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
 
             using (var connection = GetConnection())
             using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
                 connection.Open();
                 using (var reader = command.ExecuteReader())
-                    return reader.To(info);
+                    return ReadToEnd(reader, info);
             }
         }
 
@@ -97,14 +107,27 @@ namespace Dccelerator.DataAccess.Ado {
         }
 
 
-        public IEnumerable<object> ReadColumn(int columnIdx, IEntityInfo info, ICollection<IDataCriterion> criteria) {
+        public IEnumerable<object> ReadColumn(string columnName, IEntityInfo info, ICollection<IDataCriterion> criteria) {
+            return ReadColumn(columnName, (IAdoEntityInfo) info, criteria);
+        }
+
+
+        protected virtual IEnumerable<object> ReadColumn(string columnName, IAdoEntityInfo info, ICollection<IDataCriterion> criteria) {
             var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
+
+            var idx = info.ReaderColumns != null ? info.IndexOf(columnName) : -1;
 
             using (var connection = GetConnection())
             using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
                 connection.Open();
-                using (var reader = command.ExecuteReader())
-                    return reader.SelectColumn(columnIdx);
+                using (var reader = command.ExecuteReader()) {
+                    if (idx < 0) {
+                        info.InitReaderColumns(reader);
+                        idx = info.IndexOf(columnName);
+                    }
+
+                    return SelectColumn(reader, idx);
+                }
             }
         }
 
@@ -116,7 +139,7 @@ namespace Dccelerator.DataAccess.Ado {
             using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
                 connection.Open();
                 using (var reader = command.ExecuteReader())
-                    return reader.RowsCount();
+                    return RowsCount(reader);
             }
         }
 
@@ -241,5 +264,184 @@ namespace Dccelerator.DataAccess.Ado {
 
             return true;
         }
+
+
+
+
+
+        
+        protected virtual IEnumerable<object> SelectColumn(DbDataReader reader, int columnIndex) {
+            while (reader.Read()) {
+                yield return reader.GetValue(columnIndex);
+            }
+        }
+
+
+        protected virtual int RowsCount(DbDataReader reader) {
+            var count = 0;
+            while (reader.Read()) {
+                count++;
+            }
+            return count;
+        }
+
+
+        protected virtual IEnumerable<object> GetFirstOrDefault(DbDataReader reader, IAdoEntityInfo info) {
+            info.InitReaderColumns(reader);
+
+            while (reader.Read()) {
+                object keyId;
+                yield return ReadItem(reader, info, out keyId);
+            }
+        }
+
+
+
+        protected virtual IEnumerable<object> ReadToEnd(DbDataReader reader, IAdoEntityInfo mainObjectInfo) {
+
+            if (mainObjectInfo.Inclusions == null)
+                return GetFirstOrDefault(reader, mainObjectInfo);
+
+
+            var mainObjects = new Dictionary<object, object>();
+
+            mainObjectInfo.InitReaderColumns(reader);
+
+            while (reader.Read()) {
+                object keyId;
+                var item = ReadItem(reader, mainObjectInfo, out keyId);
+                try {
+                    mainObjects.Add(keyId, item);
+                }
+                catch (Exception e) {
+                    Internal.TraceEvent(TraceEventType.Critical,
+                        $"On reading '{mainObjectInfo.EntityType}' using special name {mainObjectInfo.EntityName} getted exception, " +
+                        "possibly because reader contains more then one object with same identifier.\n" +
+                        $"Identifier: {keyId}\n" +
+                        $"Exception: {e}");
+
+                    throw;
+                }
+            }
+
+            if (mainObjectInfo.Inclusions == null || !mainObjectInfo.Inclusions.Any())
+                return mainObjects.Values;
+
+
+            var tableIndex = 0;
+
+            while (reader.NextResult()) {
+                tableIndex++;
+
+                Includeon includeon;
+                if (!mainObjectInfo.Inclusions.TryGetValue(tableIndex, out includeon)) {
+                    Internal.TraceEvent(TraceEventType.Warning, $"Reader for object {mainObjectInfo.EntityType.FullName} returned more than one table, " +
+                                                                $"but it has not includeon information for table#{tableIndex}.");
+                    continue;
+                }
+
+                var info = includeon.Info;
+
+                info.InitReaderColumns(reader);
+
+
+                if (!includeon.IsCollection) {
+                    
+                    while (reader.Read()) {
+                        object keyId;
+                        var item = ReadItem(reader, info, out keyId);
+
+                        if (keyId == null) {
+                            Internal.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.EntityType}, {includeon.Attribute.TargetPath} (used on entity {mainObjectInfo.EntityType}");
+                            break;
+                        }
+
+                        var index = tableIndex;
+                        Parallel.ForEach(mainObjects.Values,
+                            mainObject => {
+                                object value;
+                                if (!mainObject.TryGetValueOnPath(includeon.Attribute.TargetPath, out value) || !keyId.Equals(value))
+                                    return;
+
+                                if (!mainObject.TrySetValueOnPath(includeon.Attribute.TargetPath, item))
+                                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {includeon.Attribute.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.EntityType} in result set #{index}.");
+                            });
+                    }
+
+                }
+                else {
+                    var children = new Dictionary<object, IList>(); //? Key is Main Object Primary Key, Value is children collection of main object's navigation property
+
+                    while (reader.Read()) {
+                        object keyId;
+                        var item = ReadItem(reader, info, out keyId);
+
+                        if (keyId == null) {
+                            Internal.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.EntityType}, {includeon.Attribute.TargetPath} (used on entity {mainObjectInfo.EntityType}");
+                            break;
+                        }
+
+
+                        IList collection;
+                        if (!children.TryGetValue(keyId, out collection)) {
+                            collection = (IList) Activator.CreateInstance(includeon.TargetCollectionType);
+                            children.Add(keyId, collection);
+                        }
+
+                        collection.Add(item);
+                    }
+
+
+                    var index = tableIndex;
+                    Parallel.ForEach(children,
+                        child => {
+                            object mainObject;
+                            if (!mainObjects.TryGetValue(child.Key, out mainObject)) {
+                                Internal.TraceEvent(TraceEventType.Warning, $"In result set #{index} finded data row of type {info.EntityType}, that doesn't has owner object in result set #1.\nOwner Id is {child.Key}.\nTarget path is '{includeon.Attribute.TargetPath}'.");
+                                return;
+                            }
+
+                            if (!mainObject.TrySetValueOnPath(includeon.Attribute.TargetPath, child.Value))
+                                Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {includeon.Attribute.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.EntityType} in result set #{index}.");
+
+                            if (string.IsNullOrWhiteSpace(includeon.OwnerNavigationReferenceName))
+                                return;
+
+                            foreach (var item in child.Value) {
+                                if (!item.TrySetValueOnPath(includeon.OwnerNavigationReferenceName, mainObject))
+                                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {includeon.OwnerNavigationReferenceName} from '{info.EntityType}' context. This should be reference to owner object ({mainObject})");
+                            }
+                        });
+                }
+            }
+
+            
+
+            return mainObjects.Values;
+        }
+
+
+        protected virtual object ReadItem(DbDataReader reader, IAdoEntityInfo info, out object keyId) {
+            var item = Activator.CreateInstance(info.EntityType);
+
+            keyId = null;
+
+            for (var i = 0; i < info.ReaderColumns.Length; i++) {
+                var name = info.ReaderColumns[i];
+                var value = reader.GetValue(i);
+                if (value == null || value.GetType().FullName == "System.DBNull")
+                    continue;
+
+                if (IsPrimaryKey(name, info))
+                    keyId = value;
+
+                if (!item.TrySetValueOnPath(name, value))
+                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {name} from '{info.EntityType.FullName}' context.");
+            }
+            return item;
+        }
+
+
+        protected abstract bool IsPrimaryKey(string propertyName, IAdoEntityInfo info);
     }
 }

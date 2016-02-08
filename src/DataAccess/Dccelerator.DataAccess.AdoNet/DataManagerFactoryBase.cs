@@ -1,5 +1,6 @@
 ﻿using System;
 using Dccelerator.DataAccess.Ado.DataGetters;
+using Dccelerator.DataAccess.Ado.Infrastructure;
 using Dccelerator.DataAccess.Ado.ReadingRepositories;
 using Dccelerator.DataAccess.Implementations;
 using Dccelerator.DataAccess.Implementations.DataExistenceChecker;

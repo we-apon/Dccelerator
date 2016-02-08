@@ -11,15 +11,19 @@ namespace Dccelerator.DataAccess {
         public int ResultSetIndex { get; set; }
 
 
-        public string PropertyName { get; set; }
+        public string TargetPath { get; set; }
+
 
         public string KeyIdName { get; set; }
 
 
+
+
+
         /// <param name="resultSetIndex">Starts from 1.</param>
-        public IncludeChildrenAttribute(int resultSetIndex, string propertyName) {
+        public IncludeChildrenAttribute(int resultSetIndex, string targetPath) {
             ResultSetIndex = resultSetIndex;
-            PropertyName = propertyName;
+            TargetPath = targetPath;
         }
     }
 }

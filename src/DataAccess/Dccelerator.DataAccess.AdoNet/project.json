@@ -1,11 +1,10 @@
-﻿{
+{
   "version": "1.0.0-*",
   "description": "Dccelerator.DataAccess.AdoNet Class Library",
   "authors": [ "we_apon" ],
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
-
   "frameworks": {
     "net40": {
       "compilationOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] },
@@ -19,5 +18,6 @@
       }
     }
   }
+
 
 }

@@ -20,7 +20,7 @@ namespace Dccelerator.DataAccess {
         bool Any(IEntityInfo info, ICollection<IDataCriterion> criteria);
 
 
-        IEnumerable<object> ReadColumn(int columnIdx, IEntityInfo info, ICollection<IDataCriterion> criteria);
+        IEnumerable<object> ReadColumn(string columnName, IEntityInfo info, ICollection<IDataCriterion> criteria);
 
 
         int CountOf(IEntityInfo info, ICollection<IDataCriterion> criteria);

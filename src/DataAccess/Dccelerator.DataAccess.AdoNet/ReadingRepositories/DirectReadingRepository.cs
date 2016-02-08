@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Dccelerator.DataAccess.Ado.Infrastructure;
 using Dccelerator.DataAccess.Infrastructure;
 
 
@@ -107,10 +108,7 @@ namespace Dccelerator.DataAccess.Ado.ReadingRepositories {
         /// It's used to .Select() something. 
         /// </summary>
         public virtual IEnumerable<object> ReadColumn(string columnName, IEntityInfo info, ICollection<IDataCriterion> criteria) {
-            var adoInfo = (IAdoEntityInfo) info;
-            var idx = adoInfo.IndexOf(columnName);
-
-            return RetryOnDeadlock(() => adoInfo.Repository.ReadColumn(idx, info, criteria));
+            return RetryOnDeadlock(() => ((IAdoEntityInfo)info).Repository.ReadColumn(columnName, info, criteria));
         }
 
 

@@ -1,11 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
-using System.Reflection;
 
 
-namespace Dccelerator.DataAccess.Infrastructure {
-
-
+namespace Dccelerator.DataAccess.Ado.Infrastructure {
     public interface IAdoEntityInfo : IEntityInfo {
         
         IAdoNetRepository Repository { get; }
@@ -16,6 +14,9 @@ namespace Dccelerator.DataAccess.Infrastructure {
         int IndexOf(string columnName);
 
         void InitReaderColumns(DbDataReader reader);
+
+
+        Dictionary<int, Includeon> Inclusions { get; }
     }
 
 /*

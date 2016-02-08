@@ -3,40 +3,46 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
-using Dccelerator.DataAccess.Infrastructure;
+using Dccelerator.DataAccess.Ado.Infrastructure;
+using Dccelerator.Reflection;
 
 
 namespace Dccelerator.DataAccess.Ado {
 
-    class AdoEntityInfo : IAdoEntityInfo {
+    class AdoEntityInfo : BaseEntityInfo<IAdoNetRepository>, IAdoEntityInfo {
 
         readonly object _lock = new object();
 
 
-        public AdoEntityInfo(Type entityType) {
-            EntityType = entityType;
-        }
+        public AdoEntityInfo(Type entityType) : base(entityType) { }
 
-        #region Implementation of IEntityInfo
-
-        public string EntityName { get { throw new NotImplementedException(); } }
-        public Type EntityType { get; }
-        public Dictionary<string, ForeignKeyAttribute> ForeignKeys { get { throw new NotImplementedException(); } }
-        public Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get { throw new NotImplementedException(); } }
-        public Dictionary<string, Type> PersistedProperties { get { throw new NotImplementedException(); } }
-
-        #endregion
 
 
         #region Implementation of IAdoEntityInfo
 
-        public IAdoNetRepository Repository { get; internal set; }
-        public TimeSpan CacheTimeout { get { throw new NotImplementedException(); } }
+        public override Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get; }
+        public override Dictionary<string, Type> PersistedProperties { get; }
+        public override Dictionary<string, Type> NavigationProperties { get; }
+
+
         public string[] ReaderColumns { get; private set; }
 
 
+        Dictionary<string, int> _readerColumnsIndexes;
         public int IndexOf(string columnName) {
-            throw new NotImplementedException();
+            if (_readerColumnsIndexes == null) {
+                lock (_lock) {
+                    if (_readerColumnsIndexes == null) {
+                        _readerColumnsIndexes = new Dictionary<string, int>(ReaderColumns.Length);
+
+                        for (var i = 0; i < ReaderColumns.Length; i++) {
+                            _readerColumnsIndexes.Add(ReaderColumns[i], i);
+                        }
+                    }
+                }
+            }
+
+            return _readerColumnsIndexes[columnName];
         }
 
 
@@ -55,6 +61,43 @@ namespace Dccelerator.DataAccess.Ado {
             }
         }
 
+
+
+
+        Dictionary<int, Includeon> _inclusions;
+
+
+        public Dictionary<int, Includeon> Inclusions {
+            get {
+                if (_inclusions == null) {
+                    lock (_lock) {
+                        if (_inclusions == null)
+                            _inclusions = GetInclusions();
+                    }
+                }
+
+                return _inclusions;
+            }
+        }
+
+
+        Dictionary<int, Includeon> GetInclusions() {
+            var inclusions = new Dictionary<int, Includeon>();
+
+            var inclusionAttributes = TypeInfo.GetCustomAttributes<IncludeChildrenAttribute>().ToArray();
+            if (inclusionAttributes.Length == 0)
+                return inclusions;
+
+            foreach (var inclusionAttribute in inclusionAttributes) {
+                var includeon = new Includeon(inclusionAttribute, this);
+                inclusions.Add(inclusionAttribute.ResultSetIndex, includeon);
+            }
+
+            return inclusions;
+        }
+
         #endregion
     }
+
+
 }
