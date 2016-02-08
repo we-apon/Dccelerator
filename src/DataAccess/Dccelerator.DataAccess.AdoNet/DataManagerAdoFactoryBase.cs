@@ -5,13 +5,12 @@ using Dccelerator.DataAccess.Ado.ReadingRepositories;
 using Dccelerator.DataAccess.Implementations;
 using Dccelerator.DataAccess.Implementations.DataExistenceChecker;
 using Dccelerator.DataAccess.Implementations.Schedulers;
-using Dccelerator.DataAccess.Infrastructure;
 
 
 namespace Dccelerator.DataAccess.Ado {
-    public abstract class DataManagerFactoryBase : IDataManagerAdoFactory {
+    public abstract class DataManagerAdoFactoryBase : IDataManagerAdoFactory {
 
-        protected abstract ForcedCacheReadingRepository CachedReadingRepository<TEntity>() where TEntity : class;
+        protected abstract ForcedCacheReadingRepository ForcedCachedReadingRepository<TEntity>() where TEntity : class;
         protected abstract DirectReadingRepository NotCachedReadingRepository<TEntity>() where TEntity : class;
 
 
@@ -39,7 +38,7 @@ namespace Dccelerator.DataAccess.Ado {
         /// This method will be called on each delete request.
         /// </summary>
         public virtual IDataExistenceChecker<TEntity> DataExistenceChecker<TEntity>() where TEntity : class {
-            return new DataExistenceChecker<TEntity>(CachedReadingRepository<TEntity>(), AdoInfoAbout<TEntity>());
+            return new DataExistenceChecker<TEntity>(ForcedCachedReadingRepository<TEntity>(), AdoInfoAbout<TEntity>());
         }
 
 
@@ -59,7 +58,7 @@ namespace Dccelerator.DataAccess.Ado {
         /// This method will be called on each delete request.
         /// </summary>
         public virtual IDataCountChecker<TEntity> DataCountChecker<TEntity>() where TEntity : class {
-            return new DataCountChecker<TEntity>(CachedReadingRepository<TEntity>(), AdoInfoAbout<TEntity>());
+            return new DataCountChecker<TEntity>(ForcedCachedReadingRepository<TEntity>(), AdoInfoAbout<TEntity>());
         }
 
 

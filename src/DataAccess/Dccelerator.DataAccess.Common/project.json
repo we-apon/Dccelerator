@@ -30,12 +30,8 @@
 
     "dnx45": {
       "compilationOptions": { "define": [ "NET45", "JETBRAINS_ANNOTATIONS" ] }
-    },
-
-
-    "dotnet": {
-      "compilationOptions": { "define": [ "DOTNET", "JETBRAINS_ANNOTATIONS" ] }
     }
+
 
   },
 

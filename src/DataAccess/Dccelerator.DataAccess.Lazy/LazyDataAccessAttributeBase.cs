@@ -67,7 +67,7 @@ namespace Dccelerator.DataAccess.Lazy {
             }
 
             //todo: validate lazy link path.
-            Message.Write(MessageLocation.Of(location), IsAcceptedMessageSeverityType(), "3543", $"!!! 'LazyDataAccess' are accepted!!!.\nLocation is {location.DeclaringType.FullName}.{location.PropertyInfo.Name}\n");
+            Message.Write(MessageLocation.Of(location), SeverityType.Verbose, "3543", $"!!! 'LazyDataAccess' are accepted!!!.\nLocation is {location.DeclaringType.FullName}.{location.PropertyInfo.Name}\n");
                 
             return true;
         }

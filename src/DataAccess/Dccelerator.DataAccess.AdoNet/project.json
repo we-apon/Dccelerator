@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-*",
+  "version": "0.0.1-alfa3",
   "description": "Dccelerator.DataAccess.AdoNet Class Library",
   "authors": [ "we_apon" ],
   "tags": [ "" ],
@@ -8,16 +8,16 @@
   "frameworks": {
     "net40": {
       "compilationOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] },
-      "dependencies": {
-        "Dccelerator.Core": "",
-        "Dccelerator.DataAccess.Common": ""
-      },
       "frameworkAssemblies": {
-        "System.Data": "4.0.0.0",
-        "System.Xml": "4.0.0.0"
+        "System.Xml": "4.0.0.0", 
+        "System.Data": "4.0.0.0"
       }
     }
+  },
+
+
+  "dependencies": {
+      "Dccelerator.Core": "",
+      "Dccelerator.DataAccess.Common": ""
   }
-
-
 }

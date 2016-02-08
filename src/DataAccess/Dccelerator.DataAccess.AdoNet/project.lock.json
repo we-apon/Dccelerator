@@ -104,12 +104,13 @@
     }
   },
   "projectFileDependencyGroups": {
-    "": [],
-    ".NETFramework,Version=v4.0": [
+    "": [
       "Dccelerator.Core ",
-      "Dccelerator.DataAccess.Common ",
-      "fx/System.Data >= 4.0.0",
-      "fx/System.Xml >= 4.0.0"
+      "Dccelerator.DataAccess.Common "
+    ],
+    ".NETFramework,Version=v4.0": [
+      "fx/System.Xml >= 4.0.0",
+      "fx/System.Data >= 4.0.0"
     ]
   }
 }

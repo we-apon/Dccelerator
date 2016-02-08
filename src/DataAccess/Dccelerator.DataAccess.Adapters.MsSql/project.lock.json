@@ -10,7 +10,7 @@
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.AdoNet/1.0.0": {
+      "Dccelerator.DataAccess.AdoNet/0.0.1-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -47,7 +47,7 @@
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.AdoNet/1.0.0": {
+      "Dccelerator.DataAccess.AdoNet/0.0.1-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -84,7 +84,7 @@
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.AdoNet/1.0.0": {
+      "Dccelerator.DataAccess.AdoNet/0.0.1-alfa2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -119,7 +119,7 @@
       "type": "project",
       "path": "../../Dccelerator.Core/project.json"
     },
-    "Dccelerator.DataAccess.AdoNet/1.0.0": {
+    "Dccelerator.DataAccess.AdoNet/0.0.1-alfa2": {
       "type": "project",
       "path": "../Dccelerator.DataAccess.AdoNet/project.json"
     },
@@ -145,13 +145,11 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Dccelerator.DataAccess.AdoNet >= 1.0.0-*"
+      "Dccelerator.DataAccess.AdoNet "
     ],
     ".NETFramework,Version=v4.0": [
-      "Dccelerator.Core ",
-      "Dccelerator.DataAccess.Common ",
-      "fx/System.Data >= 4.0.0",
-      "fx/System.Xml >= 4.0.0"
+      "fx/System.Xml >= 4.0.0",
+      "fx/System.Transactions >= 4.0.0"
     ]
   }
 }

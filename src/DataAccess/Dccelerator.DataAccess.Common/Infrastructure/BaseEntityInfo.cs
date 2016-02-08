@@ -69,7 +69,7 @@ namespace Dccelerator.DataAccess {
         public abstract Dictionary<string, Type> PersistedProperties { get; }
         public abstract Dictionary<string, Type> NavigationProperties { get; }
 
-#endregion
+        #endregion
 
 
 
@@ -77,14 +77,15 @@ namespace Dccelerator.DataAccess {
 
 
 #if NET40
-        Dictionary<string, ForeignKeyAttribute> GetForeignKeysOf(Type typeInfo)
-        {
+        Dictionary<string, ForeignKeyAttribute> GetForeignKeysOf(Type typeInfo) {
+#else
+        Dictionary<string, ForeignKeyAttribute> GetForeignKeysOf(TypeInfo typeInfo) {
+#endif
             var dict = new Dictionary<string, ForeignKeyAttribute>();
 
             var properties = typeInfo.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-            foreach (var property in properties)
-            {
+            foreach (var property in properties) {
                 var foreignKeyAttributes = property.GetCustomAttributes(ForeignKeyAttribute.Type, inherit: true).Cast<ForeignKeyAttribute>().ToList();
                 if (foreignKeyAttributes.Count < 1)
                     continue;
@@ -101,10 +102,5 @@ namespace Dccelerator.DataAccess {
 
             return dict;
         }
-#else
-        Dictionary<string, ForeignKeyAttribute> GetForeignKeysOf(TypeInfo typeInfo) {
-            throw new NotImplementedException();
-        }
-#endif
     }
 }
