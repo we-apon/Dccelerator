@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq.Expressions;
+using Dccelerator.Reflection;
 
 
 namespace Dccelerator.DataAccess.Lazy {
@@ -11,26 +14,76 @@ namespace Dccelerator.DataAccess.Lazy {
     class LazyDataGetter<TEntity> : IDataGetter<TEntity> where TEntity : class, new() {
         readonly IDataGetter<TEntity> _getter;
         readonly IDataManagerFactory _lazyFactory;
-
+        readonly IEntityInfo _mainEntityInfo;
 
         public LazyDataGetter(IDataGetter<TEntity> getter, IDataManagerFactory lazyFactory) {
             _getter = getter;
             _lazyFactory = lazyFactory;
+            _mainEntityInfo = _lazyFactory.InfoAbout<TEntity>();
         }
 
 
         void SetupLazyContext(object entity) {
             var lazyEntity = entity as LazyEntity;
             if (lazyEntity != null) {
+                if (_mainEntityInfo.Inclusions == null) {
+                    lazyEntity.Read = LazyLoad;
+                    return;
+                }
+
+                using (lazyEntity.TemporarilyBlockLazyLoading()) {
+                    SetupLazyChildren(lazyEntity, _mainEntityInfo, lazyEntity.Context);
+                }
+            }
+        }
+
+
+        void SetupLazyChildren(LazyEntity entity, IEntityInfo info, LazyEntity.LoadingContext context) {
+            if (entity == null)
+                return;
+
+            entity.Context = context;
+            if (entity.Read == null)
+                entity.Read = LazyLoad;
+
+            if (info.Inclusions == null)
+                return;
+
+            foreach (var inclusion in _mainEntityInfo.Inclusions) {
+                object child;
+                if (!entity.TryGetValueOnPath(inclusion.TargetPath, out child)) {
+                    Internal.TraceEvent(TraceEventType.Warning, $"Can't get property {inclusion.TargetPath} on {_mainEntityInfo.EntityType} to setup it's loading context.");
+                    continue;
+                }
+
+                if (!inclusion.IsCollection) {
+                    SetupLazyChildren(child as LazyEntity, inclusion.Info, context);
+                    continue;
+                }
+
+
+                foreach (var item in (IEnumerable)child) {
+                    SetupLazyChildren(item as LazyEntity, inclusion.Info, context);
+                }
+            }
+
+
+        }
+
+
+        void CopyLazyContext(LazyEntity parent, object entity) {
+            var lazyEntity = entity as LazyEntity;
+            if (lazyEntity != null) {
+                lazyEntity.Context = parent.Context;
                 lazyEntity.Read = LazyLoad;
             }
         }
 
 
-        IEnumerable<object> LazyLoad(Type type, ICollection<IDataCriterion> criteria) {
+        IEnumerable<object> LazyLoad(LazyEntity parent, Type type, ICollection<IDataCriterion> criteria) {
             var info = _lazyFactory.InfoAbout(type);
             var repository = _lazyFactory.ReadingRepository();
-            return repository.Read(info, criteria).Perform(SetupLazyContext);
+            return repository.Read(info, criteria).Perform(item => CopyLazyContext(parent, item));
         }
 
 

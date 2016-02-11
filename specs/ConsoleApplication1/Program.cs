@@ -65,7 +65,7 @@ namespace ConsoleApplication1
 
 
         static void Main(string[] args) {
-
+            
             _logTxt = Path.Combine(_home, "log.txt");
             if (File.Exists(_logTxt))
                 File.Delete(_logTxt);

@@ -37,12 +37,16 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
         #region Overrides of NotScheduledDataTransaction
 
         protected override bool IsDeadlockException(Exception exception) {
-            throw new NotImplementedException();
+            return exception.IsDeadlock();
         }
 
 
         protected override ISpecificTransactionScope BeginTransactionScope(IsolationLevel isolationLevel) {
-            return new Scope(new TransactionScope(TransactionScopeOption.Required, new TransactionOptions {IsolationLevel = (System.Transactions.IsolationLevel)isolationLevel}));
+            System.Transactions.IsolationLevel level;
+            if (!Enum.TryParse(isolationLevel.ToString("G"), out level))
+                throw new InvalidOperationException($"Can't parce isolation level {isolationLevel} to 'System.Transactions.IsolationLevel' enum type");
+
+            return new Scope(new TransactionScope(TransactionScopeOption.Required, new TransactionOptions {IsolationLevel = level}));
         }
 
         #endregion

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using Dccelerator.DataAccess.Ado.Infrastructure;
-using Dccelerator.DataAccess.Infrastructure;
 
 
 namespace Dccelerator.DataAccess.Ado.ReadingRepositories {
@@ -30,7 +29,7 @@ namespace Dccelerator.DataAccess.Ado.ReadingRepositories {
                 try {
                     return func();
                 }
-                catch (Exception exception) { //todo: make it work!
+                catch (Exception exception) {
                     Internal.TraceEvent(TraceEventType.Critical, $"On attempt coun #{attemptNumber} gaived exception:\n{exception}");
 
                     if (!IsDeadlock(exception) || (attemptNumber++ > DeadLockRetryCount))

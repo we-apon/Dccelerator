@@ -5,10 +5,10 @@ using System.Collections.Generic;
 namespace Dccelerator.DataAccess.BerkeleyDb {
     class BDbEntityInfo : BaseEntityInfo<IBDbRepository>, IBDbEntityInfo {
 
-        public override Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get; }
-        public override Dictionary<string, Type> PersistedProperties { get; }
-        public override Dictionary<string, Type> NavigationProperties { get; }
-
+        public Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get; }
+        public Dictionary<string, Type> PersistedProperties { get; }
+        public Dictionary<string, Type> NavigationProperties { get; }
+        public IEnumerable<IIncludeon> Inclusions { get; }
 
 
         public BDbEntityInfo(Type type) : base(type) { }

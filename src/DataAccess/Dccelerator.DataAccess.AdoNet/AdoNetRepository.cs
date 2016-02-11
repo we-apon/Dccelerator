@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Dccelerator.DataAccess.Ado.Infrastructure;
 using Dccelerator.DataAccess.Infrastructure;
 using Dccelerator.Reflection;
+using JetBrains.Annotations;
 
 
 namespace Dccelerator.DataAccess.Ado {
@@ -286,12 +287,12 @@ namespace Dccelerator.DataAccess.Ado {
         }
 
 
-        protected virtual IEnumerable<object> GetFirstOrDefault(DbDataReader reader, IAdoEntityInfo info) {
+        protected virtual IEnumerable<object> GetMainEntities(DbDataReader reader, IAdoEntityInfo info) {
             info.InitReaderColumns(reader);
 
             while (reader.Read()) {
                 object keyId;
-                yield return ReadItem(reader, info, out keyId);
+                yield return ReadItem(reader, info, null, out keyId);
             }
         }
 
@@ -300,7 +301,7 @@ namespace Dccelerator.DataAccess.Ado {
         protected virtual IEnumerable<object> ReadToEnd(DbDataReader reader, IAdoEntityInfo mainObjectInfo) {
 
             if (mainObjectInfo.Inclusions == null)
-                return GetFirstOrDefault(reader, mainObjectInfo);
+                return GetMainEntities(reader, mainObjectInfo);
 
 
             var mainObjects = new Dictionary<object, object>();
@@ -309,7 +310,7 @@ namespace Dccelerator.DataAccess.Ado {
 
             while (reader.Read()) {
                 object keyId;
-                var item = ReadItem(reader, mainObjectInfo, out keyId);
+                var item = ReadItem(reader, mainObjectInfo, null, out keyId);
                 try {
                     mainObjects.Add(keyId, item);
                 }
@@ -346,10 +347,9 @@ namespace Dccelerator.DataAccess.Ado {
 
 
                 if (!includeon.IsCollection) {
-                    
                     while (reader.Read()) {
                         object keyId;
-                        var item = ReadItem(reader, info, out keyId);
+                        var item = ReadItem(reader, mainObjectInfo, includeon, out keyId);
 
                         if (keyId == null) {
                             Internal.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.EntityType}, {includeon.Attribute.TargetPath} (used on entity {mainObjectInfo.EntityType}");
@@ -360,8 +360,8 @@ namespace Dccelerator.DataAccess.Ado {
                         Parallel.ForEach(mainObjects.Values,
                             mainObject => {
                                 object value;
-                                if (!mainObject.TryGetValueOnPath(includeon.Attribute.TargetPath, out value) || !keyId.Equals(value))
-                                    return;
+                                if (!mainObject.TryGetValueOnPath(includeon.ForeignKeyFromMainEntityToCurrent, out value) || !keyId.Equals(value)) // target path should be ServiceWorkplaceId, but it ServiceWorkPlace
+                                    return; //keyId should be just primary key of ServiceWorkPlace
 
                                 if (!mainObject.TrySetValueOnPath(includeon.Attribute.TargetPath, item))
                                     Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {includeon.Attribute.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.EntityType} in result set #{index}.");
@@ -374,7 +374,7 @@ namespace Dccelerator.DataAccess.Ado {
 
                     while (reader.Read()) {
                         object keyId;
-                        var item = ReadItem(reader, info, out keyId);
+                        var item = ReadItem(reader, mainObjectInfo, includeon, out keyId);
 
                         if (keyId == null) {
                             Internal.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.EntityType}, {includeon.Attribute.TargetPath} (used on entity {mainObjectInfo.EntityType}");
@@ -421,27 +421,69 @@ namespace Dccelerator.DataAccess.Ado {
         }
 
 
-        protected virtual object ReadItem(DbDataReader reader, IAdoEntityInfo info, out object keyId) {
-            var item = Activator.CreateInstance(info.EntityType);
+        protected virtual object ReadItem(DbDataReader reader, IAdoEntityInfo mainEntityInfo, [CanBeNull] Includeon includeon, out object keyId) {
+            var entityType = includeon?.Info.EntityType ?? mainEntityInfo.EntityType;
+
+            var item = Activator.CreateInstance(entityType);
 
             keyId = null;
 
-            for (var i = 0; i < info.ReaderColumns.Length; i++) {
-                var name = info.ReaderColumns[i];
+            var isKey = includeon == null
+                ? IsPrimaryKey
+                : includeon.IsCollection
+                    ? (Func<string, IAdoEntityInfo, Includeon, bool>) IsKeyOfMainEntityInForeign
+                    : IsPrimaryKey;
+
+
+            var columns = includeon?.Info.ReaderColumns ?? mainEntityInfo.ReaderColumns;
+
+            for (var i = 0; i < columns.Length; i++) {
+                var name = columns[i];
                 var value = reader.GetValue(i);
                 if (value == null || value.GetType().FullName == "System.DBNull")
                     continue;
 
-                if (IsPrimaryKey(name, info))
+                if (isKey(name, mainEntityInfo, includeon))
                     keyId = value;
 
                 if (!item.TrySetValueOnPath(name, value))
-                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {name} from '{info.EntityType.FullName}' context.");
+                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {name} from '{entityType.FullName}' context.");
             }
             return item;
         }
 
+/*
 
-        protected abstract bool IsPrimaryKey(string propertyName, IAdoEntityInfo info);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="mainEntityInfo">
+        ///     If <see langword="null"/> - <paramref name="currentEntityInfo"/> is information about main object 
+        ///     and <paramref name="propertyName"/> is main object's property, 
+        ///     if not - <paramref name="currentEntityInfo"/> is information about child of main object
+        /// </param>
+        /// <param name="currentEntityInfo"></param>
+        /// <returns>
+        ///     Is property with givent <paramref name="propertyName"/> are primary key of main object (then it's property of main object),
+        ///     or is that property are foreign key from child object to main (if includeon is <paramref name="currentEntityInfo.IsCollection"/>),
+        ///     or is that property are foreign key from main object to other (if current includeon is not collection).
+        /// </returns>
+        protected abstract bool IsMainObjectKey(string propertyName, [CanBeNull] IAdoEntityInfo mainEntityInfo, IAdoEntityInfo currentEntityInfo); //todo: rename, because it's not always PrimaryKey
+
+*/
+
+        protected abstract bool IsPrimaryKey([NotNull] string propertyName, [NotNull]  IAdoEntityInfo mainEntityInfo,[CanBeNull] Includeon includeon);
+
+
+        protected virtual bool IsForeignKeyToOtherEntityFromMain([NotNull] string propertyName, [NotNull] IAdoEntityInfo mainEntityInfo, [NotNull] Includeon includeon) {
+            return propertyName == includeon.ForeignKeyFromMainEntityToCurrent;
+        }
+
+
+        protected virtual bool IsKeyOfMainEntityInForeign([NotNull] string propertyName, [NotNull] IAdoEntityInfo mainEntityInfo, [NotNull] Includeon includeon) {
+            return propertyName == includeon.ForeignKeyFromCurrentEntityToMain;
+        }
+
     }
 }

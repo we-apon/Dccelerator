@@ -7,7 +7,7 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
         #region Overrides of DirectReadingRepository
 
         protected override bool IsDeadlock(Exception exception) {
-            throw new NotImplementedException();
+            return exception.IsDeadlock();
         }
 
         #endregion

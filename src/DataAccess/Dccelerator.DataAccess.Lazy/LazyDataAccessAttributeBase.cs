@@ -176,7 +176,7 @@ namespace Dccelerator.DataAccess.Lazy {
             }
 
             var lazyEntity = (LazyEntity) args.Instance;
-            if (lazyEntity == null)
+            if (!lazyEntity.Context.IsLoadingAllowed)
                 return;
 
             lock (_writeLock) {
@@ -190,7 +190,7 @@ namespace Dccelerator.DataAccess.Lazy {
                     return;
                 }
 
-                var value = GetValueFor(args, lazyEntity.Read);
+                var value = GetValueFor(args, lazyEntity, lazyEntity.Read);
                 args.SetNewValue(value);
                 AlreadyLoaded = true;
                 args.ProceedGetValue();
@@ -207,7 +207,7 @@ namespace Dccelerator.DataAccess.Lazy {
 
 
         [CanBeNull]
-        object GetValueFor([NotNull] LocationInterceptionArgs args, Func<Type, ICollection<IDataCriterion>, IEnumerable<object>> read) {
+        object GetValueFor([NotNull] LocationInterceptionArgs args, LazyEntity parent, Func<LazyEntity, Type, ICollection<IDataCriterion>, IEnumerable<object>> read) {
             var criterion = CriterionFor(args);
             if (criterion == null)
                 return null;
@@ -215,7 +215,7 @@ namespace Dccelerator.DataAccess.Lazy {
 
             
            // var collection = GetLazy.Entity(RealLocationType, (ILazyEntity)args.Instance).By(criterion);
-            var collection = read(RealLocationType, new[] {criterion});
+            var collection = read(parent, RealLocationType, new[] {criterion});
             if (IsCollection) {
                 var targetCollection = (IList)Activator.CreateInstance(TargetCollectionType);
                 foreach (var item in collection)

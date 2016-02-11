@@ -2,6 +2,56 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 
+/*
+    private void SetupLazyContext(object obj)
+    {
+        SetupLazyContext(obj, Info);
+    }
+
+
+    private void SetupLazyContext(object obj, EntityInfo info, Entity ownerObject = null)
+    {
+        var entity = obj as Entity;
+        if (entity != null)
+        {
+            if (ownerObject == null)
+                entity.Internal_AllowLazyLoading(Repository);
+            else {
+                entity.CopyLoadingContextFrom(ownerObject);
+            }
+        }
+        else {
+            var lazyEntity = obj as ILazyEntity;
+            lazyEntity?.AllowLazyLoading();
+        }
+
+        if (info.Children == null)
+            return;
+
+        foreach (var childInfo in info.Children)
+        { // try to use parallels
+            object child;
+            if (!TypeInfo.TryGetNestedProperty(obj, childInfo.TargetPath, out child))
+            {
+                Internal.TraceEvent(TraceEventType.Warning, $"Can't get property {childInfo.TargetPath} on {entity.GetType()} to setup it's loading context.");
+                continue;
+            }
+
+            if (childInfo.IsCollection)
+            {
+                foreach (var item in (IEnumerable)child)
+                {
+                    SetupLazyContext(item, childInfo, entity);
+                }
+            }
+            else {
+                SetupLazyContext(child, childInfo, entity);
+            }
+        }
+    }
+
+
+*/
 
 namespace Dccelerator.DataAccess.Ado.Infrastructure {
     public interface IAdoEntityInfo : IEntityInfo {
@@ -16,7 +66,7 @@ namespace Dccelerator.DataAccess.Ado.Infrastructure {
         void InitReaderColumns(DbDataReader reader);
 
 
-        Dictionary<int, Includeon> Inclusions { get; }
+        new Dictionary<int, Includeon> Inclusions { get; }
     }
 
 /*

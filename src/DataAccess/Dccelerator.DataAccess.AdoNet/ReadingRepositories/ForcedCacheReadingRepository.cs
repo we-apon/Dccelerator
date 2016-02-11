@@ -1,6 +1,5 @@
 using System;
 using Dccelerator.DataAccess.Ado.Infrastructure;
-using Dccelerator.DataAccess.Infrastructure;
 
 
 namespace Dccelerator.DataAccess.Ado.ReadingRepositories {

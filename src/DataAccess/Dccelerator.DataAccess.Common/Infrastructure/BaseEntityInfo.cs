@@ -10,7 +10,7 @@ using Dccelerator.Reflection;
 
 namespace Dccelerator.DataAccess {
 
-    public abstract class BaseEntityInfo<TRepository> : IEntityInfo where TRepository : class {
+    public abstract class BaseEntityInfo<TRepository> where TRepository : class {
 
 
         protected BaseEntityInfo(Type entityType) {
@@ -64,10 +64,10 @@ namespace Dccelerator.DataAccess {
                 return _foreignKeys;
             }
         }
-
+/*
         public abstract Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get; }
         public abstract Dictionary<string, Type> PersistedProperties { get; }
-        public abstract Dictionary<string, Type> NavigationProperties { get; }
+        public abstract Dictionary<string, Type> NavigationProperties { get; }*/
 
         #endregion
 

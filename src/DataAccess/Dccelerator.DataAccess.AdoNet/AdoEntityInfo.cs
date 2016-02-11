@@ -6,6 +6,9 @@ using System.Linq;
 using Dccelerator.DataAccess.Ado.Infrastructure;
 using Dccelerator.Reflection;
 
+#if !NET40
+using System.Reflection;
+#endif
 
 namespace Dccelerator.DataAccess.Ado {
 
@@ -20,9 +23,9 @@ namespace Dccelerator.DataAccess.Ado {
 
         #region Implementation of IAdoEntityInfo
 
-        public override Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get; }
-        public override Dictionary<string, Type> PersistedProperties { get; }
-        public override Dictionary<string, Type> NavigationProperties { get; }
+        public Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get; }
+        public Dictionary<string, Type> PersistedProperties { get; }
+        public Dictionary<string, Type> NavigationProperties { get; }
 
 
         public string[] ReaderColumns { get; private set; }
@@ -50,10 +53,10 @@ namespace Dccelerator.DataAccess.Ado {
             if (ReaderColumns != null)
                 return;
 
-#if NET40
+#if NET40 || NET45
             var columns = reader.GetSchemaTable()?.Rows.Cast<DataRow>().Select(x => (string) x[0]).ToArray();
 #else
-            throw new NotImplementedException();
+            throw new NotImplementedException() and don't build until it's implemented!
 #endif
             lock (_lock) {
                 if (ReaderColumns == null)
@@ -79,6 +82,9 @@ namespace Dccelerator.DataAccess.Ado {
                 return _inclusions;
             }
         }
+
+
+        IEnumerable<IIncludeon> IEntityInfo.Inclusions => Inclusions.Values.Any() ? Inclusions.Values : null;
 
 
         Dictionary<int, Includeon> GetInclusions() {

@@ -192,7 +192,7 @@ namespace Dccelerator.Reflection
             if (_isStrongEnumerable.TryGetValue(type, out result))
                 return result;
 
-            result = StringType != type && !InterfacesOf(type).Contains(EnumerableType);
+            result = type == EnumerableType || (type != StringType && InterfacesOf(type).Contains(EnumerableType));
             _isStrongEnumerable[type] = result;
 
             return result;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 
 namespace Dccelerator.DataAccess {
@@ -16,5 +17,8 @@ namespace Dccelerator.DataAccess {
         Dictionary<string, Type> PersistedProperties { get; }
 
         Dictionary<string, Type> NavigationProperties { get; }
+
+        [CanBeNull]
+        IEnumerable<IIncludeon> Inclusions { get; }
     }
 }
