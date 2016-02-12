@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Reflection;
 using Dccelerator.DataAccess.Infrastructure;
 using Dccelerator.Reflection;
 
@@ -10,6 +11,7 @@ namespace Dccelerator.DataAccess.Ado {
         static readonly AdoNetInfoAboutEntity _infoContainer = new AdoNetInfoAboutEntity(RUtils<TEntity>.Type);
 
         public static AdoEntityInfo Info => _infoContainer.Info;
+
     }
 
 
@@ -20,11 +22,9 @@ namespace Dccelerator.DataAccess.Ado {
         public AdoEntityInfo Info { get; }
 
 
-        public AdoNetInfoAboutEntity(Type entityType)
-        {
+        public AdoNetInfoAboutEntity(Type entityType) {
             AdoEntityInfo info;
-            if (!_infoCache.TryGetValue(entityType, out info))
-            {
+            if (!_infoCache.TryGetValue(entityType, out info)) {
                 info = new AdoEntityInfo(entityType);
                 if (!_infoCache.TryAdd(entityType, info))
                     info = _infoCache[entityType];

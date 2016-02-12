@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Dccelerator.DataAccess.Ado.DataGetters;
 using Dccelerator.DataAccess.Ado.Infrastructure;
 using Dccelerator.DataAccess.Ado.ReadingRepositories;
@@ -99,7 +100,7 @@ namespace Dccelerator.DataAccess.Ado {
         }
 
 
-        public IEntityInfo InfoAbout<TEntity>() {
+        public virtual IEntityInfo InfoAbout<TEntity>() {
             return AdoInfoAbout<TEntity>();
         }
 
@@ -108,15 +109,16 @@ namespace Dccelerator.DataAccess.Ado {
         /// Returns information about <paramref name="entityType"/>.
         /// </summary>
         /// <seealso cref="IDataManagerFactory.InfoAbout{TEntity}"/>
-        public IEntityInfo InfoAbout(Type entityType) {
+        public virtual IEntityInfo InfoAbout(Type entityType) {
             return new AdoNetInfoAboutEntity(entityType).Info;
         }
 
 
         public abstract IInternalReadingRepository ReadingRepository();
 
+        
 
-        public IAdoEntityInfo AdoInfoAbout<TEntity>() {
+        public virtual IAdoEntityInfo AdoInfoAbout<TEntity>() {
             var info = AdoNetInfoAbout<TEntity>.Info;
             if (info.Repository == null)
                 info.Repository = AdoNetRepository();

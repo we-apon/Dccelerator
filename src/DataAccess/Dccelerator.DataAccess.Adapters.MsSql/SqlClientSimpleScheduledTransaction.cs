@@ -42,11 +42,7 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
 
 
         protected override ISpecificTransactionScope BeginTransactionScope(IsolationLevel isolationLevel) {
-            System.Transactions.IsolationLevel level;
-            if (!Enum.TryParse(isolationLevel.ToString("G"), out level))
-                throw new InvalidOperationException($"Can't parce isolation level {isolationLevel} to 'System.Transactions.IsolationLevel' enum type");
-
-            return new Scope(new TransactionScope(TransactionScopeOption.Required, new TransactionOptions {IsolationLevel = level}));
+            return new Scope(new TransactionScope(TransactionScopeOption.Required, new TransactionOptions {IsolationLevel = (System.Transactions.IsolationLevel)isolationLevel}));
         }
 
         #endregion

@@ -1,5 +1,5 @@
 ﻿{
-  "version": "0.0.5-alfa7",
+  "version": "0.0.5-alfa8",
   "title": "Dccelerator's core utilities",
   "description": "Core utitities of Dccelerator framework. \nIt contains some nice stuff like TypeManipulator, SmartConvert and many usefull reflection extensions.",
   "summary": "Core utitities of Dccelerator framework.",

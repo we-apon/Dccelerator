@@ -23,11 +23,16 @@ namespace Dccelerator.DataAccess.Lazy {
         }
 
 
+        void SafetySetReadCallbackTo(LazyEntity entity) {
+            if (entity.Read == null)
+                entity.Read = LazyLoad;
+        }
+
         void SetupLazyContext(object entity) {
             var lazyEntity = entity as LazyEntity;
             if (lazyEntity != null) {
                 if (_mainEntityInfo.Inclusions == null) {
-                    lazyEntity.Read = LazyLoad;
+                    SafetySetReadCallbackTo(lazyEntity);
                     return;
                 }
 
@@ -43,8 +48,7 @@ namespace Dccelerator.DataAccess.Lazy {
                 return;
 
             entity.Context = context;
-            if (entity.Read == null)
-                entity.Read = LazyLoad;
+            SafetySetReadCallbackTo(entity);
 
             if (info.Inclusions == null)
                 return;
@@ -75,10 +79,11 @@ namespace Dccelerator.DataAccess.Lazy {
             var lazyEntity = entity as LazyEntity;
             if (lazyEntity != null) {
                 lazyEntity.Context = parent.Context;
-                lazyEntity.Read = LazyLoad;
+                SafetySetReadCallbackTo(lazyEntity);
             }
         }
 
+        
 
         IEnumerable<object> LazyLoad(LazyEntity parent, Type type, ICollection<IDataCriterion> criteria) {
             var info = _lazyFactory.InfoAbout(type);

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 
 namespace Dccelerator.Reflection
@@ -287,22 +288,52 @@ namespace Dccelerator.Reflection
 
 
 
-        public static Dictionary<string, PropertyInfo> Properties(this Type type) {
-            Dictionary<string, PropertyInfo> properties;
-            if (_typeProperties.TryGetValue(type, out properties))
-                return properties;
 
+        /// <summary>
+        /// Returns properties getted with <paramref name="bindingFlags"/> and filtered with specified <paramref name="filter"/>.
+        /// Properties are distinct by name with <see cref="TopInHierarchy{TMemberInfo}"/> method.
+        /// </summary>
+        /// <param name="type">An type</param>
+        /// <param name="bindingFlags">Used binding flags</param>
+        /// <param name="filter">Additional filter for properties. If not specified - allowed all properties.</param>
+        /// <seealso cref="Properties(Type)"/>
+        /// <seealso cref="TopInHierarchy{TMemberInfo}"/>
+        public static Dictionary<string, PropertyInfo> Properties(this Type type, BindingFlags bindingFlags, Func<PropertyInfo, bool> filter = null) {
+            filter = filter ?? _allowAllProperties;
 
-            properties = new Dictionary<string, PropertyInfo>();
-            foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Static)) {
+            var properties = new Dictionary<string, PropertyInfo>();
+            foreach (var prop in type.GetProperties(bindingFlags)) {
+                if (!filter(prop))
+                    continue;
+
                 PropertyInfo storedProperty;
                 if (!properties.TryGetValue(prop.Name, out storedProperty)) {
                     properties.Add(prop.Name, prop);
                     continue;
                 }
 
-                properties[prop.Name] = (PropertyInfo) TopInHierarchy(type, prop, storedProperty);
+                properties[prop.Name] = TopInHierarchy(type, prop, storedProperty);
             }
+            return properties;
+        }
+
+
+        static readonly Func<PropertyInfo, bool> _allowAllProperties = prop => true;
+
+
+        /// <summary>
+        /// Returns all properties of the <paramref name="type"/>.
+        /// Properties resolves using binding flags: (Public | NonPublic | FlattenHierarchy | Instance | Static).
+        /// Properties are distinct by name with <see cref="TopInHierarchy{TMemberInfo}"/> method.
+        /// </summary>
+        /// <seealso cref="Properties(Type, BindingFlags, Func{PropertyInfo,bool})"/>
+        /// <seealso cref="TopInHierarchy{TMemberInfo}"/>
+        public static Dictionary<string, PropertyInfo> Properties(this Type type) {
+            Dictionary<string, PropertyInfo> properties;
+            if (_typeProperties.TryGetValue(type, out properties))
+                return properties;
+
+            properties = Properties(type, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Static);
 
             return _typeProperties.TryAdd(type, properties)
                 ? properties
@@ -314,9 +345,9 @@ namespace Dccelerator.Reflection
 
         /// <summary>
         /// Returns <see cref="MemberInfo"/>, declared on upper in <paramref name="type"/> hierarchy.
-        /// This's usefull to select <see cref="MemberInfo"/> declared with <see langword="new"/> keyword and hiding another.
+        /// This is usefull to select <see cref="MemberInfo"/> declared with <see langword="new"/> keyword and hiding another.
         /// </summary>
-        public static MemberInfo TopInHierarchy(Type type, MemberInfo one, MemberInfo two) {
+        public static TMemberInfo TopInHierarchy<TMemberInfo>(Type type, TMemberInfo one, TMemberInfo two) where  TMemberInfo : MemberInfo {
             if (one.DeclaringType == type)
                 return one;
 

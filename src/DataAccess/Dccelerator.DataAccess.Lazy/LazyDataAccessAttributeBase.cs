@@ -190,6 +190,11 @@ namespace Dccelerator.DataAccess.Lazy {
                     return;
                 }
 
+                if (lazyEntity.Read == null) {
+                    AlreadyLoaded = true; //?if Read callback is null - it means that entity was created by the client code, and not was getted from db, so it's not persisted at all.
+                    return;
+                }
+                
                 var value = GetValueFor(args, lazyEntity, lazyEntity.Read);
                 args.SetNewValue(value);
                 AlreadyLoaded = true;

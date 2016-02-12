@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Dccelerator.DataAccess.Ado.Infrastructure;
@@ -69,7 +70,7 @@ namespace Dccelerator.DataAccess.Ado {
                     throw new InvalidOperationException($"Entity of type {entity.GetType()} should contain property '{x.Key}', " +
                                                         $"but in some reason value or that property could not be getted.");
 
-                return ParameterWith(x.Key, x.Value, value);
+                return ParameterWith(x.Key, x.Value.PropertyType, value);
             });
         }
         

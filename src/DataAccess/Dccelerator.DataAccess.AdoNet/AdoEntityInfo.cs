@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Reflection;
 using Dccelerator.DataAccess.Ado.Infrastructure;
 using Dccelerator.Reflection;
 
@@ -24,8 +26,23 @@ namespace Dccelerator.DataAccess.Ado {
         #region Implementation of IAdoEntityInfo
 
         public Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get; }
-        public Dictionary<string, Type> PersistedProperties { get; }
-        public Dictionary<string, Type> NavigationProperties { get; }
+
+        public Dictionary<string, PropertyInfo> PersistedProperties {
+            get {
+                if (_persistedProperties == null) {
+                    lock (_lock) {
+                        if (_persistedProperties == null)
+                            _persistedProperties = EntityType.Properties(BindingFlags.Instance | BindingFlags.Public, IsPersistedProperty);
+                    }
+                }
+                return _persistedProperties;
+            }
+        }
+        Dictionary<string, PropertyInfo> _persistedProperties;
+
+
+
+        public Dictionary<string, PropertyInfo> NavigationProperties { get; }
 
 
         public string[] ReaderColumns { get; private set; }
@@ -68,6 +85,7 @@ namespace Dccelerator.DataAccess.Ado {
 
 
         Dictionary<int, Includeon> _inclusions;
+        static readonly Type _notPersistedAttributeType = typeof(NotPersistedAttribute);
 
 
         public Dictionary<int, Includeon> Inclusions {
@@ -85,6 +103,45 @@ namespace Dccelerator.DataAccess.Ado {
 
 
         IEnumerable<IIncludeon> IEntityInfo.Inclusions => Inclusions.Values.Any() ? Inclusions.Values : null;
+
+        
+
+        static readonly Type _stringType = typeof(string);
+        static readonly Type _byteArrayType = typeof(byte[]);
+        static readonly Type _enumerableType = typeof(IEnumerable);
+
+
+        protected virtual Func<PropertyInfo, bool> IsPersistedProperty { get; } = _isPersistedPropertyDefaultImplementation;
+
+
+        static readonly Func<PropertyInfo, bool> _isPersistedPropertyDefaultImplementation = property => {
+
+            //? if marked with NotPersistedAttribute
+            if (property.GetCustomAttributesData().Any(x => {
+#if NET40
+                return x.Constructor.DeclaringType == _notPersistedAttributeType;
+#else
+                return x.AttributeType == _notPersistedAttributeType;
+#endif
+            }))
+                return false;
+
+
+            if (!property.CanRead)
+                return false;
+
+            var type = property.PropertyType;
+
+            if (type == _stringType || type.IsAssignableFrom(_byteArrayType))
+                return true;
+
+            if (_enumerableType.IsAssignableFrom(type) || type.IsClass)
+                return false;
+
+            return true;
+        };
+
+
 
 
         Dictionary<int, Includeon> GetInclusions() {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using JetBrains.Annotations;
 
 
@@ -14,9 +15,9 @@ namespace Dccelerator.DataAccess {
 
         Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get; }
 
-        Dictionary<string, Type> PersistedProperties { get; }
+        Dictionary<string, PropertyInfo> PersistedProperties { get; }
 
-        Dictionary<string, Type> NavigationProperties { get; }
+        Dictionary<string, PropertyInfo> NavigationProperties { get; }
 
         [CanBeNull]
         IEnumerable<IIncludeon> Inclusions { get; }

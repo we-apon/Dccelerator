@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
     class BDbEntityInfo : BaseEntityInfo<IBDbRepository>, IBDbEntityInfo {
 
         public Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get; }
-        public Dictionary<string, Type> PersistedProperties { get; }
-        public Dictionary<string, Type> NavigationProperties { get; }
+        public Dictionary<string, PropertyInfo> PersistedProperties { get; }
+        public Dictionary<string, PropertyInfo> NavigationProperties { get; }
         public IEnumerable<IIncludeon> Inclusions { get; }
 
 
