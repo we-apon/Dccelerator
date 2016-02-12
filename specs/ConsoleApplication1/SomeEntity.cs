@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -25,6 +26,8 @@ namespace ConsoleApplication1 {
         /// <summary>
         /// Name of <see cref="SomeEntity"/>
         /// </summary>
+        [DataMember(Name = "asdasd", IsRequired = true)]
+        [XmlElement("asdas", typeof(LazyEntity))]
         public string Name { get; set; }
 
 

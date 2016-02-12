@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Dccelerator.Reflection;
 
 
@@ -13,6 +14,30 @@ namespace Dccelerator
     public static class EnumerableUtils
     {
         static readonly Random _random = new Random();
+
+
+        public static TValue AggregateBranch<TContext, TValue>(this TContext context, Func<TContext, TContext> getChild, Func<TContext, TValue, TValue> aggregate) {
+            var result = default (TValue);
+            var current = context;
+
+            while (current != null) {
+                result = aggregate(current, result);
+                current = getChild(current);
+            }
+            return result;
+        }
+
+
+        public static string AggregateExceptionMessage(this Exception exception) {
+            var builder = new StringBuilder(exception.Message);
+
+            while ((exception = exception.InnerException) != null) {
+                builder.Append("\n\n").Append(exception.Message);
+            }
+
+            return builder.ToString();
+        }
+
 
         /// <summary>
         /// Returns <paramref name="collection"/> in <see cref="Random"/> order.

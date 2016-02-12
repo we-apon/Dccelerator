@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-*",
+  "version": "0.0.2-alfa2",
   "description": "Dccelerator.DataAccess.Adapters.MsSql Class Library",
   "authors": [ "we_apon" ],
   "tags": [ "" ],
@@ -8,17 +8,34 @@
   "frameworks": {
     "net40": {
       "compilationOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] },
-      "dependencies": {
-        "Dccelerator.Core": "",
-        "Dccelerator.DataAccess.Common": ""
-      },
+
       "frameworkAssemblies": {
-        "System.Data": "4.0.0.0",
-        "System.Xml": "4.0.0.0"
+        "System.Xml": "4.0.0.0",
+        "System.Transactions": "4.0.0.0"
+      }
+    },
+
+    "net45": {
+      "compilationOptions": { "define": [ "NET45", "JETBRAINS_ANNOTATIONS" ] },
+
+      "frameworkAssemblies": {
+        "System.Xml": "4.0.0.0",
+        "System.Transactions": "4.0.0.0"
+      }
+    },
+
+    "dnx45": {
+      "compilationOptions": { "define": [ "NET45", "JETBRAINS_ANNOTATIONS" ] },
+
+      "frameworkAssemblies": {
+        "System.Xml": "4.0.0.0",
+        "System.Transactions": "4.0.0.0"
       }
     }
+
+
   },
   "dependencies": {
-    "Dccelerator.DataAccess.AdoNet": "1.0.0-*"
+    "Dccelerator.DataAccess.AdoNet": ""
   }
 }

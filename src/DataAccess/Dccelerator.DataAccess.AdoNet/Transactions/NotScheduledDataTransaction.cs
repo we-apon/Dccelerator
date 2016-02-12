@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 
 
@@ -37,16 +36,9 @@ namespace Dccelerator.DataAccess.Ado.Transactions {
                 }
                 catch (Exception exception) {
                     Internal.TraceEvent(TraceEventType.Warning, $"On attempt count #{attemptNumber} gaived sql exception:\n{exception}");
-                    if (!IsDeadlockException(exception))
+                    if (!IsDeadlockException(exception) || (attemptNumber++ > retryCount))
                         throw;
-
-                    if (attemptNumber == retryCount + 1) {
-                        Internal.TraceEvent(TraceEventType.Critical, "Attempt count exceeded retry count");
-                        throw;
-                    }
                 }
-
-                attemptNumber++;
             }
         }
 
@@ -64,10 +56,8 @@ namespace Dccelerator.DataAccess.Ado.Transactions {
             if (_isCommited)
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
-            var info = _factory.InfoAbout<TEntity>();
-            var repository = info.RealRepository;
-            var name = info.EntityName;
-            _actions.Enqueue(factory => repository.InsertMany(name, entities));
+            var info = _factory.AdoInfoAbout<TEntity>();
+            _actions.Enqueue(factory => info.Repository.InsertMany(info, entities));
         }
 
 
@@ -78,10 +68,9 @@ namespace Dccelerator.DataAccess.Ado.Transactions {
             if (_isCommited)
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
-            var info = _factory.InfoAbout<TEntity>();
-            var repository = info.RealRepository;
-            var name = info.EntityName;
-            _actions.Enqueue(factory => repository.Insert(name, entity));
+
+            var info = _factory.AdoInfoAbout<TEntity>();
+            _actions.Enqueue(factory => info.Repository.Insert(info, entity));
         }
 
 
@@ -92,10 +81,8 @@ namespace Dccelerator.DataAccess.Ado.Transactions {
             if (_isCommited)
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
-            var info = _factory.InfoAbout<TEntity>();
-            var repository = info.RealRepository;
-            var name = info.EntityName;
-            _actions.Enqueue(factory => repository.Update(name, entity));
+            var info = _factory.AdoInfoAbout<TEntity>();
+            _actions.Enqueue(factory => info.Repository.Update(info, entity));
         }
 
 
@@ -106,10 +93,8 @@ namespace Dccelerator.DataAccess.Ado.Transactions {
             if (_isCommited)
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
-            var info = _factory.InfoAbout<TEntity>();
-            var repository = info.RealRepository;
-            var name = info.EntityName;
-            _actions.Enqueue(factory => repository.UpdateMany(name, entities));
+            var info = _factory.AdoInfoAbout<TEntity>();
+            _actions.Enqueue(factory => info.Repository.UpdateMany(info, entities));
         }
 
 
@@ -120,10 +105,8 @@ namespace Dccelerator.DataAccess.Ado.Transactions {
             if (_isCommited)
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
-            var info = _factory.InfoAbout<TEntity>();
-            var repository = info.RealRepository;
-            var name = info.EntityName;
-            _actions.Enqueue(factory => repository.Delete(name, entity));
+            var info = _factory.AdoInfoAbout<TEntity>();
+            _actions.Enqueue(factory => info.Repository.Delete(info, entity));
         }
 
 
@@ -134,10 +117,8 @@ namespace Dccelerator.DataAccess.Ado.Transactions {
             if (_isCommited)
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
-            var info = _factory.InfoAbout<TEntity>();
-            var repository = info.RealRepository;
-            var name = info.EntityName;
-            _actions.Enqueue(factory => repository.DeleteMany(name, entities));
+            var info = _factory.AdoInfoAbout<TEntity>();
+            _actions.Enqueue(factory => info.Repository.DeleteMany(info, entities));
         }
 
 

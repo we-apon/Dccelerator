@@ -1,5 +1,5 @@
 ﻿{
-  "version": "0.0.1-alfa2",
+  "version": "0.0.1-alfa7",
   "description": "Dccelerator.DataAccess.Common Class Library",
   "authors": [ "we_apon" ],
   "tags": [ "" ],
@@ -30,12 +30,8 @@
 
     "dnx45": {
       "compilationOptions": { "define": [ "NET45", "JETBRAINS_ANNOTATIONS" ] }
-    },
-
-
-    "dotnet": {
-      "compilationOptions": { "define": [ "DOTNET", "JETBRAINS_ANNOTATIONS" ] }
     }
+
 
   },
 

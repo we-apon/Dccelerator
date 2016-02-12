@@ -1,9 +1,13 @@
-﻿using Dccelerator.DataAccess.Infrastructure;
+﻿using Dccelerator.DataAccess.Ado.Infrastructure;
+using Dccelerator.DataAccess.Infrastructure;
 
 
 namespace Dccelerator.DataAccess.Ado {
     public interface IDataManagerAdoFactory : IDataManagerFactory {
 
-        IEntityInfo AdoInfoAbout<TEntity>();
+        IAdoEntityInfo AdoInfoAbout<TEntity>();
+
+
+        IAdoNetRepository AdoNetRepository();
     }
 }

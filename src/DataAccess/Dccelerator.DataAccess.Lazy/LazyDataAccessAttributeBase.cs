@@ -67,7 +67,7 @@ namespace Dccelerator.DataAccess.Lazy {
             }
 
             //todo: validate lazy link path.
-            Message.Write(MessageLocation.Of(location), IsAcceptedMessageSeverityType(), "3543", $"!!! 'LazyDataAccess' are accepted!!!.\nLocation is {location.DeclaringType.FullName}.{location.PropertyInfo.Name}\n");
+            Message.Write(MessageLocation.Of(location), SeverityType.Verbose, "3543", $"!!! 'LazyDataAccess' are accepted!!!.\nLocation is {location.DeclaringType.FullName}.{location.PropertyInfo.Name}\n");
                 
             return true;
         }
@@ -176,7 +176,7 @@ namespace Dccelerator.DataAccess.Lazy {
             }
 
             var lazyEntity = (LazyEntity) args.Instance;
-            if (lazyEntity == null)
+            if (!lazyEntity.Context.IsLoadingAllowed)
                 return;
 
             lock (_writeLock) {
@@ -190,7 +190,12 @@ namespace Dccelerator.DataAccess.Lazy {
                     return;
                 }
 
-                var value = GetValueFor(args, lazyEntity.Read);
+                if (lazyEntity.Read == null) {
+                    AlreadyLoaded = true; //?if Read callback is null - it means that entity was created by the client code, and not was getted from db, so it's not persisted at all.
+                    return;
+                }
+                
+                var value = GetValueFor(args, lazyEntity, lazyEntity.Read);
                 args.SetNewValue(value);
                 AlreadyLoaded = true;
                 args.ProceedGetValue();
@@ -207,7 +212,7 @@ namespace Dccelerator.DataAccess.Lazy {
 
 
         [CanBeNull]
-        object GetValueFor([NotNull] LocationInterceptionArgs args, Func<Type, ICollection<IDataCriterion>, IEnumerable<object>> read) {
+        object GetValueFor([NotNull] LocationInterceptionArgs args, LazyEntity parent, Func<LazyEntity, Type, ICollection<IDataCriterion>, IEnumerable<object>> read) {
             var criterion = CriterionFor(args);
             if (criterion == null)
                 return null;
@@ -215,7 +220,7 @@ namespace Dccelerator.DataAccess.Lazy {
 
             
            // var collection = GetLazy.Entity(RealLocationType, (ILazyEntity)args.Instance).By(criterion);
-            var collection = read(RealLocationType, new[] {criterion});
+            var collection = read(parent, RealLocationType, new[] {criterion});
             if (IsCollection) {
                 var targetCollection = (IList)Activator.CreateInstance(TargetCollectionType);
                 foreach (var item in collection)

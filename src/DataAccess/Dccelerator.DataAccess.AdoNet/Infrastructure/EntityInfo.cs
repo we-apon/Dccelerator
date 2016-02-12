@@ -7,8 +7,10 @@ using Dccelerator.Reflection;
 
 
 namespace Dccelerator.DataAccess.Infrastructure {
+/*
+
     abstract class EntityInfo : IEntityInfo {
-        public Type Type { get; }
+        public Type EntityType { get; }
 
 
 #if NET40
@@ -17,7 +19,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
         public TypeInfo TypeInfo { get; }
 #endif
 
-        public string EntityName => _entityName ?? (_entityName = string.IsNullOrWhiteSpace(EntityAttribute.Name) ? Type.Name : EntityAttribute.Name);
+        public string EntityName => _entityName ?? (_entityName = string.IsNullOrWhiteSpace(EntityAttribute.Name) ? EntityType.Name : EntityAttribute.Name);
         string _entityName;
 
 
@@ -36,7 +38,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
         /// </summary>
         public PropertyInfo KeyId => string.IsNullOrWhiteSpace(EntityAttribute.IdProperty)
             ? null
-            : _keyId ?? (_keyId = Type.GetProperty(EntityAttribute.IdProperty, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
+            : _keyId ?? (_keyId = EntityType.GetProperty(EntityAttribute.IdProperty, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
 
         PropertyInfo _keyId;
 
@@ -50,7 +52,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
                 if (_persistedFields != null)
                     return _persistedFields;
 
-                _persistedFields = Type.GetProperties()
+                _persistedFields = EntityType.GetProperties()
                     .Where(x => x.CanRead && !x.IsDefined<NotPersistedAttribute>()
                                 && (x.PropertyType.IsAssignableFrom(_stringType) || _byteArrayType.IsAssignableFrom(x.PropertyType)
                                     || (!_enumerableType.IsAssignableFrom(x.PropertyType) && !x.PropertyType.GetInfo().IsClass)))
@@ -79,8 +81,8 @@ namespace Dccelerator.DataAccess.Infrastructure {
         public abstract IInternalReadingRepository GlobalReadingRepository { get; }
 
 
-        public IDataAccessRepository RealRepository => _realRepository ?? (_realRepository = (IDataAccessRepository)Activator.CreateInstance(RealRepositoryType));
-        IDataAccessRepository _realRepository;
+        public IAdoNetRepository RealRepository => _realRepository ?? (_realRepository = (IAdoNetRepository)Activator.CreateInstance(RealRepositoryType));
+        IAdoNetRepository _realRepository;
 
 
         public IEntityInfo[] Children { get; }
@@ -93,10 +95,10 @@ namespace Dccelerator.DataAccess.Infrastructure {
 
 
         public EntityInfo(Type type) {
-            Type = type;
+            EntityType = type;
             TypeInfo = type.GetInfo();
 
-            EntityAttribute = TypeInfo.GetConfigurationForRepository();
+            //EntityAttribute = TypeInfo.GetConfigurationForRepository()
 
 
 
@@ -107,18 +109,18 @@ namespace Dccelerator.DataAccess.Infrastructure {
             if (KeyId == null) {
                 var possibleNames = new [] {
                     "Id",
-                    Type.Name + "Id",
-                    Type.Name + "_Id",
+                    EntityType.Name + "Id",
+                    EntityType.Name + "_Id",
                     EntityName + "Id",
                     EntityName + "_Id"
                 };
 
-                _keyId = Type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                _keyId = EntityType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
                     .FirstOrDefault(x => possibleNames.Any(z => string.Compare(x.Name, z, StringComparison.InvariantCultureIgnoreCase) == 0));
 
                 if (_keyId == null)
                     throw new InvalidOperationException($"In order to use inclusions possibility, you must specify {nameof(EntityAttribute.IdProperty)} in {nameof(EntityAttribute)} " +
-                                                            $"on entity {Type}, or use identifier in property named like: {string.Join(", ", possibleNames)}. Case of property name letters are ignored.");
+                                                            $"on entity {EntityType}, or use identifier in property named like: {string.Join(", ", possibleNames)}. Case of property name letters are ignored.");
             }
 
 
@@ -138,4 +140,7 @@ namespace Dccelerator.DataAccess.Infrastructure {
         static readonly Type _enumerableType = typeof(IEnumerable);
 
     }
+
+*/
+
 }

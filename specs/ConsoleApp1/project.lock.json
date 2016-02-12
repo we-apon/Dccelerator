@@ -12,7 +12,7 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.5-alfa": {
+      "Dccelerator.Core/0.0.5-alfa5": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -28,7 +28,7 @@
           "Dccelerator.DataAccess.Common": null
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
+      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -55,7 +55,7 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.5-alfa": {
+      "Dccelerator.Core/0.0.5-alfa5": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -71,7 +71,7 @@
           "Dccelerator.DataAccess.Common": null
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
+      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -98,7 +98,7 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.5-alfa": {
+      "Dccelerator.Core/0.0.5-alfa5": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -114,7 +114,7 @@
           "Dccelerator.DataAccess.Common": null
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
+      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -133,7 +133,7 @@
     }
   },
   "libraries": {
-    "Dccelerator.Core/0.0.5-alfa": {
+    "Dccelerator.Core/0.0.5-alfa5": {
       "type": "project",
       "path": "../../src/Dccelerator.Core/project.json"
     },
@@ -141,7 +141,7 @@
       "type": "project",
       "path": "../../src/DataAccess/Dccelerator.DataAccess.BerkeleyDb/project.json"
     },
-    "Dccelerator.DataAccess.Common/0.0.1-alfa2": {
+    "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
       "type": "project",
       "path": "../../src/DataAccess/Dccelerator.DataAccess.Common/project.json"
     },
