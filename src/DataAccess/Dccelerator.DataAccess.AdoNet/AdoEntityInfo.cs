@@ -14,7 +14,7 @@ using System.Reflection;
 
 namespace Dccelerator.DataAccess.Ado {
 
-    class AdoEntityInfo : BaseEntityInfo<IAdoNetRepository>, IAdoEntityInfo {
+    class AdoEntityInfo<TRepository> : BaseEntityInfo<TRepository>, IAdoEntityInfo where TRepository : class, IAdoNetRepository {
 
         readonly object _lock = new object();
 
@@ -22,28 +22,24 @@ namespace Dccelerator.DataAccess.Ado {
         public AdoEntityInfo(Type entityType) : base(entityType) { }
 
 
+        internal void SetRepository(IAdoNetRepository repository) {
+            var genericRepository = repository as TRepository;
+            if (genericRepository == null)
+                throw new InvalidOperationException($"{nameof(repository)} should be of type {typeof(TRepository)}.");
+
+            if (Repository != null)
+                throw new InvalidOperationException("Repository already initialized.");
+
+            Repository = genericRepository;
+        }
+
 
         #region Implementation of IAdoEntityInfo
 
-        public Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get; }
-
-        public Dictionary<string, PropertyInfo> PersistedProperties {
-            get {
-                if (_persistedProperties == null) {
-                    lock (_lock) {
-                        if (_persistedProperties == null)
-                            _persistedProperties = EntityType.Properties(BindingFlags.Instance | BindingFlags.Public, IsPersistedProperty);
-                    }
-                }
-                return _persistedProperties;
-            }
-        }
-        Dictionary<string, PropertyInfo> _persistedProperties;
-
-
-
         public Dictionary<string, PropertyInfo> NavigationProperties { get; }
 
+
+        IAdoNetRepository IAdoEntityInfo.Repository => Repository;
 
         public string[] ReaderColumns { get; private set; }
 
@@ -85,7 +81,6 @@ namespace Dccelerator.DataAccess.Ado {
 
 
         Dictionary<int, Includeon> _inclusions;
-        static readonly Type _notPersistedAttributeType = typeof(NotPersistedAttribute);
 
 
         public Dictionary<int, Includeon> Inclusions {
@@ -106,40 +101,6 @@ namespace Dccelerator.DataAccess.Ado {
 
         
 
-        static readonly Type _stringType = typeof(string);
-        static readonly Type _byteArrayType = typeof(byte[]);
-        static readonly Type _enumerableType = typeof(IEnumerable);
-
-
-        protected virtual Func<PropertyInfo, bool> IsPersistedProperty { get; } = _isPersistedPropertyDefaultImplementation;
-
-
-        static readonly Func<PropertyInfo, bool> _isPersistedPropertyDefaultImplementation = property => {
-
-            //? if marked with NotPersistedAttribute
-            if (property.GetCustomAttributesData().Any(x => {
-#if NET40
-                return x.Constructor.DeclaringType == _notPersistedAttributeType;
-#else
-                return x.AttributeType == _notPersistedAttributeType;
-#endif
-            }))
-                return false;
-
-
-            if (!property.CanRead)
-                return false;
-
-            var type = property.PropertyType;
-
-            if (type == _stringType || type.IsAssignableFrom(_byteArrayType))
-                return true;
-
-            if (_enumerableType.IsAssignableFrom(type) || type.IsClass)
-                return false;
-
-            return true;
-        };
 
 
 
@@ -152,7 +113,7 @@ namespace Dccelerator.DataAccess.Ado {
                 return inclusions;
 
             foreach (var inclusionAttribute in inclusionAttributes) {
-                var includeon = new Includeon(inclusionAttribute, this);
+                var includeon = new Includeon(inclusionAttribute, this, type => new AdoEntityInfo<TRepository>(type));
                 inclusions.Add(inclusionAttribute.ResultSetIndex, includeon);
             }
 

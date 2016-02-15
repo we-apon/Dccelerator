@@ -12,12 +12,14 @@ namespace Dccelerator.DataAccess.Ado.Infrastructure {
 
     public class Includeon : IIncludeon {
         readonly IAdoEntityInfo _ownerInfo;
+        readonly Func<Type, IAdoEntityInfo> _getInfoCallback;
         readonly IProperty _targetProperty;
         readonly object _lock = new object();
 
-        public Includeon(IncludeChildrenAttribute inclusion, IAdoEntityInfo ownerInfo) {
+        public Includeon(IncludeChildrenAttribute inclusion, IAdoEntityInfo ownerInfo, Func<Type, IAdoEntityInfo> getInfoCallback) {
             Attribute = inclusion;
             _ownerInfo = ownerInfo;
+            _getInfoCallback = getInfoCallback;
 
             var propertyPath = ownerInfo.EntityType.GetPropertyPath(inclusion.TargetPath);
             if (propertyPath == null)
@@ -29,7 +31,7 @@ namespace Dccelerator.DataAccess.Ado.Infrastructure {
         public IncludeChildrenAttribute Attribute { get; }
 
         IEntityInfo IIncludeon.Info => Info;
-        public IAdoEntityInfo Info => _info ?? (_info = new AdoEntityInfo(IsCollection ? _targetProperty.Info.PropertyType.ElementType() : _targetProperty.Info.PropertyType));
+        public IAdoEntityInfo Info => _info ?? (_info = _getInfoCallback(IsCollection ? _targetProperty.Info.PropertyType.ElementType() : _targetProperty.Info.PropertyType));
         IAdoEntityInfo _info;
 
 
@@ -135,7 +137,7 @@ namespace Dccelerator.DataAccess.Ado.Infrastructure {
             if (mainInfo.ForeignKeys.Any()) {
                 var fk = mainInfo.ForeignKeys.Values.FirstOrDefault(x => x.Relationship == Relationship.ManyToOne && x.ForeignEntityName == foreignInfo.EntityName);
                 if (fk != null)
-                    return fk.ForeignKeyPath;
+                    return fk.Name;
             }
 
             subCriteria = subCriteria ?? (info => true);

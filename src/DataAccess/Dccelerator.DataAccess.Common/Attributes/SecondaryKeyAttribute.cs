@@ -12,8 +12,6 @@ namespace Dccelerator.DataAccess {
         /// </summary>
         public Relationship Relationship { get; set; }
 
-
-
         /// <summary>
         /// Duplication policy between current entity and marked secondary key
         /// </summary>
@@ -21,13 +19,19 @@ namespace Dccelerator.DataAccess {
 
 
         /// <summary>
-        /// Name of secondary key. It may be just marked property name.
+        /// Name of secondary key. 
+        /// By default, it's name of marged property.
         /// </summary>
-        public string SecondaryKeyName { get; set; }
+        public string Name { get; set; }
 
 
-        public SecondaryKeyAttribute(Relationship relationship) {
+
+        /// <param name="relationship">Reletionship of key and entity.</param>
+        /// <param name="duplicatesPolicy">Duplication policy between current entity and marked secondary key.</param>
+        public SecondaryKeyAttribute(Relationship relationship = Relationship.ManyToOne, DuplicatesPolicy duplicatesPolicy = DuplicatesPolicy.NONE) {
             Relationship = relationship;
+            DuplicatesPolicy = duplicatesPolicy;
+            //todo: check relationship and duplicatesPolicy for compatibility
         }
     }
 }

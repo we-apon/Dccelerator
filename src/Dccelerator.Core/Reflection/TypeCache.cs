@@ -360,6 +360,21 @@ namespace Dccelerator.Reflection
 
 
 
+        /// <summary>
+        /// <see cref="Activator"/>.<see cref="Activator.CreateInstance(Type)"/> as extension.
+        /// </summary>
+        public static object CreateInstance(this Type type) {
+            return Activator.CreateInstance(type);
+        }
+
+
+        /// <summary>
+        /// <see cref="Activator"/>.<see cref="Activator.CreateInstance(Type, object[])"/> as extension.
+        /// </summary>
+        public static object CreateInstance(this Type type, params object[] args) {
+            return Activator.CreateInstance(type, args);
+        }
+
 
 
 

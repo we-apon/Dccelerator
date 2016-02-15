@@ -24,8 +24,12 @@ namespace Dccelerator.DataAccess.Lazy {
 
 
         void SafetySetReadCallbackTo(LazyEntity entity) {
-            if (entity.Read == null)
-                entity.Read = LazyLoad;
+            if (entity.Read == null) {
+                lock (entity) {
+                    if (entity.Read == null)
+                        entity.Read = LazyLoad;
+                }
+            }
         }
 
         void SetupLazyContext(object entity) {

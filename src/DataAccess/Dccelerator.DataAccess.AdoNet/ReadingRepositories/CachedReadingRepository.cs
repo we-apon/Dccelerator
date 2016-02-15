@@ -12,6 +12,8 @@ namespace Dccelerator.DataAccess.Ado.ReadingRepositories {
     {
         readonly ConcurrentDictionary<string, EntitiesCache> _entities = new ConcurrentDictionary<string, EntitiesCache>();
         
+
+
         class EntitiesCache {
             public object[] Entities;
             public DateTime QueriedTime;
@@ -40,7 +42,7 @@ namespace Dccelerator.DataAccess.Ado.ReadingRepositories {
             EntitiesCache cache;
             if (!_entities.TryGetValue(identityString, out cache) || (DateTime.UtcNow - cache.QueriedTime) > timeout) {
                 cache = new EntitiesCache {
-                    Entities = base.Read(info, criteria).ToArray(),
+                    /*Entities = base.Read(info, criteria).ToArray(),*/
                     QueriedTime = DateTime.UtcNow
                 };
 
@@ -48,7 +50,15 @@ namespace Dccelerator.DataAccess.Ado.ReadingRepositories {
                     cache = _entities[identityString];
             }
 
+            if (cache.Entities == null) {
+                lock (cache) {
+                    if (cache.Entities == null)
+                        cache.Entities = base.Read(info, criteria).ToArray();
+                }
+            }
+
             return cache.Entities;
+            
         }
 
         

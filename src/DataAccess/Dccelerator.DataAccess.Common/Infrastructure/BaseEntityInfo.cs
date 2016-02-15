@@ -1,12 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Dccelerator.DataAccess.Attributes;
-
-#if !NET40
 using Dccelerator.Reflection;
-#endif
 
 namespace Dccelerator.DataAccess {
 
@@ -21,7 +19,7 @@ namespace Dccelerator.DataAccess {
             var entityAttribute = entityType.GetConfigurationForRepository(typeof(TRepository));
             if (entityAttribute != null) {
                 EntityName = entityAttribute.Name ?? EntityType.Name;
-                Repository = Activator.CreateInstance(entityAttribute.Repository) as TRepository;
+                Repository = entityAttribute.Repository?.CreateInstance() as TRepository;
 
                 var cachedEntityAttribute = entityAttribute as GloballyCachedEntityAttribute;
                 if (cachedEntityAttribute != null)
@@ -49,58 +47,132 @@ namespace Dccelerator.DataAccess {
         public virtual Type EntityType { get; }
         public TimeSpan CacheTimeout { get; }
 
-        readonly object _foreignKeysLock = new object();
-        Dictionary<string, ForeignKeyAttribute> _foreignKeys;
 
 
         public virtual Dictionary<string, ForeignKeyAttribute> ForeignKeys {
             get {
                 if (_foreignKeys == null) {
-                    lock (_foreignKeysLock) {
+                    lock (_lock) {
                         if (_foreignKeys == null)
-                            _foreignKeys = GetForeignKeysOf(TypeInfo);
+                            _foreignKeys = EntityInfoBaseBackend.Get<ForeignKeyAttribute>(TypeInfo);
                     }
                 }
                 return _foreignKeys;
             }
         }
-/*
-        public abstract Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get; }
-        public abstract Dictionary<string, Type> PersistedProperties { get; }
-        public abstract Dictionary<string, Type> NavigationProperties { get; }*/
+        Dictionary<string, ForeignKeyAttribute> _foreignKeys;
+
+
+
+
+        public virtual Dictionary<string, SecondaryKeyAttribute> SecondaryKeys {
+            get {
+                if (_secondaryKeys == null) {
+                    lock (_lock) {
+                        if (_secondaryKeys == null)
+                            _secondaryKeys = EntityInfoBaseBackend.Get<SecondaryKeyAttribute>(TypeInfo);
+                    }
+                }
+                return _secondaryKeys;
+            }
+        }
+        Dictionary<string, SecondaryKeyAttribute> _secondaryKeys;
+
+
+
+
+        public virtual Dictionary<string, PropertyInfo> PersistedProperties {
+            get {
+                if (_persistedProperties == null) {
+                    lock (_lock) {
+                        if (_persistedProperties == null)
+                            _persistedProperties = EntityType.Properties(BindingFlags.Instance | BindingFlags.Public, IsPersistedProperty);
+                    }
+                }
+                return _persistedProperties;
+            }
+        }
+        Dictionary<string, PropertyInfo> _persistedProperties;
+
+        protected virtual Func<PropertyInfo, bool> IsPersistedProperty { get; } = EntityInfoBaseBackend.IsPersistedProperty;
 
         #endregion
 
+        readonly object _lock = new object();
+
+    }
 
 
 
-
-
+    class EntityInfoBaseBackend {
+        
 #if NET40
-        Dictionary<string, ForeignKeyAttribute> GetForeignKeysOf(Type typeInfo) {
+        internal static Dictionary<string, TAttribute> Get<TAttribute>(Type typeInfo) where TAttribute : SecondaryKeyAttribute {
 #else
-        Dictionary<string, ForeignKeyAttribute> GetForeignKeysOf(TypeInfo typeInfo) {
+        internal static Dictionary<string, TAttribute> Get<TAttribute>(TypeInfo typeInfo) where TAttribute : SecondaryKeyAttribute {
 #endif
-            var dict = new Dictionary<string, ForeignKeyAttribute>();
+
+            var dict = new Dictionary<string, TAttribute>();
 
             var properties = typeInfo.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
+            var attributeType = RUtils<TAttribute>.Type;
+
             foreach (var property in properties) {
-                var foreignKeyAttributes = property.GetCustomAttributes(ForeignKeyAttribute.Type, inherit: true).Cast<ForeignKeyAttribute>().ToList();
-                if (foreignKeyAttributes.Count < 1)
+                var keyAttributes = property.GetCustomAttributes(attributeType, inherit: true).Cast<TAttribute>().ToList();
+                if (keyAttributes.Count < 1)
                     continue;
 
-                if (foreignKeyAttributes.Count > 1)
-                    throw new InvalidOperationException($"Property {typeInfo.FullName}.{property.Name} contains more that one {nameof(ForeignKeyAttribute)}.");
+                if (keyAttributes.Count > 1)
+                    throw new InvalidOperationException($"Property {typeInfo.FullName}.{property.Name} contains more that one {attributeType.Name}.");
 
-                var attribute = foreignKeyAttributes.Single();
-                if (string.IsNullOrWhiteSpace(attribute.ForeignKeyPath))
-                    attribute.ForeignKeyPath = property.Name;
+                var attribute = keyAttributes.Single();
+                if (string.IsNullOrWhiteSpace(attribute.Name))
+                    attribute.Name = property.Name;
 
                 dict.Add(property.Name, attribute);
             }
 
             return dict;
         }
+
+
+
+
+
+        static readonly Type _notPersistedAttributeType = typeof(NotPersistedAttribute);
+        static readonly Type _stringType = typeof(string);
+        static readonly Type _byteArrayType = typeof(byte[]);
+        static readonly Type _enumerableType = typeof(IEnumerable);
+
+
+
+
+        internal static readonly Func<PropertyInfo, bool> IsPersistedProperty = property => {
+
+            //? if marked with NotPersistedAttribute
+            if (property.GetCustomAttributesData().Any(x => {
+#if NET40
+                return x.Constructor.DeclaringType == _notPersistedAttributeType;
+#else
+                return x.AttributeType == _notPersistedAttributeType;
+#endif
+            }))
+                return false;
+
+
+            if (!property.CanRead)
+                return false;
+
+            var type = property.PropertyType;
+
+            if (type == _stringType || type.IsAssignableFrom(_byteArrayType))
+                return true;
+
+            if (_enumerableType.IsAssignableFrom(type) || type.IsClass)
+                return false;
+
+            return true;
+        };
     }
 }

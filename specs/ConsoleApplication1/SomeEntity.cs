@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Xml;
 using System.Xml.Serialization;
 using Dccelerator.DataAccess;
-using Dccelerator.DataAccess.Attributes;
 using Dccelerator.DataAccess.Entities;
 using Dccelerator.DataAccess.Lazy;
 
@@ -53,10 +49,7 @@ namespace ConsoleApplication1 {
 
         public Guid Id { get; set; }
 
-        [ForeignKey(Relationship = Relationship.ManyToOne, 
-            DuplicatesPolicy = DuplicatesPolicy.UNSORTED, 
-            ForeignEntityName = "SomeEntity", 
-            ForeignEntityNavigationPath = "SomeEntity")]
+        [ForeignKey("SomeEntity", "SomeEntity")]
         public Guid SomeEntityId { get; set; }
 
         public string Name { get; set; }

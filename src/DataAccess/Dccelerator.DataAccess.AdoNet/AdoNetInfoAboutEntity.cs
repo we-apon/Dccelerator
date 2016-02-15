@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Dccelerator.DataAccess.Infrastructure;
 using Dccelerator.Reflection;
@@ -7,25 +8,26 @@ using Dccelerator.Reflection;
 
 namespace Dccelerator.DataAccess.Ado {
 
-    class AdoNetInfoAbout<TEntity> {
-        static readonly AdoNetInfoAboutEntity _infoContainer = new AdoNetInfoAboutEntity(RUtils<TEntity>.Type);
+    class AdoNetInfoAbout<TRepository, TEntity> where TRepository : class, IAdoNetRepository {
+        static readonly AdoNetInfoAboutEntity<TRepository> _infoContainer = new AdoNetInfoAboutEntity<TRepository>(RUtils<TEntity>.Type);
 
-        public static AdoEntityInfo Info => _infoContainer.Info;
+        public static AdoEntityInfo<TRepository> Info => _infoContainer.Info;
 
     }
 
 
-    class AdoNetInfoAboutEntity {
-        static readonly ConcurrentDictionary<Type, AdoEntityInfo> _infoCache = new ConcurrentDictionary<Type, AdoEntityInfo>();
+    class AdoNetInfoAboutEntity<TRepository> where TRepository : class, IAdoNetRepository {
+        [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
+        static readonly ConcurrentDictionary<Type, AdoEntityInfo<TRepository>> _infoCache = new ConcurrentDictionary<Type, AdoEntityInfo<TRepository>>();
 
 
-        public AdoEntityInfo Info { get; }
+        public AdoEntityInfo<TRepository> Info { get; }
 
 
         public AdoNetInfoAboutEntity(Type entityType) {
-            AdoEntityInfo info;
+            AdoEntityInfo<TRepository> info;
             if (!_infoCache.TryGetValue(entityType, out info)) {
-                info = new AdoEntityInfo(entityType);
+                info = new AdoEntityInfo<TRepository>(entityType);
                 if (!_infoCache.TryAdd(entityType, info))
                     info = _infoCache[entityType];
             }

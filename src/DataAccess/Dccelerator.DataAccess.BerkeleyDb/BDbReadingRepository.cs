@@ -38,7 +38,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 ForeignKeyAttribute foreignKeyInfo;
                 if (info.ForeignKeys.TryGetValue(criterion.Name, out foreignKeyInfo)) {
                     policy = foreignKeyInfo.DuplicatesPolicy;
-                    indexSubName = foreignKeyInfo.ForeignEntityNavigationPath;
+                    indexSubName = foreignKeyInfo.NavigationPropertyPath;
                 }
                 else {
                     policy = DuplicatesPolicy.UNSORTED;

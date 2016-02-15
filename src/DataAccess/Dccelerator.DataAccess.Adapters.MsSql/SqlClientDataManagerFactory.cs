@@ -2,7 +2,7 @@
 
 
 namespace Dccelerator.DataAccess.Ado.SqlClient {
-    public abstract class SqlClientDataManagerFactory : DataManagerAdoFactoryBase {
+    public abstract class SqlClientDataManagerFactory<TRepository> : DataManagerAdoFactoryBase<TRepository> where TRepository : class, IAdoNetRepository {
         #region Overrides of DataManagerAdoFactoryBase
 
         protected override ForcedCacheReadingRepository ForcedCachedReadingRepository<TEntity>() {

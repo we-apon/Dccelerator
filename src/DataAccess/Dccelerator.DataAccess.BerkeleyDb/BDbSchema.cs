@@ -231,7 +231,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 var entity = pData.Data.FromBytes();
 
                 object foreingKey;
-                if (!entity.TryGetValueOnPath(foreignKeyMapping.ForeignKeyPath, out foreingKey))
+                if (!entity.TryGetValueOnPath(foreignKeyMapping.Name, out foreingKey))
                     throw new InvalidOperationException();
 
                 return new DatabaseEntry(foreingKey.ToBinnary());

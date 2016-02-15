@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using Dccelerator.DataAccess.Ado.DataGetters;
 using Dccelerator.DataAccess.Ado.Infrastructure;
 using Dccelerator.DataAccess.Ado.ReadingRepositories;
@@ -9,7 +8,7 @@ using Dccelerator.DataAccess.Implementations.Schedulers;
 
 
 namespace Dccelerator.DataAccess.Ado {
-    public abstract class DataManagerAdoFactoryBase : IDataManagerAdoFactory {
+    public abstract class DataManagerAdoFactoryBase<TRepository> : IDataManagerAdoFactory where TRepository : class, IAdoNetRepository {
 
         protected abstract ForcedCacheReadingRepository ForcedCachedReadingRepository<TEntity>() where TEntity : class;
         protected abstract DirectReadingRepository NotCachedReadingRepository<TEntity>() where TEntity : class;
@@ -110,7 +109,14 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <seealso cref="IDataManagerFactory.InfoAbout{TEntity}"/>
         public virtual IEntityInfo InfoAbout(Type entityType) {
-            return new AdoNetInfoAboutEntity(entityType).Info;
+            var info = new AdoNetInfoAboutEntity<TRepository>(entityType).Info;
+            if (info.Repository == null) {
+                lock (info) {
+                    if (info.Repository == null)
+                        info.SetRepository(AdoNetRepository());
+                }
+            }
+            return info;
         }
 
 
@@ -119,10 +125,13 @@ namespace Dccelerator.DataAccess.Ado {
         
 
         public virtual IAdoEntityInfo AdoInfoAbout<TEntity>() {
-            var info = AdoNetInfoAbout<TEntity>.Info;
-            if (info.Repository == null)
-                info.Repository = AdoNetRepository();
-
+            var info = AdoNetInfoAbout<TRepository, TEntity>.Info;
+            if (info.Repository == null) {
+                lock (info) {
+                    if (info.Repository == null)
+                        info.SetRepository(AdoNetRepository());
+                }
+            }
             return info;
         }
 

@@ -113,7 +113,7 @@ namespace Dccelerator.DataAccess.Lazy {
 
             var link = GetCustomAttribute(targetLocation.PropertyInfo, typeof (ForeignKeyAttribute)) as ForeignKeyAttribute;
             if (link != null)
-                CriterionName = link.ForeignKeyPath;
+                CriterionName = link.Name;
             else if (targetLocation.DeclaringType == RealLocationType && IsCollection)
                 CriterionName = "ParentId";
             else if (IsCollection)
