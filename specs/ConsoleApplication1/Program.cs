@@ -10,8 +10,6 @@ using BerkeleyDB;
 using Dccelerator;
 using Dccelerator.DataAccess;
 using Dccelerator.DataAccess.BerkeleyDb;
-using Dccelerator.DataAccess.Entities;
-using Dccelerator.DataAccess.Implementations;
 using Dccelerator.DataAccess.Lazy;
 using ServiceStack;
 using DuplicatesPolicy = Dccelerator.DataAccess.DuplicatesPolicy;

@@ -1,5 +1,7 @@
 ﻿using System;
-using Dccelerator.DataAccess.Implementations.Schedulers;
+using Dccelerator.DataAccess.BasicImplementation;
+using Dccelerator.DataAccess.BerkeleyDb.Implementation;
+using Dccelerator.DataAccess.BerkeleyDb.Infrastructure;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
@@ -110,7 +112,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        public IInternalReadingRepository ReadingRepository() {
+        public IReadingRepository ReadingRepository() {
             return BDbReadingRepository.Instance;
         }
         

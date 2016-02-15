@@ -1,4 +1,5 @@
-﻿using Dccelerator.DataAccess.Ado.ReadingRepositories;
+﻿using Dccelerator.DataAccess.Ado.BasicImplementation;
+using Dccelerator.DataAccess.Ado.SqlClient.Implementation;
 
 
 namespace Dccelerator.DataAccess.Ado.SqlClient {
@@ -24,7 +25,7 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
         }
 
 
-        public override IInternalReadingRepository ReadingRepository() {
+        public override IReadingRepository ReadingRepository() {
             return new SqlClientCommonReadingRepository();
         }
 

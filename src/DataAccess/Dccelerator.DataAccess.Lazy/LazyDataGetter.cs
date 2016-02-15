@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using Dccelerator.Reflection;
 
 
+
 namespace Dccelerator.DataAccess.Lazy {
     /// <summary>
     /// Basic implementation of manager, that can get something from <seealso cref="IDataAccessRepository"/>, using some <see cref="IDataCriterion"/>.
@@ -60,7 +61,7 @@ namespace Dccelerator.DataAccess.Lazy {
             foreach (var inclusion in _mainEntityInfo.Inclusions) {
                 object child;
                 if (!entity.TryGetValueOnPath(inclusion.TargetPath, out child)) {
-                    Internal.TraceEvent(TraceEventType.Warning, $"Can't get property {inclusion.TargetPath} on {_mainEntityInfo.EntityType} to setup it's loading context.");
+                    Infrastructure.Internal.TraceEvent(TraceEventType.Warning, $"Can't get property {inclusion.TargetPath} on {_mainEntityInfo.EntityType} to setup it's loading context.");
                     continue;
                 }
 

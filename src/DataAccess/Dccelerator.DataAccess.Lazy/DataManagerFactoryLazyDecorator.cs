@@ -103,7 +103,7 @@ namespace Dccelerator.DataAccess.Lazy
         }
 
 
-        public IInternalReadingRepository ReadingRepository() {
+        public IReadingRepository ReadingRepository() {
             return _factory.ReadingRepository();
         }
 

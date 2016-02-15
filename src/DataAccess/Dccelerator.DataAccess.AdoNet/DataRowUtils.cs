@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Diagnostics;
+using Dccelerator.DataAccess.Infrastructure;
 using Dccelerator.Reflection;
 using JetBrains.Annotations;
 

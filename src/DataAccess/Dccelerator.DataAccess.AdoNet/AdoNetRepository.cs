@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
-using Dccelerator.DataAccess.Ado.Infrastructure;
+using Dccelerator.DataAccess.Ado.BasicImplementation;
 using Dccelerator.DataAccess.Infrastructure;
 using Dccelerator.Reflection;
 using JetBrains.Annotations;

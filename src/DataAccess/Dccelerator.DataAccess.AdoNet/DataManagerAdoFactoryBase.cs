@@ -1,10 +1,7 @@
 ﻿using System;
-using Dccelerator.DataAccess.Ado.DataGetters;
-using Dccelerator.DataAccess.Ado.Infrastructure;
-using Dccelerator.DataAccess.Ado.ReadingRepositories;
-using Dccelerator.DataAccess.Implementations;
-using Dccelerator.DataAccess.Implementations.DataExistenceChecker;
-using Dccelerator.DataAccess.Implementations.Schedulers;
+using Dccelerator.DataAccess.Ado.BasicImplementation;
+using Dccelerator.DataAccess.Ado.BasicImplementation.Internal;
+using Dccelerator.DataAccess.BasicImplementation;
 
 
 namespace Dccelerator.DataAccess.Ado {
@@ -120,7 +117,7 @@ namespace Dccelerator.DataAccess.Ado {
         }
 
 
-        public abstract IInternalReadingRepository ReadingRepository();
+        public abstract IReadingRepository ReadingRepository();
 
         
 

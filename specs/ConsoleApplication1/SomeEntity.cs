@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using Dccelerator.DataAccess;
-using Dccelerator.DataAccess.Entities;
 using Dccelerator.DataAccess.Lazy;
 
 

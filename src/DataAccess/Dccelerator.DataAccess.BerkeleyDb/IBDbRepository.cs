@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BerkeleyDB;
+using Dccelerator.DataAccess.BerkeleyDb.Implementation;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {

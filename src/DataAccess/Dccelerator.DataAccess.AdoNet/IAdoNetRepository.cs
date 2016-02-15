@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Dccelerator.DataAccess.Infrastructure;
+﻿using System.Collections.Generic;
 
 
-namespace Dccelerator.DataAccess {
+namespace Dccelerator.DataAccess.Ado {
 
     /// <summary>
     /// Interface of an repository that holds database-specific CRUD actions.

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using Dccelerator.DataAccess.Entities;
+using Dccelerator.DataAccess.Infrastructure;
 using Dccelerator.Reflection;
 using JetBrains.Annotations;
 using PostSharp;
