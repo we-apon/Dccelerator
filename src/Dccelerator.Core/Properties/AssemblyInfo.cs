@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Dccelerator.Core")]
-[assembly: AssemblyDescription("Core utitities of Dccelerator framework. It contains some nice stuff like RUtils, SmartConvert and many usefull basic types extensions.")]
+[assembly: AssemblyDescription("Core utitities of Dccelerator framework. It contains some nice stuff like RUtils, SmartConvert and many usefull reflection extensions, some of that works through runtime delegate generation.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kirill Dubinkin")]
 [assembly: AssemblyProduct("Dccelerator")]
-[assembly: AssemblyCopyright("Copyright © Kirill Dubinkin 2015")]
+[assembly: AssemblyCopyright("Copyright © Kirill Dubinkin 2015-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

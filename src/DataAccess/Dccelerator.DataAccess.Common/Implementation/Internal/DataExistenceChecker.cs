@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 
-
-namespace Dccelerator.DataAccess.BasicImplementation {
+namespace Dccelerator.DataAccess.Implementation.Internal {
     class DataExistenceChecker<TEntity> : DataFilterBase<TEntity, bool>, IDataExistenceChecker<TEntity> where TEntity : class {
         readonly IReadingRepository _repository;
         readonly IEntityInfo _info;

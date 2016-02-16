@@ -1,13 +1,15 @@
 ﻿{
-  "version": "0.0.2-alfa5",
-  "description": "Dccelerator.DataAccess.Lazy Class Library",
-  "authors": [ "we_apon" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+  "version": "0.0.3-beta",
+  "title": "Dccelerator.DataAccess.Lazy",
+  "description": "Lazy Loading and navigation properties support for Dccelerator.DataAccess ORM.",
+  "summary": "Lazy Loading and navigation properties support for Dccelerator.DataAccess ORM.",
+  "authors": [ "Kirill Dubinkin" ],
+  "tags": [ "ORM Lazy Loading" ],
+  "projectUrl": "https://github.com/we-apon/Dccelerator",
+  "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE",
 
   "frameworks": {
-    
+
     "net40": {
       "compilationOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] }
     },
@@ -29,6 +31,6 @@
 
   "dependencies": {
     "Dccelerator.DataAccess.Common": "",
-    "PostSharp": "4.2.20"
+    "PostSharp": "4.2.21"
   }
 }

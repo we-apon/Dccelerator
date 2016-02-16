@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-
-namespace Dccelerator.DataAccess.BasicImplementation {
+namespace Dccelerator.DataAccess.Implementation {
     public abstract class DataFilterBase<TEntity, TResult> : CriterionGeneratorBase<TEntity>, IDataFilter<TEntity, TResult> where TEntity : class {
 
         // ReSharper disable once StaticMemberInGenericType

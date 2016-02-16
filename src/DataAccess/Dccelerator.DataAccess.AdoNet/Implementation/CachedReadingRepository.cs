@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Dccelerator.Reflection;
 
-
-namespace Dccelerator.DataAccess.Ado.BasicImplementation {
+namespace Dccelerator.DataAccess.Ado.Implementation {
     public abstract class CachedReadingRepository : DirectReadingRepository
     {
         readonly ConcurrentDictionary<string, EntitiesCache> _entities = new ConcurrentDictionary<string, EntitiesCache>();

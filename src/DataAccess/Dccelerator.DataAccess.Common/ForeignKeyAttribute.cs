@@ -1,5 +1,6 @@
-﻿namespace Dccelerator.DataAccess {
+﻿using System;
 
+namespace Dccelerator.DataAccess {
     /// <summary>
     /// Means what marked property will be used as for searching and maps current entity to another.
     /// For that property should(and will) be generated an secondary index and constraint.

@@ -1,10 +1,13 @@
 {
-  "version": "0.0.4-alfa2",
-  "description": "Dccelerator.DataAccess.AdoNet Class Library",
-  "authors": [ "we_apon" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+  "version": "0.0.5-beta",
+  "title": "Dccelerator.DataAccess.AdoNet",
+  "description": "Contains ADO.NET adapter classes for Dccelerator.DataAccess ORM",
+  "summary": "ADO.NET adapter classes for Dccelerator.DataAccess ORM",
+  "authors": [ "Kirill Dubinkin" ],
+  "tags": [ "ORM ADO.NET" ],
+  "projectUrl": "https://github.com/we-apon/Dccelerator",
+  "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE",
+
   "frameworks": {
     "net40": {
       "compilationOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] },
@@ -35,7 +38,6 @@
 
 
   "dependencies": {
-      "Dccelerator.Core": "",
-      "Dccelerator.DataAccess.Common": ""
+    "Dccelerator.DataAccess.Common": ""
   }
 }

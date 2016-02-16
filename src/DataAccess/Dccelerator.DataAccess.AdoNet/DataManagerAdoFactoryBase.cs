@@ -1,7 +1,8 @@
 ﻿using System;
-using Dccelerator.DataAccess.Ado.BasicImplementation;
-using Dccelerator.DataAccess.Ado.BasicImplementation.Internal;
-using Dccelerator.DataAccess.BasicImplementation;
+using Dccelerator.DataAccess.Ado.Implementation;
+using Dccelerator.DataAccess.Ado.Implementation.Internal;
+using Dccelerator.DataAccess.Implementation;
+using Dccelerator.DataAccess.Implementation.Internal;
 
 
 namespace Dccelerator.DataAccess.Ado {

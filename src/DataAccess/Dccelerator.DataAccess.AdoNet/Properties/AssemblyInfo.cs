@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Dccelerator.DataAccess.AdoNet")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Contains ADO.NET adapter classes for Dccelerator.DataAccess ORM")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Dccelerator.DataAccess.AdoNet")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyCompany("Kirill Dubinkin")]
+[assembly: AssemblyProduct("Dccelerator.DataAccess ORM")]
+[assembly: AssemblyCopyright("Copyright © Kirill Dubinkin 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using Dccelerator.Reflection.Abstract;
 
 
 namespace Dccelerator.Reflection

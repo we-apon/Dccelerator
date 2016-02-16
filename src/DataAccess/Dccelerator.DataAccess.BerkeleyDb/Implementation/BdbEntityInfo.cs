@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Dccelerator.DataAccess.BasicImplementation;
+using Dccelerator.DataAccess.Implementation;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {

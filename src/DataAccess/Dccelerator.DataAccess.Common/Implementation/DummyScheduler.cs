@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-
-namespace Dccelerator.DataAccess.BasicImplementation {
+namespace Dccelerator.DataAccess.Implementation {
     public class DummyScheduler : ITransactionScheduler {
 
         private readonly List<IDataTransaction> _transactions = new List<IDataTransaction>();

@@ -1,5 +1,4 @@
 ﻿using System;
-using Dccelerator.Reflection.Abstract;
 
 
 namespace Dccelerator.Reflection

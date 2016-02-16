@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 
-
-namespace Dccelerator.DataAccess.BasicImplementation {
+namespace Dccelerator.DataAccess.Implementation.Internal {
     class DataCountChecker<TEntity> : DataFilterBase<TEntity, long>, IDataCountChecker<TEntity> where TEntity : class {
         readonly IReadingRepository _repository;
         readonly IEntityInfo _info;

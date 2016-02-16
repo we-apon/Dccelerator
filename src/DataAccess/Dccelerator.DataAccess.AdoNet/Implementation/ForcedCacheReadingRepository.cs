@@ -1,7 +1,6 @@
 using System;
 
-
-namespace Dccelerator.DataAccess.Ado.BasicImplementation {
+namespace Dccelerator.DataAccess.Ado.Implementation {
     public abstract class ForcedCacheReadingRepository : CachedReadingRepository
     {
         #region Overrides of CachedReadingRepository

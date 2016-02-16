@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-
-namespace Dccelerator.DataAccess.Ado.BasicImplementation {
+namespace Dccelerator.DataAccess.Ado.Implementation {
 
 
     public abstract class DirectReadingRepository : IReadingRepository {

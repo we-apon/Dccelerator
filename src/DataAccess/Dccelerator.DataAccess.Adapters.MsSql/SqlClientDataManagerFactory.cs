@@ -1,4 +1,4 @@
-﻿using Dccelerator.DataAccess.Ado.BasicImplementation;
+﻿using Dccelerator.DataAccess.Ado.Implementation;
 using Dccelerator.DataAccess.Ado.SqlClient.Implementation;
 
 

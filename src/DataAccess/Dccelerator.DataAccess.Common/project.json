@@ -1,11 +1,13 @@
 ﻿{
-  "version": "0.0.2-alfa6",
-  "description": "Dccelerator.DataAccess.Common Class Library",
-  "authors": [ "we_apon" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
-  
+  "version": "0.0.5-beta",
+  "title": "Dccelerator.DataAccess.Common",
+  "description": "Contains interfaces and base implementation of Dccelerator.DataAccess ORM.",
+  "summary": "Base interfaces of Dccelerator.DataAccess ORM.",
+  "authors": [ "Kirill Dubinkin" ],
+  "tags": [ "ORM" ],
+  "projectUrl": "https://github.com/we-apon/Dccelerator",
+  "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE",
+
 
   "configurations": {
     "Debug": { "compilationOptions": { "define": [ "DEBUG" ] } },

@@ -1,10 +1,13 @@
 {
-  "version": "0.0.2-alfa4",
-  "description": "Dccelerator.DataAccess.Adapters.MsSql Class Library",
-  "authors": [ "we_apon" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+  "version": "0.0.3-beta",
+  "title": "Dccelerator.DataAccess.Adapters.MsSql",
+  "description": "Contains Microsoft SQL Server adapter for Dccelerator.DataAccess ORM.",
+  "summary": "Microsoft SQL Server adapter for Dccelerator.DataAccess ORM.",
+  "authors": [ "Kirill Dubinkin" ],
+  "tags": [ "ORM ADO.NET SQLClient MSSQL SQL" ],
+  "projectUrl": "https://github.com/we-apon/Dccelerator",
+  "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE",
+
   "frameworks": {
     "net40": {
       "compilationOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] },

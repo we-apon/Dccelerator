@@ -3,14 +3,14 @@
   "version": 2,
   "targets": {
     ".NETFramework,Version=v4.0": {
-      "Dccelerator.Core/0.0.5-alfa5": {
+      "Dccelerator.Core/0.0.5-alfa9": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -26,7 +26,7 @@
           "lib/net20/JetBrains.Annotations.dll": {}
         }
       },
-      "PostSharp/4.2.20": {
+      "PostSharp/4.2.21": {
         "type": "package",
         "compile": {
           "lib/net35-client/PostSharp.dll": {}
@@ -37,14 +37,14 @@
       }
     },
     ".NETFramework,Version=v4.5": {
-      "Dccelerator.Core/0.0.5-alfa5": {
+      "Dccelerator.Core/0.0.5-alfa9": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -60,7 +60,7 @@
           "lib/net20/JetBrains.Annotations.dll": {}
         }
       },
-      "PostSharp/4.2.20": {
+      "PostSharp/4.2.21": {
         "type": "package",
         "compile": {
           "lib/net35-client/PostSharp.dll": {}
@@ -71,14 +71,14 @@
       }
     },
     "DNX,Version=v4.5": {
-      "Dccelerator.Core/0.0.5-alfa5": {
+      "Dccelerator.Core/0.0.5-alfa9": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -94,7 +94,7 @@
           "lib/net20/JetBrains.Annotations.dll": {}
         }
       },
-      "PostSharp/4.2.20": {
+      "PostSharp/4.2.21": {
         "type": "package",
         "compile": {
           "lib/net35-client/PostSharp.dll": {}
@@ -105,14 +105,14 @@
       }
     },
     ".NETFramework,Version=v4.0/win7-x86": {
-      "Dccelerator.Core/0.0.5-alfa5": {
+      "Dccelerator.Core/0.0.5-alfa9": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -128,7 +128,7 @@
           "lib/net20/JetBrains.Annotations.dll": {}
         }
       },
-      "PostSharp/4.2.20": {
+      "PostSharp/4.2.21": {
         "type": "package",
         "compile": {
           "lib/net35-client/PostSharp.dll": {}
@@ -139,14 +139,14 @@
       }
     },
     ".NETFramework,Version=v4.0/win7-x64": {
-      "Dccelerator.Core/0.0.5-alfa5": {
+      "Dccelerator.Core/0.0.5-alfa9": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -162,7 +162,7 @@
           "lib/net20/JetBrains.Annotations.dll": {}
         }
       },
-      "PostSharp/4.2.20": {
+      "PostSharp/4.2.21": {
         "type": "package",
         "compile": {
           "lib/net35-client/PostSharp.dll": {}
@@ -173,14 +173,14 @@
       }
     },
     ".NETFramework,Version=v4.5/win7-x86": {
-      "Dccelerator.Core/0.0.5-alfa5": {
+      "Dccelerator.Core/0.0.5-alfa9": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -196,7 +196,7 @@
           "lib/net20/JetBrains.Annotations.dll": {}
         }
       },
-      "PostSharp/4.2.20": {
+      "PostSharp/4.2.21": {
         "type": "package",
         "compile": {
           "lib/net35-client/PostSharp.dll": {}
@@ -207,14 +207,14 @@
       }
     },
     ".NETFramework,Version=v4.5/win7-x64": {
-      "Dccelerator.Core/0.0.5-alfa5": {
+      "Dccelerator.Core/0.0.5-alfa9": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -230,7 +230,7 @@
           "lib/net20/JetBrains.Annotations.dll": {}
         }
       },
-      "PostSharp/4.2.20": {
+      "PostSharp/4.2.21": {
         "type": "package",
         "compile": {
           "lib/net35-client/PostSharp.dll": {}
@@ -241,14 +241,14 @@
       }
     },
     "DNX,Version=v4.5/win7-x86": {
-      "Dccelerator.Core/0.0.5-alfa5": {
+      "Dccelerator.Core/0.0.5-alfa9": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -264,7 +264,7 @@
           "lib/net20/JetBrains.Annotations.dll": {}
         }
       },
-      "PostSharp/4.2.20": {
+      "PostSharp/4.2.21": {
         "type": "package",
         "compile": {
           "lib/net35-client/PostSharp.dll": {}
@@ -275,14 +275,14 @@
       }
     },
     "DNX,Version=v4.5/win7-x64": {
-      "Dccelerator.Core/0.0.5-alfa5": {
+      "Dccelerator.Core/0.0.5-alfa9": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -298,7 +298,7 @@
           "lib/net20/JetBrains.Annotations.dll": {}
         }
       },
-      "PostSharp/4.2.20": {
+      "PostSharp/4.2.21": {
         "type": "package",
         "compile": {
           "lib/net35-client/PostSharp.dll": {}
@@ -310,11 +310,11 @@
     }
   },
   "libraries": {
-    "Dccelerator.Core/0.0.5-alfa5": {
+    "Dccelerator.Core/0.0.5-alfa9": {
       "type": "project",
       "path": "../../Dccelerator.Core/project.json"
     },
-    "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+    "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
       "type": "project",
       "path": "../Dccelerator.DataAccess.Common/project.json"
     },
@@ -333,19 +333,19 @@
         "lib/portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/JetBrains.Annotations.PCL328.xml"
       ]
     },
-    "PostSharp/4.2.20": {
+    "PostSharp/4.2.21": {
       "type": "package",
-      "sha512": "fmtv0VnLsy8xSsfwFpn+3AzKAE0eHlIlPV2a3FP8guD3bwhVpUAy0xRs7v4Ip/6PUtrcBU9Em5yw0eFeCCI1XQ==",
+      "sha512": "gov8WJBnNnyCqUMi5PeVCdewUVU4xlUjLsqFH3DQk/HchJEC9Oafqtiv/2PY5xtefYk8fLhjVagZbOBGSeaA+w==",
       "files": [
         "lib/net35-client/PostSharp.dll",
         "lib/net35-client/PostSharp.xml",
         "lib/portable-net4+sl5+netcore45+wpa81+wp8/PostSharp.dll",
         "lib/portable-net4+sl5+netcore45+wpa81+wp8/PostSharp.xml",
-        "PostSharp.4.2.20.nupkg",
-        "PostSharp.4.2.20.nupkg.sha512",
+        "PostSharp.4.2.21.nupkg",
+        "PostSharp.4.2.21.nupkg.sha512",
         "PostSharp.nuspec",
         "tools/install.ps1",
-        "tools/PostSharp.MSBuild.v4.2.20.Release.dll",
+        "tools/PostSharp.MSBuild.v4.2.21.Release.dll",
         "tools/PostSharp.properties",
         "tools/PostSharp.targets",
         "tools/PostSharp.tasks",
@@ -358,7 +358,7 @@
   "projectFileDependencyGroups": {
     "": [
       "Dccelerator.DataAccess.Common ",
-      "PostSharp >= 4.2.20"
+      "PostSharp >= 4.2.21"
     ],
     ".NETFramework,Version=v4.0": [],
     ".NETFramework,Version=v4.5": [],

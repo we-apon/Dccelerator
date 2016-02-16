@@ -1,4 +1,4 @@
-namespace Dccelerator.DataAccess.Ado.BasicImplementation {
+namespace Dccelerator.DataAccess.Ado.Implementation {
     public abstract class SimpleScheduledTransaction : NotScheduledDataTransaction {
         readonly ITransactionScheduler _scheduler;
 

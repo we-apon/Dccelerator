@@ -3,8 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-
-namespace Dccelerator.DataAccess.Ado.BasicImplementation {
+namespace Dccelerator.DataAccess.Ado.Implementation {
     /// <summary>
     /// An realization of <see cref="IDataTransaction"/> that is not deferring anything.
     /// Once methods like <see cref="Insert{TEntity}"/> or <see cref="UpdateMany{TEntity}"/> called - in just doing it and no waits for anyone.

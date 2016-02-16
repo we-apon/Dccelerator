@@ -1,7 +1,6 @@
-using Dccelerator.DataAccess.BasicImplementation;
+using Dccelerator.DataAccess.Implementation;
 
-
-namespace Dccelerator.DataAccess.Ado.BasicImplementation.Internal {
+namespace Dccelerator.DataAccess.Ado.Implementation.Internal {
 
     /// <summary>
     /// Manager, that can get something from <seealso cref="IAdoNetRepository"/>, using some <see cref="IDataCriterion"/>.

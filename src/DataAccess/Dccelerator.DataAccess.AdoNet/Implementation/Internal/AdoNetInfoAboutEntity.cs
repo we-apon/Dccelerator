@@ -3,8 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Dccelerator.Reflection;
 
-
-namespace Dccelerator.DataAccess.Ado.BasicImplementation.Internal {
+namespace Dccelerator.DataAccess.Ado.Implementation.Internal {
 
     class AdoNetInfoAbout<TRepository, TEntity> where TRepository : class, IAdoNetRepository {
         static readonly AdoNetInfoAboutEntity<TRepository> _infoContainer = new AdoNetInfoAboutEntity<TRepository>(RUtils<TEntity>.Type);

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Reflection;
 using Dccelerator.Convertion;
-using Dccelerator.Reflection.Abstract;
 
 
 namespace Dccelerator.Reflection
 {
-    public class Property<TContext, TType> : MemberBase, IProperty
+    class Property<TContext, TType> : MemberBase, IProperty
     {
         MethodDelegate<TContext, TType> _getter;
         ActionDelegate<TContext, TType> _setter;

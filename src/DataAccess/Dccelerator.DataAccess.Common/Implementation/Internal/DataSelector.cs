@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-
-namespace Dccelerator.DataAccess.BasicImplementation {
+namespace Dccelerator.DataAccess.Implementation.Internal {
     class DataSelector<TEntity, TResult> : DataFilterBase<TEntity, IEnumerable<TResult>>, IDataSelector<TEntity, TResult> where TEntity : class, new() {
         readonly IReadingRepository _repository;
         readonly IEntityInfo _info;

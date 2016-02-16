@@ -1,4 +1,4 @@
-namespace Dccelerator.Reflection.Abstract
+namespace Dccelerator.Reflection
 {
 
     public interface IDelegateContainer<out TDelegate> where TDelegate : class

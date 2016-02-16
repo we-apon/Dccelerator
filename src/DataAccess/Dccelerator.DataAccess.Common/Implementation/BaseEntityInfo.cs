@@ -6,8 +6,7 @@ using System.Reflection;
 using Dccelerator.DataAccess.Infrastructure;
 using Dccelerator.Reflection;
 
-
-namespace Dccelerator.DataAccess.BasicImplementation {
+namespace Dccelerator.DataAccess.Implementation {
 
     public abstract class BaseEntityInfo<TRepository> where TRepository : class {
 

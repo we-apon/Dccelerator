@@ -4,10 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using Dccelerator.Reflection.Abstract;
 using Dccelerator.Reflection;
 
-namespace Dccelerator.DataAccess.Ado.BasicImplementation {
+namespace Dccelerator.DataAccess.Ado.Implementation {
 
     public class Includeon : IIncludeon {
         readonly IAdoEntityInfo _ownerInfo;

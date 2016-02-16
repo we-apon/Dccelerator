@@ -6,10 +6,10 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Dccelerator.DataAccess.Common")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Contains interfaces and base implementation of Dccelerator.DataAccess ORM.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Dccelerator.DataAccess.Common")]
+[assembly: AssemblyCompany("Kirill Dubinkin")]
+[assembly: AssemblyProduct("Dccelerator.DataAccess ORM")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

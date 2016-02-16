@@ -3,8 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-
-namespace Dccelerator.Reflection.Abstract
+namespace Dccelerator.Reflection
 {
     public abstract class MethodDelegateBase : MemberBase
     {

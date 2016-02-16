@@ -1,7 +1,7 @@
 ﻿using System;
-using Dccelerator.DataAccess.BasicImplementation;
 using Dccelerator.DataAccess.BerkeleyDb.Implementation;
 using Dccelerator.DataAccess.BerkeleyDb.Infrastructure;
+using Dccelerator.DataAccess.Implementation;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {

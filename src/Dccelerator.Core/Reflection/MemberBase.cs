@@ -1,4 +1,4 @@
-﻿namespace Dccelerator.Reflection.Abstract
+﻿namespace Dccelerator.Reflection
 {
     public abstract class MemberBase
     {

@@ -5,8 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Dccelerator.Reflection;
 
-
-namespace Dccelerator.DataAccess.BasicImplementation {
+namespace Dccelerator.DataAccess.Implementation {
     public abstract class CriterionGeneratorBase<TEntity> where TEntity : class {
 
         protected static readonly Type EntityType = RUtils<TEntity>.Type;

@@ -1,10 +1,11 @@
 ﻿{
-  "version": "0.0.5-alfa9",
+  "version": "0.0.6-beta",
   "title": "Dccelerator's core utilities",
-  "description": "Core utitities of Dccelerator framework. \nIt contains some nice stuff like TypeManipulator, SmartConvert and many usefull reflection extensions.",
+  "description": "Core utitities of Dccelerator framework. \nIt contains some nice stuff like RUtils, SmartConvert and many usefull reflection extensions, some of that works through runtime delegate generation.",
   "summary": "Core utitities of Dccelerator framework.",
   "authors": [ "Kirill Dubinkin" ],
-  "tags": [ "Convertion Reflection Extensions" ],
+  "copyright": "Copyright © Kirill Dubinkin 2015-2016",
+  "tags": [ "Reflection Convertion Extensions" ],
   "projectUrl": "https://github.com/we-apon/Dccelerator",
   "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE",
 
@@ -33,7 +34,7 @@
         "JetBrains.Annotations": "10.0.0"
       }
     },
-    
+
 
 
     "dnx45": {

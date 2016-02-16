@@ -4,14 +4,14 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Reflection;
-using Dccelerator.DataAccess.BasicImplementation;
+using Dccelerator.DataAccess.Implementation;
 using Dccelerator.Reflection;
 
 #if !NET40
 using System.Reflection;
 #endif
 
-namespace Dccelerator.DataAccess.Ado.BasicImplementation {
+namespace Dccelerator.DataAccess.Ado.Implementation {
 
     public class AdoEntityInfo<TRepository> : BaseEntityInfo<TRepository>, IAdoEntityInfo where TRepository : class, IAdoNetRepository {
 

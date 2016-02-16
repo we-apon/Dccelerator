@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using Dccelerator.DataAccess.Ado.BasicImplementation;
+using Dccelerator.DataAccess.Ado.Implementation;
 
 
 namespace Dccelerator.DataAccess.Ado {

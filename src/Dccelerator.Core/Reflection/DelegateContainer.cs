@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 
-
-namespace Dccelerator.Reflection.Abstract
+namespace Dccelerator.Reflection
 {
 
     public abstract class DelegateContainer<TDelegate> : MethodDelegateBase//, IDelegateContainer<TDelegate> 
