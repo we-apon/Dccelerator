@@ -108,12 +108,32 @@ namespace Dccelerator
                 while (enumerator.MoveNext())
                     count++;
             }
-            catch (Exception) {
+            catch {
                 //do_nothing();
             }
 
             return count;
         }
+
+
+        /// <summary>
+        /// Checks, is <paramref name="enumerable"/> has any elements.
+        /// </summary>
+        /// <param name="enumerable">An collection</param>
+        public static bool HasAny(this IEnumerable enumerable) {
+            var collection = enumerable as ICollection;
+            if (collection != null)
+                return collection.Count != 0;
+
+            var enumerator = enumerable.GetEnumerator();
+            try {
+                return enumerator.MoveNext();
+            }
+            catch {
+                return false;
+            }
+        }
+
 
 
         /// <summary>
