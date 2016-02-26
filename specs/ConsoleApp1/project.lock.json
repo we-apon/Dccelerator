@@ -3,6 +3,15 @@
   "version": 2,
   "targets": {
     "DNX,Version=v4.5.1": {
+      "Berkeley.DB/6.1.26": {
+        "type": "package",
+        "compile": {
+          "lib/net40/libdb_dotnet61.dll": {}
+        },
+        "runtime": {
+          "lib/net40/libdb_dotnet61.dll": {}
+        }
+      },
       "BerkleyDB/6.1.26-debug": {
         "type": "package",
         "compile": {
@@ -12,7 +21,7 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.5-alfa5": {
+      "Dccelerator.Core/0.0.6-beta": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -23,12 +32,11 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
-          "BerkleyDB": "6.1.26-debug",
-          "Dccelerator.Core": null,
+          "Berkeley.DB": "6.1.26",
           "Dccelerator.DataAccess.Common": null
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+      "Dccelerator.DataAccess.Common/0.0.5-beta": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -46,6 +54,15 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x86": {
+      "Berkeley.DB/6.1.26": {
+        "type": "package",
+        "compile": {
+          "lib/net40/libdb_dotnet61.dll": {}
+        },
+        "runtime": {
+          "lib/net40/libdb_dotnet61.dll": {}
+        }
+      },
       "BerkleyDB/6.1.26-debug": {
         "type": "package",
         "compile": {
@@ -55,7 +72,7 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.5-alfa5": {
+      "Dccelerator.Core/0.0.6-beta": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -66,12 +83,11 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
-          "BerkleyDB": "6.1.26-debug",
-          "Dccelerator.Core": null,
+          "Berkeley.DB": "6.1.26",
           "Dccelerator.DataAccess.Common": null
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+      "Dccelerator.DataAccess.Common/0.0.5-beta": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -89,6 +105,15 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x64": {
+      "Berkeley.DB/6.1.26": {
+        "type": "package",
+        "compile": {
+          "lib/net40/libdb_dotnet61.dll": {}
+        },
+        "runtime": {
+          "lib/net40/libdb_dotnet61.dll": {}
+        }
+      },
       "BerkleyDB/6.1.26-debug": {
         "type": "package",
         "compile": {
@@ -98,7 +123,7 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.5-alfa5": {
+      "Dccelerator.Core/0.0.6-beta": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -109,12 +134,11 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
-          "BerkleyDB": "6.1.26-debug",
-          "Dccelerator.Core": null,
+          "Berkeley.DB": "6.1.26",
           "Dccelerator.DataAccess.Common": null
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+      "Dccelerator.DataAccess.Common/0.0.5-beta": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -133,7 +157,7 @@
     }
   },
   "libraries": {
-    "Dccelerator.Core/0.0.5-alfa5": {
+    "Dccelerator.Core/0.0.6-beta": {
       "type": "project",
       "path": "../../src/Dccelerator.Core/project.json"
     },
@@ -141,9 +165,22 @@
       "type": "project",
       "path": "../../src/DataAccess/Dccelerator.DataAccess.BerkeleyDb/project.json"
     },
-    "Dccelerator.DataAccess.Common/0.0.1-alfa3": {
+    "Dccelerator.DataAccess.Common/0.0.5-beta": {
       "type": "project",
       "path": "../../src/DataAccess/Dccelerator.DataAccess.Common/project.json"
+    },
+    "Berkeley.DB/6.1.26": {
+      "type": "package",
+      "sha512": "RCjmfTPM/t+uW6DRcek0dFhrJ4WEe8XF6oB/UvDoylDrB1AQBBgsqkPfZQ7qjcA8JGTv1++4ik6uOnczybl6Nw==",
+      "files": [
+        "Berkeley.DB.6.1.26.nupkg",
+        "Berkeley.DB.6.1.26.nupkg.sha512",
+        "Berkeley.DB.nuspec",
+        "content/libdb_csharp61.dll",
+        "content/libdb61.dll",
+        "lib/net40/libdb_dotnet61.dll",
+        "lib/net40/libdb_dotnet61.XML"
+      ]
     },
     "BerkleyDB/6.1.26-debug": {
       "type": "package",

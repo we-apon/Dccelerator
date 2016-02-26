@@ -1,10 +1,11 @@
-﻿{
-  "version": "0.0.1-alfa2",
-  "description": "Dccelerator.DataAccess.BerkeleyDb Class Library",
-  "authors": [ "we_apon" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+{
+  "version": "0.0.2-beta",
+  "title": "Berkeley Db adapter for Dccelerator.DataAccess ORM",
+  "description": "Berkeley Db adapter for Dccelerator.DataAccess ORM",
+  "authors": [ "Kirill Dubinkin" ],
+  "tags": [ "ORM BerkeleyDb" ],
+  "projectUrl": "https://github.com/we-apon/Dccelerator",
+  "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE",
 
   "frameworks": {
     "net40": {
@@ -14,8 +15,7 @@
   },
 
   "dependencies": {
-    "Dccelerator.Core": "",
     "Dccelerator.DataAccess.Common": "",
-    "BerkleyDB": "6.1.26-debug"
+    "Berkeley.DB": "6.1.26"
   }
 }

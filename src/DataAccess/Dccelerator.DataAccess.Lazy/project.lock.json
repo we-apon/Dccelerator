@@ -3,14 +3,14 @@
   "version": 2,
   "targets": {
     ".NETFramework,Version=v4.0": {
-      "Dccelerator.Core/0.0.5-alfa9": {
+      "Dccelerator.Core/0.0.6-beta": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
+      "Dccelerator.DataAccess.Common/0.0.5-beta": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -37,14 +37,14 @@
       }
     },
     ".NETFramework,Version=v4.5": {
-      "Dccelerator.Core/0.0.5-alfa9": {
+      "Dccelerator.Core/0.0.6-beta": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
+      "Dccelerator.DataAccess.Common/0.0.5-beta": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -71,14 +71,14 @@
       }
     },
     "DNX,Version=v4.5": {
-      "Dccelerator.Core/0.0.5-alfa9": {
+      "Dccelerator.Core/0.0.6-beta": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
+      "Dccelerator.DataAccess.Common/0.0.5-beta": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -105,14 +105,14 @@
       }
     },
     ".NETFramework,Version=v4.0/win7-x86": {
-      "Dccelerator.Core/0.0.5-alfa9": {
+      "Dccelerator.Core/0.0.6-beta": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
+      "Dccelerator.DataAccess.Common/0.0.5-beta": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -139,14 +139,14 @@
       }
     },
     ".NETFramework,Version=v4.0/win7-x64": {
-      "Dccelerator.Core/0.0.5-alfa9": {
+      "Dccelerator.Core/0.0.6-beta": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
+      "Dccelerator.DataAccess.Common/0.0.5-beta": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -173,14 +173,14 @@
       }
     },
     ".NETFramework,Version=v4.5/win7-x86": {
-      "Dccelerator.Core/0.0.5-alfa9": {
+      "Dccelerator.Core/0.0.6-beta": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
+      "Dccelerator.DataAccess.Common/0.0.5-beta": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -207,14 +207,14 @@
       }
     },
     ".NETFramework,Version=v4.5/win7-x64": {
-      "Dccelerator.Core/0.0.5-alfa9": {
+      "Dccelerator.Core/0.0.6-beta": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
+      "Dccelerator.DataAccess.Common/0.0.5-beta": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -241,14 +241,14 @@
       }
     },
     "DNX,Version=v4.5/win7-x86": {
-      "Dccelerator.Core/0.0.5-alfa9": {
+      "Dccelerator.Core/0.0.6-beta": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
+      "Dccelerator.DataAccess.Common/0.0.5-beta": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -275,14 +275,14 @@
       }
     },
     "DNX,Version=v4.5/win7-x64": {
-      "Dccelerator.Core/0.0.5-alfa9": {
+      "Dccelerator.Core/0.0.6-beta": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
+      "Dccelerator.DataAccess.Common/0.0.5-beta": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -310,11 +310,11 @@
     }
   },
   "libraries": {
-    "Dccelerator.Core/0.0.5-alfa9": {
+    "Dccelerator.Core/0.0.6-beta": {
       "type": "project",
       "path": "../../Dccelerator.Core/project.json"
     },
-    "Dccelerator.DataAccess.Common/0.0.2-alfa6": {
+    "Dccelerator.DataAccess.Common/0.0.5-beta": {
       "type": "project",
       "path": "../Dccelerator.DataAccess.Common/project.json"
     },

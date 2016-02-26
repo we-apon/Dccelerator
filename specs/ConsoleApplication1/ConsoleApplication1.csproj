@@ -34,36 +34,33 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dccelerator.Core, Version=0.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\artifacts\bin\Dccelerator.Core\Debug\net45\Dccelerator.Core.dll</HintPath>
+    <Reference Include="Dccelerator.Core, Version=0.0.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Dccelerator.Core.0.0.6-beta\lib\net45\Dccelerator.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Dccelerator.DataAccess.BerkeleyDb, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\artifacts\bin\Dccelerator.DataAccess.BerkeleyDb\Debug\net45\Dccelerator.DataAccess.BerkeleyDb.dll</HintPath>
+    <Reference Include="Dccelerator.DataAccess.BerkeleyDb, Version=0.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Dccelerator.DataAccess.BerkeleyDb.0.0.2-beta\lib\net40\Dccelerator.DataAccess.BerkeleyDb.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Dccelerator.DataAccess.Common, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\artifacts\bin\Dccelerator.DataAccess.Common\Debug\net45\Dccelerator.DataAccess.Common.dll</HintPath>
+    <Reference Include="Dccelerator.DataAccess.Common, Version=0.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Dccelerator.DataAccess.Common.0.0.5-beta\lib\net45\Dccelerator.DataAccess.Common.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Dccelerator.DataAccess.Lazy, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\artifacts\bin\Dccelerator.DataAccess.Lazy\Debug\net45\Dccelerator.DataAccess.Lazy.dll</HintPath>
+    <Reference Include="Dccelerator.DataAccess.Lazy, Version=0.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Dccelerator.DataAccess.Lazy.0.0.3-beta\lib\net45\Dccelerator.DataAccess.Lazy.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="libdb_dotnet61, Version=6.1.26.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\BerkleyDB.6.1.26.1\lib\net40\libdb_dotnet61.dll</HintPath>
+      <HintPath>..\..\packages\Berkeley.DB.6.1.26\lib\net40\libdb_dotnet61.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PostSharp, Version=4.2.20.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PostSharp.4.2.20\lib\net35-client\PostSharp.dll</HintPath>
+    <Reference Include="PostSharp, Version=4.2.21.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\PostSharp.4.2.21\lib\net35-client\PostSharp.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="ServiceStack.Text, Version=4.0.52.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ServiceStack.Text.4.0.52\lib\net40\ServiceStack.Text.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -87,20 +84,22 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="libdb61.dll" />
-    <Content Include="libdb61.pdb" />
-    <Content Include="libdb_csharp61.dll" />
-    <Content Include="libdb_csharp61.pdb" />
+    <Content Include="libdb61.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libdb_csharp61.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(SolutionDir)artifacts\bin\Dccelerator.Core\$(ConfigurationName)\net45\* $(TargetDir) /Y &amp;&amp; copy $(SolutionDir)artifacts\bin\Dccelerator.DataAccess.Common\$(ConfigurationName)\net45\* $(TargetDir) /Y &amp;&amp; copy $(SolutionDir)artifacts\bin\Dccelerator.DataAccess.BerkeleyDb\$(ConfigurationName)\net40\* $(TargetDir) /Y &amp;&amp; copy $(SolutionDir)artifacts\bin\Dccelerator.DataAccess.Lazy\$(ConfigurationName)\net45\* $(TargetDir) /Y
-</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\..\packages\PostSharp.4.2.20\tools\PostSharp.targets" Condition="Exists('..\..\packages\PostSharp.4.2.20\tools\PostSharp.targets')" />
+  <Import Project="..\..\packages\PostSharp.4.2.21\tools\PostSharp.targets" Condition="Exists('..\..\packages\PostSharp.4.2.21\tools\PostSharp.targets')" />
   <Target Name="EnsurePostSharpImported" BeforeTargets="BeforeBuild" Condition="'$(PostSharp30Imported)' == ''">
-    <Error Condition="!Exists('..\..\packages\PostSharp.4.2.20\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
-    <Error Condition="Exists('..\..\packages\PostSharp.4.2.20\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
+    <Error Condition="!Exists('..\..\packages\PostSharp.4.2.21\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
+    <Error Condition="Exists('..\..\packages\PostSharp.4.2.21\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

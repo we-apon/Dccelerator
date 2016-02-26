@@ -11,7 +11,6 @@ using Dccelerator;
 using Dccelerator.DataAccess;
 using Dccelerator.DataAccess.BerkeleyDb;
 using Dccelerator.DataAccess.Lazy;
-using ServiceStack;
 using DuplicatesPolicy = Dccelerator.DataAccess.DuplicatesPolicy;
 
 
@@ -518,18 +517,17 @@ namespace ConsoleApplication1
             watch.Restart();
             Parallel.For(0, length, i => {
                 var id = new DatabaseEntry(ids[i]);
-                var text = entities[i].ToJson();
-                var data = new DatabaseEntry(Encoding.UTF8.GetBytes(text));
+                var data = new DatabaseEntry(entities[i].ToBinnary());
                 entitiesDb.Instance().Put(id, data);
 
                 var other1 = otherEntities[i*2];
                 var other1Id = new DatabaseEntry(other1.Id.ToBinnary());
-                var other1Data = new DatabaseEntry(Encoding.UTF8.GetBytes(other1.ToJson()));
+                var other1Data = new DatabaseEntry(other1.ToBinnary());
                 otherEntitiesDb.Instance().Put(other1Id, other1Data);
 
                 var other2 = otherEntities[i*2 + 1];
                 var other2Id = new DatabaseEntry(other2.Id.ToBinnary());
-                var other2Data = new DatabaseEntry(Encoding.UTF8.GetBytes(other2.ToJson()));
+                var other2Data = new DatabaseEntry(other2.ToBinnary());
                 otherEntitiesDb.Instance().Put(other2Id, other2Data);
             });
 
