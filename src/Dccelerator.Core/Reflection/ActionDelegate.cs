@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Reflection;
 
 
@@ -14,7 +15,8 @@ namespace Dccelerator.Reflection
                 Delegate(context);
                 return true;
             }
-            catch (Exception) { //todo: add logging
+            catch (Exception e) {
+                Internal.TraceEvent(TraceEventType.Error, e.ToString());
                 return false;
             }
         }
@@ -31,7 +33,8 @@ namespace Dccelerator.Reflection
                 Delegate(context, p1);
                 return true;
             }
-            catch (Exception) { //todo: add logging
+            catch (Exception e) {
+                Internal.TraceEvent(TraceEventType.Error, e.ToString());
                 return false;
             }
         }

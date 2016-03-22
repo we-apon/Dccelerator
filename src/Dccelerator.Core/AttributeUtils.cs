@@ -165,7 +165,7 @@ namespace Dccelerator
         /// <seealso cref="IsDefined"/>
         public static bool IsDefinedAny(this MemberInfo member, Type type, bool includeInherited = true) {
 #if NET40
-            return Attribute.IsDefined(member, type, includeInherited); //todo: fix it
+            return Attribute.IsDefined(member, type, includeInherited);
 #else
             return member.CustomAttributes.Any(x => type.IsAssignableFrom(type));
 #endif

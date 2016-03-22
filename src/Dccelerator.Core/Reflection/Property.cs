@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using Dccelerator.Convertion;
 
@@ -33,8 +34,8 @@ namespace Dccelerator.Reflection
                     return true;
                 }
             }
-            catch (Exception) {
-                //todo: log
+            catch (Exception e) {
+                Internal.TraceEvent(TraceEventType.Error, e.ToString());
             }
 
             value = null;
@@ -51,7 +52,8 @@ namespace Dccelerator.Reflection
 
                 return Setter.TryInvoke((TContext)context, val);
             }
-            catch (Exception) {
+            catch (Exception e) {
+                Internal.TraceEvent(TraceEventType.Error, e.ToString());
                 return false;
             }
         }
