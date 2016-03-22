@@ -9,11 +9,11 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         readonly IBDbSchema _schema;
 
 
-        protected BDbDataManagerFactory(string environmentPath, string dbFilePath, string password) {
+        public BDbDataManagerFactory(string environmentPath, string dbFilePath, string password) {
             _schema = new BDbSchema(environmentPath, dbFilePath, password);
         }
 
-        protected BDbDataManagerFactory(string environmentPath, string dbFilePath) : this(environmentPath, dbFilePath, null) { }
+        public BDbDataManagerFactory(string environmentPath, string dbFilePath) : this(environmentPath, dbFilePath, null) { }
 
 
         #region Implementation of IDataManagerFactory
