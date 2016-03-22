@@ -1,19 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using BerkeleyDB;
 using Dccelerator.DataAccess.BerkeleyDb.Implementation;
-
+using Dccelerator.DataAccess.Infrastructure;
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
-    public abstract class BDbRepositoryBase : IBDbRepository {
+    public class BDbRepository : IBDbRepository {
         readonly IBDbSchema _schema;
 
 
-        protected BDbRepositoryBase(IBDbSchema schema) {
+        public BDbRepository(IBDbSchema schema) {
             _schema = schema;
         }
 
-        protected abstract DatabaseEntry KeyOf(object entity, IBDbEntityInfo info);
+
+        /// <exception cref="NotSupportedException">Can't provide id for <paramref name="entity"/>.</exception>
+        protected virtual DatabaseEntry KeyOf(object entity, IBDbEntityInfo info) {
+            var bytesIdentified = entity as IIdentified<byte[]>;
+            if (bytesIdentified != null)
+                return new DatabaseEntry(bytesIdentified.Id);
+
+            var guidIdentified = entity as IIdentified<Guid>;
+            if (guidIdentified != null)
+                return new DatabaseEntry(guidIdentified.Id.ToByteArray());
+
+            var longIdentified = entity as IIdentified<long>;
+            if (longIdentified != null)
+                return new DatabaseEntry(BitConverter.GetBytes(longIdentified.Id));
+
+            var intIdentified = entity as IIdentified<int>;
+            if (intIdentified != null)
+                return new DatabaseEntry(BitConverter.GetBytes(intIdentified.Id));
+
+            throw new NotSupportedException("By default, supported only identifying of entities that implements at least one of the following interfaces:\n" +
+                                            $"{nameof(IIdentified<byte[]>)},\n" +
+                                            $"{nameof(IIdentified<Guid>)},\n" +
+                                            $"{nameof(IIdentified<long>)},\n" +
+                                            $"{nameof(IIdentified<int>)}.\n" +
+                                            $"Please, implement at least one of these interfaces in entity '{info.EntityType.FullName}', or manually override that logic.");
+        }
 
 
         protected virtual DatabaseEntry DataOf(object entity) {
@@ -59,7 +85,9 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
         #region Implementation of IBDbRepository
 
-        public abstract bool IsPrimaryKey(IDataCriterion criterion);
+        public virtual bool IsPrimaryKey(IDataCriterion criterion) {
+            return criterion.Name == nameof(IIdentified<int>.Id);
+        }
 
 
         public virtual DatabaseEntry EntryFrom(IDataCriterion criterion) {
@@ -189,8 +217,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 return true;
             }
             catch (Exception e) {
-                //todo: write log
-
+                Internal.TraceEvent(TraceEventType.Error, e.ToString());
                 transaction?.Abort();
                 return false;
             }
