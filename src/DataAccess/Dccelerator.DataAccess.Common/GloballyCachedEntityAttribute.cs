@@ -8,7 +8,7 @@ namespace Dccelerator.DataAccess
     /// Allows to cache marked entity.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public sealed class GloballyCachedEntityAttribute : EntityAttribute //todo: rename to GloballyCachedEntityAttribute
+    public sealed class GloballyCachedEntityAttribute : EntityAttribute
     {
         /// <summary>
         /// Timeout of caching.
