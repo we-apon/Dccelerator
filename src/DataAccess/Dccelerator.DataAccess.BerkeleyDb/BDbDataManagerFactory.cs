@@ -5,15 +5,15 @@ using Dccelerator.DataAccess.Implementation;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
-    public abstract class BDbDataManagerFactoryBase : IDataManagerBDbFactory, IDisposable {
+    public class BDbDataManagerFactory : IDataManagerBDbFactory, IDisposable {
         readonly IBDbSchema _schema;
 
 
-        protected BDbDataManagerFactoryBase(string environmentPath, string dbFilePath, string password) {
+        protected BDbDataManagerFactory(string environmentPath, string dbFilePath, string password) {
             _schema = new BDbSchema(environmentPath, dbFilePath, password);
         }
 
-        protected BDbDataManagerFactoryBase(string environmentPath, string dbFilePath) : this(environmentPath, dbFilePath, null) { }
+        protected BDbDataManagerFactory(string environmentPath, string dbFilePath) : this(environmentPath, dbFilePath, null) { }
 
 
         #region Implementation of IDataManagerFactory
@@ -129,7 +129,9 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        public abstract IBDbRepository Repository();
+        public virtual IBDbRepository Repository() {
+            return new BDbRepository(Schema());
+        }
 
 
         public IBDbSchema Schema() {

@@ -20,7 +20,7 @@ namespace ConsoleApplication1
         public Repository(IBDbSchema schema) : base(schema) {}
 
 
-        #region Overrides of BDbRepositoryBase
+        #region Overrides of BDbRepository
 
         protected override DatabaseEntry KeyOf(object entity, IBDbEntityInfo info) {
             var identifiedEntity = entity as IIdentifiedEntity;
@@ -44,7 +44,7 @@ namespace ConsoleApplication1
         public BdbFactory(string environmentPath, string dbFilePath, string password) : base(environmentPath, dbFilePath, password) { }
 
 
-        #region Overrides of BDbDataManagerFactoryBase
+        #region Overrides of BDbDataManagerFactory
 
         public override IBDbRepository Repository() {
             return new Repository(Schema());
