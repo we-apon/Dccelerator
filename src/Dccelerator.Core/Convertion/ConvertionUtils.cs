@@ -12,16 +12,19 @@ namespace Dccelerator.Convertion
     /// </summary>
     public static class ConvertionUtils
     {
-
+        
         /// <summary>
         /// Tries to convert <paramref name="value"/> to <typeparamref name="T"/>
         /// </summary>
         /// <param name="value">An value of absolutelly anything type.</param>
         /// <seealso cref="SmartConvert"/>
         /// <seealso cref="FillAllFrom{TEntity, TOtherEntity}"/>
-        public static T ConvertTo<T>( this object value) {
+        public static T ConvertTo<T>(this object value) {
             return value.ConvertTo(typeof (T)).SafeCastTo<T>();
         }
+
+
+
 
 
         /// <summary>
@@ -31,7 +34,6 @@ namespace Dccelerator.Convertion
         /// <param name="targetType">Any type.</param>
         /// <seealso cref="SmartConvert"/>
         /// <seealso cref="FillAllFrom{TEntity, TOtherEntity}"/>
-        
         public static object ConvertTo<T>(this T value,  Type targetType) {
             var targetInfo = targetType.GetInfo();
 
@@ -41,7 +43,11 @@ namespace Dccelerator.Convertion
             var valueType = value.GetType();
             //? It's necessary to use value.GetType() instead of typeof(T), because often this method will be called on object that was getted through reflection, or something..
            
+
+            if (targetType == TypeCache.StringType)
+                return value.ToString();
              
+
             if (TypeCache.IsAssignableFrom(targetType, valueType))
                 return value;
 
@@ -67,9 +73,19 @@ namespace Dccelerator.Convertion
                 return explicitCastMethod.Invoke(null, new object[] { value });
 
 
+            var stringValue = value.ToString();
+            if (stringValue != valueType.FullName) {
 
-            if (targetType == TypeCache.StringType)
-                return value.ToString();
+                var implicitCastFromStringMethod = targetType.GetMethod("op_Implicit", new[] {TypeCache.StringType});
+                if (implicitCastFromStringMethod != null)
+                    return implicitCastFromStringMethod.Invoke(null, new object[] { stringValue });
+
+
+                var explicitCastFromStringMethod = targetType.GetMethod("op_Explicit", new[] {TypeCache.StringType});
+                if (explicitCastFromStringMethod != null)
+                    return explicitCastFromStringMethod.Invoke(null, new object[] { stringValue });
+            }
+
 
             if (targetInfo.IsEnum) {
                 try {
@@ -83,8 +99,10 @@ namespace Dccelerator.Convertion
             if (valueType == TypeCache.StringType && TypeCache.IsAssignableFrom(targetType, TypeCache.GuidType))
                 return Guid.Parse(value.SafeCastTo<string>());
 
+
             if (TypeCache.IsAssignableFrom(TypeCache.ConvertibleType, valueType))
                 return Convert.ChangeType(value, targetType, null);
+
 
             var collection = value.AsAnCollection(valueType);
             if (collection == null || !targetType.IsAnCollection())
