@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using BerkeleyDB;
 using Dccelerator.Reflection;
-
+using Dccelerator.DataAccess.Infrastructure;
 
 namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
     class BDbSchema : IBDbSchema {
@@ -44,10 +46,30 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
 
         public BDbSchema(string environmentPath, string dbPath) : this(environmentPath, dbPath, null) { }
 
+
+        /// <exception cref="InvalidOperationException">Can't create environment directory.</exception>
+        /// <exception cref="ArgumentException">BerkeleyDb file name is an absolute or relative path, but should be just file name (with or without extension).</exception>
         public BDbSchema(string environmentPath, string dbPath, string password) {
             _environmentPath = environmentPath;
             _dbPath = dbPath;
             _password = password;
+
+            if (Path.GetFileName(_dbPath) != _dbPath) {
+                var msg = $"BerkeleyDb file name '{dbPath}' is an absolute or relative path, but should be just file name (with or without extension)";
+                Internal.TraceEvent(TraceEventType.Error, msg);
+                throw new ArgumentException(msg, nameof(dbPath));
+            }
+
+            if (!Directory.Exists(_environmentPath)) {
+                try {
+                    Directory.CreateDirectory(_environmentPath);
+                }
+                catch (Exception e) {
+                    var msg = $"Can't create environment directory {environmentPath}";
+                    Internal.TraceEvent(TraceEventType.Error, msg);
+                    throw new InvalidOperationException(msg, e);
+                }
+            }
         }
 
 
