@@ -9,7 +9,8 @@ namespace Dccelerator {
 
 
     public static class BinaryFormatterUtils {
-        static readonly Type _nullableGuid= typeof (Guid?);
+        static readonly Type _nullableGuid = typeof (Guid?);
+        static readonly Type _byteArrayType = typeof (byte[]);
 
 
         public static byte[] ToBinnary<T>(this T entity) {
@@ -17,8 +18,12 @@ namespace Dccelerator {
                 return null;
             
             var type = entity.GetType();
+            if (_byteArrayType == type)
+                return entity as byte[];
+
             if (_nullableGuid.IsAssignableFrom(type))
                 return entity.SafeCastTo<Guid?>().Value.ToByteArray();
+
 
             var formatter = new BinaryFormatter();
 
