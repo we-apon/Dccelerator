@@ -78,7 +78,7 @@ namespace Dccelerator.DataAccess.Implementation {
         }
         Dictionary<string, SecondaryKeyAttribute> _secondaryKeys;
 
-
+        
 
 
         public virtual Dictionary<string, PropertyInfo> PersistedProperties {

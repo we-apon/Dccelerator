@@ -20,17 +20,22 @@ namespace Dccelerator.DataAccess {
 
         /// <summary>
         /// Name of secondary key. 
-        /// By default, it's name of marged property.
+        /// By default, it's name of marked property.
         /// </summary>
         public string Name { get; set; }
 
 
-
         /// <param name="relationship">Reletionship of key and entity.</param>
         /// <param name="duplicatesPolicy">Duplication policy between current entity and marked secondary key.</param>
-        public SecondaryKeyAttribute(Relationship relationship = Relationship.ManyToOne, DuplicatesPolicy duplicatesPolicy = DuplicatesPolicy.NONE) {
+        /// <exception cref="InvalidOperationException">relationshid and duplicates policy conflicts with each other.</exception>
+        public SecondaryKeyAttribute(Relationship relationship = Relationship.ManyToOne, DuplicatesPolicy duplicatesPolicy = DuplicatesPolicy.UNSORTED) {
             Relationship = relationship;
             DuplicatesPolicy = duplicatesPolicy;
+
+            if (DuplicatesPolicy == DuplicatesPolicy.NONE && relationship != Relationship.OneToOne) {
+                throw new InvalidOperationException($"{nameof(Relationship)} {relationship} can't be in pair with {nameof(DuplicatesPolicy)} {duplicatesPolicy}");
+            }
+
             //todo: check relationship and duplicatesPolicy for compatibility
         }
     }

@@ -18,6 +18,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
 
         readonly ConcurrentDictionary<string, Database> _primaryWritableDbs = new ConcurrentDictionary<string, Database>();
         readonly ConcurrentDictionary<string, SecondaryDatabase> _foreignKeyWritableDbs = new ConcurrentDictionary<string, SecondaryDatabase>();
+        readonly ConcurrentDictionary<string, SecondaryDatabase> _secondaryKeyWritableDbs = new ConcurrentDictionary<string, SecondaryDatabase>();
 
         readonly HashSet<string> _transactionPreparedEntities = new HashSet<string>(); 
 
@@ -89,14 +90,14 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
         }
 
 
-        public SecondaryDatabase GetReadOnlySecondaryDb(Database primaryDb, string indexSubName, DuplicatesPolicy duplicatesPolicy) {
-            var dbName = SecondaryDbName(primaryDb, indexSubName);
+        public SecondaryDatabase GetReadOnlySecondaryDb(Database primaryDb, SecondaryKeyAttribute secondaryKey) {
+            var dbName = SecondaryKeyDbName(primaryDb, secondaryKey);
 
             SecondaryDatabase database;
             if (_secondaryReadOnlyDbs.TryGetValue(dbName, out database))
                 return database;
 
-            database = OpenReadOnlySecondaryDb(primaryDb, indexSubName, duplicatesPolicy);
+            database = OpenReadOnlySecondaryDb(primaryDb, secondaryKey);
 
             if (_secondaryReadOnlyDbs.TryAdd(dbName, database))
                 return database;
@@ -106,8 +107,8 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
             return database;
         }
 
-        public SecondaryDatabase GetWritableForeignKeyDatabase(Database primaryDb, Database foreignDb, ForeignKeyAttribute foreignKeyMapping) {
-            var dbName = ForeignKeyDbName(primaryDb, foreignDb);
+        public SecondaryDatabase GetWritableForeignKeyDatabase(Database primaryDb, Database foreignDb, SecondaryKeyAttribute foreignKeyMapping) {
+            var dbName = SecondaryKeyDbName(primaryDb, foreignKeyMapping);
 
             SecondaryDatabase database;
 
@@ -115,12 +116,31 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
                 return database;
 
             database = OpenWritableForeignKeyDatabase(primaryDb, foreignDb, foreignKeyMapping, dbName);
-
+            
             if (_foreignKeyWritableDbs.TryAdd(dbName, database))
                 return database;
 
             database.Close();
             database = _foreignKeyWritableDbs[dbName];
+            return database;
+        }
+
+
+        public SecondaryDatabase GetWritableSecondaryKeyDatabase(Database primaryDb, SecondaryKeyAttribute secondaryKey) {
+            var dbName = SecondaryKeyDbName(primaryDb, secondaryKey);
+
+            SecondaryDatabase database;
+
+            if (_secondaryKeyWritableDbs.TryGetValue(dbName, out database))
+                return database;
+
+            database = OpenWritableSecondaryDatabase(primaryDb, secondaryKey, dbName);
+
+            if (_secondaryKeyWritableDbs.TryAdd(dbName, database))
+                return database;
+
+            database.Close();
+            database = _secondaryKeyWritableDbs[dbName];
             return database;
         }
 
@@ -140,6 +160,10 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
                     GetWritableForeignKeyDatabase(primaryDb, foreignDb, keyMapping);
                 }
 
+                foreach (var keyMapping in info.SecondaryKeys.Where(x => !info.ForeignKeys.ContainsKey(x.Key))) {
+                    GetWritableSecondaryKeyDatabase(primaryDb, keyMapping.Value);
+                }
+
                 lock (_transactionPreparedEntities) {
                     _transactionPreparedEntities.Add(info.EntityName);
                 }
@@ -149,11 +173,11 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
         }
 
 
-        protected virtual SecondaryDatabase OpenWritableForeignKeyDatabase(Database primaryDb, Database foreignDb, ForeignKeyAttribute foreignKeyMapping, string dbName) {
-            var foreignKeyConfig = new SecondaryBTreeDatabaseConfig(primaryDb, GetForeignKeyGenerator(foreignKeyMapping)) {
+        protected virtual SecondaryDatabase OpenWritableForeignKeyDatabase(Database primaryDb, Database foreignDb, SecondaryKeyAttribute secondaryForeingKey, string dbName) {
+            var foreignKeyConfig = new SecondaryBTreeDatabaseConfig(primaryDb, GetForeignKeyGenerator(secondaryForeingKey)) {
                 Env = Environment,
                 Encrypted = IsEncrypted,
-                Duplicates = (BerkeleyDB.DuplicatesPolicy)foreignKeyMapping.DuplicatesPolicy,
+                Duplicates = (BerkeleyDB.DuplicatesPolicy)secondaryForeingKey.DuplicatesPolicy,
                 Creation = CreatePolicy.IF_NEEDED,
                 ReadUncommitted = true,
                 FreeThreaded = IsFreeThreaded,
@@ -164,15 +188,28 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
 
             return SecondaryBTreeDatabase.Open(_dbPath, dbName, foreignKeyConfig);
         }
+        protected virtual SecondaryDatabase OpenWritableSecondaryDatabase(Database primaryDb, SecondaryKeyAttribute secondaryForeingKey, string dbName) {
+            var foreignKeyConfig = new SecondaryBTreeDatabaseConfig(primaryDb, GetForeignKeyGenerator(secondaryForeingKey)) {
+                Env = Environment,
+                Encrypted = IsEncrypted,
+                Duplicates = (BerkeleyDB.DuplicatesPolicy)secondaryForeingKey.DuplicatesPolicy,
+                Creation = CreatePolicy.IF_NEEDED,
+                ReadUncommitted = true,
+                FreeThreaded = IsFreeThreaded,
+                AutoCommit = true,
+            };
+
+            return SecondaryBTreeDatabase.Open(_dbPath, dbName, foreignKeyConfig);
+        }
 
 
-        protected virtual SecondaryDatabase OpenReadOnlySecondaryDb(Database primaryDb, string indexSubName, DuplicatesPolicy duplicatesPolicy) {
-            return SecondaryBTreeDatabase.Open(_dbPath,
-                SecondaryDbName(primaryDb, indexSubName),
+        protected virtual SecondaryDatabase OpenReadOnlySecondaryDb(Database primaryDb, SecondaryKeyAttribute secondaryKey) {
+            return SecondaryBTreeDatabase.Open(_dbPath, //bug: when open fails - it means that key is new, so we should open new writtable db and make indexes for existed values
+                SecondaryKeyDbName(primaryDb, secondaryKey),
                 new SecondaryBTreeDatabaseConfig(primaryDb, (key, data) => null) {
                     Env = Environment,
                     Encrypted = IsEncrypted,
-                    Duplicates = (BerkeleyDB.DuplicatesPolicy)duplicatesPolicy,
+                    Duplicates = (BerkeleyDB.DuplicatesPolicy)secondaryKey.DuplicatesPolicy,
                     Creation = CreatePolicy.NEVER,
                     ReadOnly = true,
                     AutoCommit = true,
@@ -182,13 +219,17 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
         }
 
 
-        protected virtual string SecondaryDbName(Database primaryDb, string indexSubName) {
+/*        protected virtual string SecondaryDbName(Database primaryDb, string indexSubName) {
             return $"{primaryDb.DatabaseName}-->{indexSubName}";
-        }
+        }*/
 
-
+/*        [Obsolete]
         protected virtual string ForeignKeyDbName(Database primaryDb, Database foreignDb) {
             return $"{primaryDb.DatabaseName}-->{foreignDb.DatabaseName}";
+        }*/
+
+        protected virtual string SecondaryKeyDbName(Database primaryDb, SecondaryKeyAttribute secondaryKey) {
+            return $"{primaryDb.DatabaseName}-->{secondaryKey.Name}";
         }
 
 
@@ -247,12 +288,12 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
         }
 
 
-        protected virtual SecondaryKeyGenDelegate GetForeignKeyGenerator(ForeignKeyAttribute foreignKeyMapping) {
+        protected virtual SecondaryKeyGenDelegate GetForeignKeyGenerator(SecondaryKeyAttribute secondaryKey) {
             return (pKey, pData) => {
                 var entity = pData.Data.FromBytes();
 
                 object foreingKey;
-                if (!entity.TryGetValueOnPath(foreignKeyMapping.Name, out foreingKey))
+                if (!entity.TryGetValueOnPath(secondaryKey.Name, out foreingKey))
                     throw new InvalidOperationException();
 
                 return new DatabaseEntry(foreingKey.ToBinnary());

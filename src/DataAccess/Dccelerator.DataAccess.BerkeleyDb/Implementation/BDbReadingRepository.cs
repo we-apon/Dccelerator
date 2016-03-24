@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using BerkeleyDB;
-
+using Dccelerator.DataAccess.Infrastructure;
 
 namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
     class BDbReadingRepository : IReadingRepository {
@@ -30,23 +31,15 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
 
                 if (repository.IsPrimaryKey(criterion))
                     return repository.GetByKeyFromPrimaryDb(entry, info.EntityName);
-
-
-                DuplicatesPolicy policy;
-                string indexSubName;
-
-                ForeignKeyAttribute foreignKeyInfo;
-                if (info.ForeignKeys.TryGetValue(criterion.Name, out foreignKeyInfo)) {
-                    policy = foreignKeyInfo.DuplicatesPolicy;
-                    indexSubName = foreignKeyInfo.NavigationPropertyPath;
-                }
-                else {
-                    policy = DuplicatesPolicy.UNSORTED;
-                    indexSubName = criterion.Name;
-                }
                 
-                
-                return repository.GetFromSecondaryDb(entry, info.EntityName, indexSubName, policy);
+                SecondaryKeyAttribute secondaryKeyInfo;
+                if (!info.SecondaryKeys.TryGetValue(criterion.Name, out secondaryKeyInfo)) {
+                    var msg = $"Missed secondaty key '{criterion.Name}' for entity {info.EntityName} ({info.EntityType}).";
+                    Internal.TraceEvent(TraceEventType.Critical, msg);
+                    throw new InvalidOperationException(msg);
+                }
+
+                return repository.GetFromSecondaryDb(entry, info.EntityName, secondaryKeyInfo);
             }
 
             return repository.GetByJoin(dbdInfo, criteria);

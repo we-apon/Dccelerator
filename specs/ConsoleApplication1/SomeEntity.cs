@@ -10,7 +10,7 @@ namespace ConsoleApplication1 {
 
     [LazyLazyDataAccess]
     [Serializable]
-    public class SomeEntity : LazyEntity, IIdentifiedEntity {
+    public class SomeEntity : LazyEntity, IIdentified<Guid>, IIdentifiedEntity {
 
         /// <summary>
         /// Id of <see cref="SomeEntity"/>
@@ -23,6 +23,7 @@ namespace ConsoleApplication1 {
         /// </summary>
         [DataMember(Name = "asdasd", IsRequired = true)]
         [XmlElement("asdas", typeof(LazyEntity))]
+        [SecondaryKey]
         public string Name { get; set; }
 
 
@@ -44,7 +45,7 @@ namespace ConsoleApplication1 {
 
     [LazyLazyDataAccess]
     [Serializable]
-    public class SomeOtherEntity : LazyEntity, IIdentifiedEntity {
+    public class SomeOtherEntity : LazyEntity, IIdentified<Guid>, IIdentifiedEntity {
 
         public Guid Id { get; set; }
 

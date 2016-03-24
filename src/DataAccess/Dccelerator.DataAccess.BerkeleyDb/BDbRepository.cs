@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using BerkeleyDB;
 using Dccelerator.DataAccess.BerkeleyDb.Implementation;
 using Dccelerator.DataAccess.Infrastructure;
@@ -48,15 +49,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
             return new DatabaseEntry(entity.ToBinnary());
         }
-
-        protected virtual string SecondaryDbName(Database primaryDb, string indexSubName) {
-            return $"{primaryDb.DatabaseName}-->{indexSubName}";
-        }
-
-        protected virtual string ForeignKeyDbName(Database primaryDb, Database foreignDb) {
-            return $"{primaryDb.DatabaseName}-->{foreignDb.DatabaseName}";
-        }
-
+        
 
         protected virtual void Insert(TransactionElement element, Database primaryDb, Transaction transaction) {
             var key = KeyOf(element.Entity, element.Info);
@@ -76,9 +69,9 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        protected virtual Transaction BeginTransaction(DatabaseEnvironment environment) {
+/*        protected virtual Transaction BeginTransaction(DatabaseEnvironment environment) {
             return environment.BeginTransaction();
-        }
+        }*/
 
 
         
@@ -117,20 +110,21 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        public IEnumerable<DatabaseEntry> GetFromSecondaryDb(DatabaseEntry key, string entityName, string indexSubName, DuplicatesPolicy duplicatesPolicy) {
+        public IEnumerable<DatabaseEntry> GetFromSecondaryDb(DatabaseEntry key, string entityName, SecondaryKeyAttribute secondaryKey) {
             Cursor cursor = null;
             try {
                 var primaryDb = _schema.GetPrimaryDb(entityName, readOnly: true);
-                var secondaryDb = _schema.GetReadOnlySecondaryDb(primaryDb, indexSubName, duplicatesPolicy);
+                var secondaryDb = _schema.GetReadOnlySecondaryDb(primaryDb, secondaryKey);
 
-                if (duplicatesPolicy == DuplicatesPolicy.NONE) {
+                if (secondaryKey.DuplicatesPolicy == DuplicatesPolicy.NONE) {
                     if (secondaryDb.Exists(key))
                         yield return secondaryDb.Get(key).Value;
                 }
 
                 cursor = secondaryDb.Cursor();
-                if (!cursor.Move(key, exact:true))
+                if (!cursor.Move(key, exact: true)) {
                     yield break;
+                }
 
                 yield return cursor.Current.Value;
 
@@ -143,6 +137,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
+        /// <exception cref="InvalidOperationException">Missed secondary key for some criterion.</exception>
         public IEnumerable<DatabaseEntry> GetByJoin(IBDbEntityInfo info, ICollection<IDataCriterion> criteria) {
 
             var cursorsLength = 0;
@@ -153,12 +148,14 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 var primaryDb = _schema.GetPrimaryDb(info.EntityName, readOnly: true);
 
                 foreach (var criterion in criteria) {
-                    ForeignKeyAttribute foreignKeyMapping;
-                    var duplicatesPolicy = info.ForeignKeys.TryGetValue(criterion.Name, out foreignKeyMapping)
-                        ? foreignKeyMapping.DuplicatesPolicy
-                        : DefaultDuplicatesPolicy;
+                    SecondaryKeyAttribute secondaryKey;
+                    if (!info.SecondaryKeys.TryGetValue(criterion.Name, out secondaryKey)) {
+                        var msg = $"Missed secondaty key '{criterion.Name}' for entity {info.EntityName} ({info.EntityType}).";
+                        Internal.TraceEvent(TraceEventType.Critical, msg);
+                        throw new InvalidOperationException(msg);
+                    }
 
-                    var secondaryDb = _schema.GetReadOnlySecondaryDb(primaryDb, criterion.Name, duplicatesPolicy);
+                    var secondaryDb = _schema.GetReadOnlySecondaryDb(primaryDb, secondaryKey);
 
                     var cursor = secondaryDb.SecondaryCursor();
                     secondaryCursors[cursorsLength++] = cursor;

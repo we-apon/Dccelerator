@@ -8,6 +8,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
     class BDbEntityInfo : BaseEntityInfo<IBDbRepository>, IBDbEntityInfo {
 
         public Dictionary<string, PropertyInfo> NavigationProperties { get; }
+
         public IEnumerable<IIncludeon> Inclusions { get; }
 
 

@@ -8,9 +8,9 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
         Database GetPrimaryDb(string dbName, bool readOnly);
 
-        SecondaryDatabase GetReadOnlySecondaryDb(Database primaryDb, string indexSubName, DuplicatesPolicy duplicatesPolicy);
+        SecondaryDatabase GetReadOnlySecondaryDb(Database primaryDb, SecondaryKeyAttribute secondaryKey);
 
-        SecondaryDatabase GetWritableForeignKeyDatabase(Database primaryDb, Database foreignDb, ForeignKeyAttribute foreignKeyMapping);
+        SecondaryDatabase GetWritableForeignKeyDatabase(Database primaryDb, Database foreignDb, SecondaryKeyAttribute foreignKeyMapping);
 
         Transaction BeginTransactionFor(ICollection<IBDbEntityInfo> entityInfos);
 
