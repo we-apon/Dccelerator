@@ -34,21 +34,21 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dccelerator.Core, Version=0.0.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Dccelerator.Core.0.0.6-beta\lib\net45\Dccelerator.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Dccelerator.Core, Version=0.0.10.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\artifacts\bin\Last\net40\Dccelerator.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Dccelerator.DataAccess.BerkeleyDb, Version=0.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Dccelerator.DataAccess.BerkeleyDb.0.0.2-beta\lib\net40\Dccelerator.DataAccess.BerkeleyDb.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Dccelerator.DataAccess.BerkeleyDb, Version=0.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\artifacts\bin\Last\net40\Dccelerator.DataAccess.BerkeleyDb.dll</HintPath>
     </Reference>
-    <Reference Include="Dccelerator.DataAccess.Common, Version=0.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Dccelerator.DataAccess.Common.0.0.5-beta\lib\net45\Dccelerator.DataAccess.Common.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Dccelerator.DataAccess.Common, Version=0.0.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\artifacts\bin\Last\net40\Dccelerator.DataAccess.Common.dll</HintPath>
     </Reference>
     <Reference Include="Dccelerator.DataAccess.Lazy, Version=0.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Dccelerator.DataAccess.Lazy.0.0.3-beta\lib\net45\Dccelerator.DataAccess.Lazy.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\artifacts\bin\Last\net40\Dccelerator.DataAccess.Lazy.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>

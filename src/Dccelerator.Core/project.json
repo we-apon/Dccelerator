@@ -61,5 +61,19 @@
   },
 
   "dependencies": {
+  },
+
+
+  "scripts": {
+    "postbuild": [
+      "if not exist \"%project:BuildOutputDir%\\..\\Last\\net40\" mkdir %project:BuildOutputDir%\\..\\Last\\net40",
+      "if not exist \"%project:BuildOutputDir%\\..\\Last\\net45\" mkdir %project:BuildOutputDir%\\..\\Last\\net45",
+      "if not exist \"%project:BuildOutputDir%\\..\\Last\\dnx45\" mkdir %project:BuildOutputDir%\\..\\Last\\dnx45",
+      "if not exist \"%project:BuildOutputDir%\\..\\Last\\dotnet\" mkdir %project:BuildOutputDir%\\..\\Last\\dotnet",
+      "copy /V /Y %project:BuildOutputDir%\\Debug\\net40\\* %project:BuildOutputDir%\\..\\Last\\net40 /B",
+      "copy /V /Y %project:BuildOutputDir%\\Debug\\net45\\* %project:BuildOutputDir%\\..\\Last\\net45 /B",
+      "copy /V /Y %project:BuildOutputDir%\\Debug\\dnx45\\* %project:BuildOutputDir%\\..\\Last\\dnx45 /B",
+      "copy /V /Y %project:BuildOutputDir%\\Debug\\dotnet\\* %project:BuildOutputDir%\\..\\Last\\dotnet /B"
+    ]
   }
 }

@@ -16,7 +16,7 @@ using DuplicatesPolicy = Dccelerator.DataAccess.DuplicatesPolicy;
 
 namespace ConsoleApplication1
 {
-    class Repository : BDbRepositoryBase {
+/*    class Repository : BDbRepositoryBase {
         public Repository(IBDbSchema schema) : base(schema) {}
 
 
@@ -36,10 +36,10 @@ namespace ConsoleApplication1
         }
 
         #endregion
-    }
+    }*/
 
 
-    class BdbFactory : BDbDataManagerFactoryBase {
+/*    class BdbFactory : BDbDataManagerFactoryBase {
 
         public BdbFactory(string environmentPath, string dbFilePath, string password) : base(environmentPath, dbFilePath, password) { }
 
@@ -51,7 +51,7 @@ namespace ConsoleApplication1
         }
 
         #endregion
-    }
+    }*/
 
 
 
@@ -107,7 +107,7 @@ namespace ConsoleApplication1
 
 
 
-            using (var factory = new BdbFactory(_home, Path.Combine(_home, "btree.bdb"), "asdasdd")) {
+            using (var factory = new BDbDataManagerFactory(_home, "btree.bdb", "asdasdd")) {
                 var lazyFactory = new DataManagerFactoryLazyDecorator(factory);
 
                 var manager = new DataManager(lazyFactory);
@@ -157,7 +157,18 @@ namespace ConsoleApplication1
                     allLazyEntities.AddRange(someEntity.SomeEntities);
                 }
                 watch.Stop();
-                File.AppendAllText(_logTxt, $"Lazy loade elements {allEntities.Length} times by Dccelerator: " + watch.Elapsed + "\n");
+                File.AppendAllText(_logTxt, $"Lazy load elements {allEntities.Length} times by Dccelerator: " + watch.Elapsed + "\n");
+
+
+                var namedEntities = new Dictionary<string, List<SomeEntity>>();
+                var distinctNames = allEntities.Select(x => x.Name).Distinct().ToList();
+                watch.Restart();
+                foreach (var name in distinctNames) {
+                    namedEntities[name] = manager.Get<SomeEntity>().Where(x => x.Name, name).ToList();
+                }
+                watch.Stop();
+                File.AppendAllText(_logTxt, $"Searched {distinctNames.Count} times by secondary key with Dccelerator: " + watch.Elapsed + "\n");
+
 
             }
 

@@ -17,5 +17,15 @@
   "dependencies": {
     "Dccelerator.DataAccess.Common": "",
     "Berkeley.DB": "6.1.26"
+  },
+
+
+  "scripts": {
+    "postbuild": [
+      "if not exist \"%project:BuildOutputDir%\\..\\Last\\net40\" mkdir %project:BuildOutputDir%\\..\\Last\\net40",
+      "if not exist \"%project:BuildOutputDir%\\..\\Last\\net45\" mkdir %project:BuildOutputDir%\\..\\Last\\net45",
+      "if not exist \"%project:BuildOutputDir%\\..\\Last\\dnx45\" mkdir %project:BuildOutputDir%\\..\\Last\\dnx45",
+      "copy /V /Y %project:BuildOutputDir%\\Debug\\net40\\* %project:BuildOutputDir%\\..\\Last\\net40 /B"
+    ]
   }
 }
