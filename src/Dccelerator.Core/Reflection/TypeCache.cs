@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 
 namespace Dccelerator.Reflection
@@ -18,6 +17,7 @@ namespace Dccelerator.Reflection
         public static readonly Type EnumerableType = typeof (IEnumerable);
         public static readonly Type ListType = typeof (IList);
         public static readonly Type ConvertibleType = typeof (IConvertible);
+        public static readonly Type DateTimeType = typeof (DateTime);
         /*        public static readonly Type XmlElementAttributeType = typeof (XmlElementAttribute);
                 public static readonly Type XmlTypeAttributeType = typeof (XmlTypeAttribute);
                 public static readonly Type DataMemberAttributeType = typeof (DataMemberAttribute);

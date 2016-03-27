@@ -2,6 +2,7 @@
 using System.IO;
 using Dccelerator.DataAccess;
 using Dccelerator.DataAccess.BerkeleyDb;
+using Dccelerator.DataAccess.BerkeleyDb.Implementation;
 using Machine.Specifications;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming

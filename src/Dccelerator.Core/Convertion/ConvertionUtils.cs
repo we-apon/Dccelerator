@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Dccelerator.Reflection;
@@ -148,8 +149,43 @@ namespace Dccelerator.Convertion
                 }
             },
 
-            new ConvertionRule { //bug: maybe canConvert should also call Convert.ChangeType.
-                CanConvert = (source, target, value, thisRule) => TypeCache.IsAssignableFrom(TypeCache.ConvertibleType, source),
+            new ConvertionRule {
+                CanConvert = (source, target, value, thisRule) => source == TypeCache.StringType && TypeCache.IsAssignableFrom(target, TypeCache.DateTimeType),
+                Convert = (source, target, value, thisRule) => {
+                    DateTime date;
+                    if (DateTime.TryParse(value as string, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+                        return date;
+
+                    if (DateTime.TryParse(value as string, CultureInfo.CurrentCulture, DateTimeStyles.None, out date))
+                        return date;
+
+
+                    if (DateTime.TryParse(value as string, CultureInfo.CurrentUICulture, DateTimeStyles.None, out date))
+                        return date;
+
+#if !DOTNET
+
+                    if (DateTime.TryParse(value as string, CultureInfo.InstalledUICulture, DateTimeStyles.None, out date))
+                        return date;
+#endif
+
+                    Internal.TraceEvent(TraceEventType.Warning, $"Can't parse DateTime from {value}");
+                    return null;
+                }
+            },
+
+            new ConvertionRule {
+                CanConvert = (source, target, value, thisRule) => {
+                    if (!TypeCache.IsAssignableFrom(TypeCache.ConvertibleType, source))
+                        return false;
+
+                    try {
+                        return Convert.ChangeType(value, target, null) != null; //? it will return true when no exceptions will be thrown
+                    }
+                    catch (Exception) {
+                        return false;
+                    }
+                },
                 Convert = (source, target, value, thisRule) => {
                     try {
                         return Convert.ChangeType(value, target, null);
