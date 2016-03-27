@@ -152,24 +152,35 @@ namespace Dccelerator.Convertion
             new ConvertionRule {
                 CanConvert = (source, target, value, thisRule) => source == TypeCache.StringType && TypeCache.IsAssignableFrom(target, TypeCache.DateTimeType),
                 Convert = (source, target, value, thisRule) => {
+                    var stringValue = (string)value;
+
                     DateTime date;
-                    if (DateTime.TryParse(value as string, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+                    if (DateTime.TryParse(stringValue, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
                         return date;
 
-                    if (DateTime.TryParse(value as string, CultureInfo.CurrentCulture, DateTimeStyles.None, out date))
+                    if (DateTime.TryParse(stringValue, CultureInfo.CurrentCulture, DateTimeStyles.None, out date))
                         return date;
 
 
-                    if (DateTime.TryParse(value as string, CultureInfo.CurrentUICulture, DateTimeStyles.None, out date))
+                    if (DateTime.TryParse(stringValue, CultureInfo.CurrentUICulture, DateTimeStyles.None, out date))
                         return date;
 
 #if !DOTNET
-
-                    if (DateTime.TryParse(value as string, CultureInfo.InstalledUICulture, DateTimeStyles.None, out date))
+                    if (DateTime.TryParse(stringValue, CultureInfo.InstalledUICulture, DateTimeStyles.None, out date))
                         return date;
 #endif
+                    if (stringValue.Count(x => x == '/') == 2) {
+#if !DOTNET
+                        if (DateTime.TryParse(stringValue, CultureInfo.GetCultureInfo("ru-RU"), DateTimeStyles.None, out date))
+                            return date;
+#endif
 
-                    Internal.TraceEvent(TraceEventType.Warning, $"Can't parse DateTime from {value}");
+                        if (DateTime.TryParse(stringValue.Replace('/', '.'), CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+                            return date;
+                    }
+                    
+
+                    Internal.TraceEvent(TraceEventType.Warning, $"Can't parse DateTime from string '{stringValue}'");
                     return null;
                 }
             },
