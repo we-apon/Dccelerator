@@ -9,7 +9,7 @@ using Dccelerator.Reflection;
 using Dccelerator.DataAccess.Infrastructure;
 
 namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
-    class BDbSchema : IBDbSchema {
+    public class BDbSchema : IBDbSchema {
         readonly string _environmentPath;
         readonly string _dbPath;
         string _password;
@@ -234,10 +234,44 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
 
 
         protected virtual DatabaseEnvironment OpenEnvironment(string environmentPath, string dbPath, string password) {
+            try {
+                var environmentConfig = GetDefaultEnvironmentConfig();
+                if (!string.IsNullOrWhiteSpace(password)) {
+                    environmentConfig.SetEncryption(_password, EncryptionAlgorithm.AES);
+                }
+                return DatabaseEnvironment.Open(_environmentPath, environmentConfig);
+            }
+            catch (RunRecoveryException e) {
+                try {
+                    var environmentConfig = GetDefaultEnvironmentConfig();
+                    environmentConfig.RunRecovery = true;
+                    if (!string.IsNullOrWhiteSpace(password)) {
+                        environmentConfig.SetEncryption(_password, EncryptionAlgorithm.AES);
+                    }
+                    return DatabaseEnvironment.Open(_environmentPath, environmentConfig);
+                }
+                catch (RunRecoveryException exception) {
+                    try {
+                        var environmentConfig = GetDefaultEnvironmentConfig();
+                        environmentConfig.RunFatalRecovery = true;
+                        if (!string.IsNullOrWhiteSpace(password)) {
+                            environmentConfig.SetEncryption(_password, EncryptionAlgorithm.AES);
+                        }
+                        return DatabaseEnvironment.Open(_environmentPath, environmentConfig);
+                    }
+                    catch (Exception ex) {
+                        throw new InvalidOperationException($"Can't open environment even with recovery!", ex);
+                    }
+                }
+            }
+        }
+
+
+        protected virtual DatabaseEnvironmentConfig GetDefaultEnvironmentConfig() {
             var environmentConfig = new DatabaseEnvironmentConfig {
                 Create = true,
                 UseMPool = true,
-                Private = true,
+                Private = false,
                 UseLogging = true,
                 UseLocking = true,
                 FreeThreaded = true,
@@ -246,11 +280,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
                 LogSystemCfg = GetLogSystemConfig(),
                 MPoolSystemCfg = GetMPoolSystemConfig()
             };
-            if (!string.IsNullOrWhiteSpace(password)) {
-                environmentConfig.SetEncryption(_password, EncryptionAlgorithm.AES);
-            }
-
-            return DatabaseEnvironment.Open(_environmentPath, environmentConfig);
+            return environmentConfig;
         }
 
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -14,6 +15,9 @@ namespace Dccelerator
     /// </summary>
     public class RandomMaker
     {
+
+
+
         /// <summary>
         /// Makes an entity of <typeparamref name="T"/> and fills it's public properties with random values
         /// </summary>
@@ -41,12 +45,64 @@ namespace Dccelerator
             var props = type.GetProperties().Where(x => x.CanWrite).ToArray();
             var entity = new T();
             foreach (var prop in props) {
-                TrySetRandomValue(entity, prop, includeGuids.GetValueOrDefault());
+                TrySetRandomValue(entity, prop, includeGuids ?? false);
             }
 
             actions.Perform(x => x(entity)).ToEnd();
             return entity;
         }
+
+
+
+        public static object Make(Type type, bool includeGuids = false) {
+            var props = type.GetProperties().Where(x => x.CanWrite).ToArray();
+            var entity = Activator.CreateInstance(type);
+            foreach (var prop in props) {
+                TrySetRandomValue(entity, prop, includeGuids);
+            }
+            return entity;
+        }
+
+
+        /// <summary>
+        /// Makes an entity of <paramref name="type"/> and fills it's public properties with random values.
+        /// If public property is not an primitive value - it recursively fills properties of that type, and so on..
+        /// </summary>
+        /// <param name="type">Type of generated object</param>
+        /// <param name="includeGuids">Is it need to generate <see cref="Guid"/>s?</param>
+        /// <param name="maxDepth">Maximum depth on generated complex objects</param>
+        /// <param name="depth">Current depth of generated object. Used for returning from infinitive loop.</param>
+        /// <returns></returns>
+        public static object MakeRecursive(Type type, bool includeGuids = false, int maxDepth = 7, int depth = 0) {
+            if (depth > maxDepth)
+                return null;
+
+            var props = type.GetProperties().Where(x => x.CanWrite).ToArray();
+
+            object entity;
+            try {
+                entity = Activator.CreateInstance(type);
+            }
+            catch {
+                return null;
+            }
+
+            var innerObjectProps = props.Where(prop => !TrySetRandomValue(entity, prop, includeGuids)).ToList();
+
+            foreach (var prop in innerObjectProps) {
+                try {
+                    var item = MakeRecursive(prop.PropertyType, includeGuids, maxDepth, depth + 1);
+                    if (item != null)
+                        prop.SetValue(entity, item, null);
+                }
+                catch {
+                    /*do_nothing()*/
+                }
+            }
+            
+            return entity;
+        }
+
 
 
         /// <summary>
@@ -60,10 +116,10 @@ namespace Dccelerator
         
         public static string MakeString(int? length = null, short? minCharIdx = 1040, short? maxCharIdx = 1071, bool includeDigits = false) {
             length = length ?? StaticRandom.Next(4, 32);
-            var minChar = minCharIdx.GetValueOrDefault();
-            var maxChar = maxCharIdx.GetValueOrDefault();
+            var minChar = minCharIdx ?? 0;
+            var maxChar = maxCharIdx ?? 0;
 
-            var builder = new StringBuilder(length.GetValueOrDefault());
+            var builder = new StringBuilder(length.Value);
             var idx = 0;
             while (idx++ < length) {
                 char next;
@@ -114,7 +170,7 @@ namespace Dccelerator
         public static string MakeNumber(int? length = null) {
             length = length ?? StaticRandom.Next(3, 10);
 
-            var builder = new StringBuilder(length.GetValueOrDefault()).Append(StaticRandom.Next(1, 9));
+            var builder = new StringBuilder(length.Value).Append(StaticRandom.Next(1, 9));
             var idx = 1;
             while (idx++ < length) {
                 builder.Append(StaticRandom.Next(0, 9));
@@ -125,17 +181,16 @@ namespace Dccelerator
 
         #region private
 
+        static readonly Type _stringType = typeof (string);
+        static readonly Type _guidType = typeof (Guid);
+        static readonly Type _intType = typeof (int);
+        static readonly Type _doubleType = typeof (double);
+        static readonly Type _boolType = typeof (bool);
+        static readonly Type _dateTimeType = typeof (DateTime);
+        static readonly Type _decimalType = typeof (decimal);
 
-        private static readonly Type _stringType = typeof (string);
-        private static readonly Type _guidType = typeof (Guid);
-        private static readonly Type _intType = typeof (int);
-        private static readonly Type _doubleType = typeof (double);
-        private static readonly Type _boolType = typeof (bool);
-        private static readonly Type _dateTimeType = typeof (DateTime);
-        private static readonly Type _decimalType = typeof (decimal);
 
-
-        private static void TrySetRandomValue(object entity, PropertyInfo prop, bool includeGuids) {
+        static bool TrySetRandomValue(object entity, PropertyInfo prop, bool includeGuids) {
             var type = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
 
             object value = null;
@@ -156,8 +211,11 @@ namespace Dccelerator
                 value = Guid.NewGuid();
 
 
-            if (value != null)
-                prop.SmartSetValue(entity, value);
+            if (value == null)
+                return false;
+
+            prop.SmartSetValue(entity, value);
+            return true;
         }
 
         #endregion

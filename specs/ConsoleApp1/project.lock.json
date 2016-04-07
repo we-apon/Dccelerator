@@ -21,14 +21,14 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.9-beta": {
+      "Dccelerator.Core/0.0.11-beta-006": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.BerkeleyDb/0.0.5-beta": {
+      "Dccelerator.DataAccess.BerkeleyDb/0.0.6-beta-003": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -36,7 +36,7 @@
           "Dccelerator.DataAccess.Common": null
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.6-beta": {
+      "Dccelerator.DataAccess.Common/0.0.7-beta-002": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -72,14 +72,14 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.9-beta": {
+      "Dccelerator.Core/0.0.11-beta-006": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.BerkeleyDb/0.0.5-beta": {
+      "Dccelerator.DataAccess.BerkeleyDb/0.0.6-beta-003": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -87,7 +87,7 @@
           "Dccelerator.DataAccess.Common": null
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.6-beta": {
+      "Dccelerator.DataAccess.Common/0.0.7-beta-002": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -123,14 +123,14 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.9-beta": {
+      "Dccelerator.Core/0.0.11-beta-006": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.BerkeleyDb/0.0.5-beta": {
+      "Dccelerator.DataAccess.BerkeleyDb/0.0.6-beta-003": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -138,7 +138,7 @@
           "Dccelerator.DataAccess.Common": null
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.6-beta": {
+      "Dccelerator.DataAccess.Common/0.0.7-beta-002": {
         "type": "project",
         "framework": "DNX,Version=v4.5",
         "dependencies": {
@@ -157,15 +157,15 @@
     }
   },
   "libraries": {
-    "Dccelerator.Core/0.0.9-beta": {
+    "Dccelerator.Core/0.0.11-beta-006": {
       "type": "project",
       "path": "../../src/Dccelerator.Core/project.json"
     },
-    "Dccelerator.DataAccess.BerkeleyDb/0.0.5-beta": {
+    "Dccelerator.DataAccess.BerkeleyDb/0.0.6-beta-003": {
       "type": "project",
       "path": "../../src/DataAccess/Dccelerator.DataAccess.BerkeleyDb/project.json"
     },
-    "Dccelerator.DataAccess.Common/0.0.6-beta": {
+    "Dccelerator.DataAccess.Common/0.0.7-beta-002": {
       "type": "project",
       "path": "../../src/DataAccess/Dccelerator.DataAccess.Common/project.json"
     },

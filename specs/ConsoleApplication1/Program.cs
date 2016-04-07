@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using BerkeleyDB;
 using Dccelerator;
+using Dccelerator.CodeContracts;
 using Dccelerator.DataAccess;
 using Dccelerator.DataAccess.BerkeleyDb;
 using Dccelerator.DataAccess.Lazy;
@@ -105,7 +107,7 @@ namespace ConsoleApplication1
 
             //TestBTreehDbMt(length, ids, entities, otherEntities);
 
-
+            
 
             using (var factory = new BDbDataManagerFactory(_home, "btree.bdb", "asdasdd")) {
                 var lazyFactory = new DataManagerFactoryLazyDecorator(factory);

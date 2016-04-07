@@ -1,5 +1,5 @@
 ﻿{
-  "version": "0.0.7-beta",
+  "version": "0.0.7-beta-003",
   "title": "Dccelerator.DataAccess.Common",
   "description": "Contains interfaces and base implementation of Dccelerator.DataAccess ORM.",
   "summary": "Base interfaces of Dccelerator.DataAccess ORM.",

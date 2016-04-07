@@ -1,5 +1,5 @@
 {
-  "version": "0.0.6-beta",
+  "version": "0.0.6-beta-004",
   "title": "Berkeley Db adapter for Dccelerator.DataAccess ORM",
   "description": "Berkeley Db adapter for Dccelerator.DataAccess ORM",
   "authors": [ "Kirill Dubinkin" ],

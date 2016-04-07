@@ -49,7 +49,7 @@ namespace Dccelerator
             return Path(expression);
         }
 
-
+/*
         /// <summary>
         /// Returns path listed in <paramref name="expression"/>
         /// </summary>
@@ -81,6 +81,103 @@ namespace Dccelerator
 
             return builder.ToString().Trim('.');
         }
+
+
+        /// <summary>
+        /// Returns path listed in <paramref name="expression"/>
+        /// </summary>
+        /// <typeparam name="T">Any type</typeparam>
+        /// <typeparam name="TOut">Any type</typeparam>
+        /// <param name="expression">Any expression</param>
+        /// <seealso cref="PathTo{T,TOut}"/>
+        /// <seealso cref="NameOf{TIn, TOut}"/>
+        
+        public static string Path<T>( this Expression<Func<T>> exp) {
+            var builder = new StringBuilder();
+
+            var expression = exp.Body;
+
+            while (expression != null) {
+                if (expression.NodeType == ExpressionType.Convert || expression.NodeType == ExpressionType.ConvertChecked) {
+                    var unaryExpression = expression as UnaryExpression;
+                    expression = unaryExpression?.Operand as MemberExpression;
+                    continue;
+                }
+
+                if (expression.NodeType == ExpressionType.ArrayIndex) {
+                    var binExpression = (BinaryExpression) expression;
+                    builder.Insert(0, ']').Insert(0, binExpression.Right).Insert(0, "[");
+                    expression = binExpression.Left;
+                    continue;
+                }
+
+                if (expression.NodeType == ExpressionType.MemberAccess) {
+                    var memberExpression = (MemberExpression) expression;
+                    if (memberExpression.Expression == null)
+                        break;
+
+                    builder.Insert(0, memberExpression.Member.Name).Insert(0, '.');
+                    expression = memberExpression.Expression;
+                    continue;
+                }
+
+                break;
+            }
+
+            return builder.ToString().Trim('.', ' ');
+        }*/
+
+
+        /// <summary>
+        /// Returns path listed in <paramref name="expression"/>
+        /// </summary>
+        /// <typeparam name="T">Any type</typeparam>
+        /// <typeparam name="TOut">Any type</typeparam>
+        /// <param name="expression">Any expression</param>
+        /// <seealso cref="PathTo{T,TOut}"/>
+        /// <seealso cref="NameOf{TIn, TOut}"/>
+        
+        public static string Path(this Expression expression) {
+            var builder = new StringBuilder();
+
+            while (expression != null) {
+                if (expression.NodeType == ExpressionType.Convert || expression.NodeType == ExpressionType.ConvertChecked) {
+                    var unaryExpression = expression as UnaryExpression;
+                    expression = unaryExpression?.Operand as MemberExpression;
+                    continue;
+                }
+
+                if (expression.NodeType == ExpressionType.MemberAccess) {
+                    var memberExpression = (MemberExpression) expression;
+                    if (memberExpression.Expression == null)
+                        break;
+
+                    builder.Insert(0, memberExpression.Member.Name).Insert(0, '.');
+                    expression = memberExpression.Expression;
+                    continue;
+                }
+                
+                if (expression.NodeType == ExpressionType.ArrayIndex) {
+                    var binExpression = (BinaryExpression) expression;
+                    builder.Insert(0, ']').Insert(0, binExpression.Right).Insert(0, "[");
+                    expression = binExpression.Left;
+                    continue;
+                }
+
+
+                if (expression.NodeType == ExpressionType.Lambda) {
+                    var lambda = (LambdaExpression) expression;
+                    expression = lambda.Body;
+                    continue;
+                }
+
+                break;
+            }
+
+            return builder.ToString().Trim('.', ' ');
+        }
+
+        
 
 
         /// <summary>

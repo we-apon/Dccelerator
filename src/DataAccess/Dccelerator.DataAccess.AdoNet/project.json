@@ -1,5 +1,5 @@
 {
-  "version": "0.0.5-beta",
+  "version": "0.0.5-beta-003",
   "title": "Dccelerator.DataAccess.AdoNet",
   "description": "Contains ADO.NET adapter classes for Dccelerator.DataAccess ORM",
   "summary": "ADO.NET adapter classes for Dccelerator.DataAccess ORM",

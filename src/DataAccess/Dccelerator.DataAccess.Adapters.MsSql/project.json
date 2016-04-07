@@ -1,5 +1,5 @@
 {
-  "version": "0.0.3-beta",
+  "version": "0.0.3-beta-003",
   "title": "Dccelerator.DataAccess.Adapters.MsSql",
   "description": "Contains Microsoft SQL Server adapter for Dccelerator.DataAccess ORM.",
   "summary": "Microsoft SQL Server adapter for Dccelerator.DataAccess ORM.",
