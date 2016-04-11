@@ -13,6 +13,7 @@ using Dccelerator.CodeContracts;
 using Dccelerator.DataAccess;
 using Dccelerator.DataAccess.BerkeleyDb;
 using Dccelerator.DataAccess.Lazy;
+using Dccelerator.NumberExtensions;
 using DuplicatesPolicy = Dccelerator.DataAccess.DuplicatesPolicy;
 
 
@@ -59,18 +60,21 @@ namespace ConsoleApplication1
 
     class Program
     {
-        static readonly string _home = AppDomain.CurrentDomain.BaseDirectory;
+        static readonly string _home = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "localdb");
         static string _logTxt;
 
 
         static void Main(string[] args) {
             
             _logTxt = Path.Combine(_home, "log.txt");
+            if (!Directory.Exists(_home))
+                Directory.CreateDirectory(_home);
+
             if (File.Exists(_logTxt))
                 File.Delete(_logTxt);
 
 #if DEBUG
-            var length = 1000;
+            var length = 10000;
 #else
             var length = 10000;
 #endif
@@ -83,7 +87,7 @@ namespace ConsoleApplication1
             Parallel.For(0,
                 length,
                 i => {
-                    var someEntity = RandomMaker.Make<SomeEntity>(includeGuids: true);
+                    var someEntity = RandomMaker.Make<SomeEntity>(true, x => x.Name = Guid.NewGuid().ToString());
 
                     var other1 = RandomMaker.Make<SomeOtherEntity>(true, x => x.SomeEntityId = someEntity.Id);
                     var other2 = RandomMaker.Make<SomeOtherEntity>(true, x => x.SomeEntityId = someEntity.Id);
@@ -109,7 +113,7 @@ namespace ConsoleApplication1
 
             
 
-            using (var factory = new BDbDataManagerFactory(_home, "btree.bdb", "asdasdd")) {
+            using (var factory = new BDbDataManagerFactory(_home, "btree.bdb")) {
                 var lazyFactory = new DataManagerFactoryLazyDecorator(factory);
 
                 var manager = new DataManager(lazyFactory);
@@ -153,6 +157,72 @@ namespace ConsoleApplication1
                 File.AppendAllText(_logTxt, $"Search elements {allEntities.Length} times by foreign key with Dccelerator: " + watch.Elapsed + "\n");
 
 
+
+                var oldNames = new List<string>();
+
+                var someName = Guid.NewGuid().ToString();
+                var someNameCount = 0;
+                for (int i = 0; i < allEntities.Length; i++) {
+                        oldNames.Add(allEntities[i].Name);
+                    if (i.IsOdd()) {
+                        allEntities[i].Name = someName;
+                        someNameCount++;
+                    }
+                    else {
+                        allEntities[i].Name = Guid.NewGuid().ToString();
+                    }
+                }
+                watch.Restart();
+                using (var transaction = manager.BeginTransaction()) {
+                    transaction.UpdateMany(allEntities);
+                    if (!transaction.Commit()) {
+                        File.AppendAllText(_logTxt, $"Update {someNameCount} elements secondary index with Dccelerator FAILS: " + watch.Elapsed + "\n");
+                    }
+                }
+                watch.Stop();
+                File.AppendAllText(_logTxt, $"Update {allEntities.Length} elements secondary index. {someNameCount} elements has same index value: " + watch.Elapsed + "\n");
+
+
+                watch.Restart();
+                var storedNamedEntities = manager.Get<SomeEntity>().Where(x => x.Name, someName).ToArray();
+                watch.Stop();
+
+                if (storedNamedEntities.Length != someNameCount) {
+                    File.AppendAllText(_logTxt, $"[FAIL] storedNamedEntities entities count {storedNamedEntities.Length} doesn't equal to expected count {someNameCount} " + watch.Elapsed + "\n");
+                }
+                else {
+                    File.AppendAllText(_logTxt, $"Getted {someNameCount} entities with the same known name: " + watch.Elapsed + "\n");
+                }
+
+                if (storedNamedEntities.Any(x => x.Name != someName)) {
+                    File.AppendAllText(_logTxt, "[FAIL] Same named entities is not same named!\n");
+                }
+
+
+
+                var unUpdatedCount = 0;
+                var updatedWithOldIdCount = 0;
+                foreach (var oldName in oldNames) {
+                    var old = manager.Get<SomeEntity>().Where(x => x.Name, oldName).FirstOrDefault();
+                    if (old != null) {
+                        if (old.Name == oldName)
+                            unUpdatedCount++;
+                        else {
+                            updatedWithOldIdCount++;
+                        }
+                    }
+                }
+
+                if (unUpdatedCount != 0)
+                    File.AppendAllText(_logTxt, $"[FAIL] {unUpdatedCount} of {someNameCount} entities is not updated!\n");
+
+                if (updatedWithOldIdCount != 0)
+                    File.AppendAllText(_logTxt, $"[FAIL] {updatedWithOldIdCount} of {someNameCount} entities has old secondary keys binded to updated entities data!\n");
+
+
+
+
+
                 watch.Restart();
                 var allLazyEntities = new List<SomeOtherEntity>();
                 foreach (var someEntity in allEntities) {
@@ -170,6 +240,16 @@ namespace ConsoleApplication1
                 }
                 watch.Stop();
                 File.AppendAllText(_logTxt, $"Searched {distinctNames.Count} times by secondary key with Dccelerator: " + watch.Elapsed + "\n");
+
+                List<SomeEntity> someNamed;
+                if (!namedEntities.TryGetValue(someName, out someNamed)) {
+                    File.AppendAllText(_logTxt, "[FAIL] Can't find updated entities\n");
+                    return;
+                }
+
+                if (someNamed.Count != someNameCount) {
+                    File.AppendAllText(_logTxt, $"[FAIL] SomeNamed entities count {someNamed.Count} doesn't equal to expected count {someNameCount}\n");
+                }
 
 
             }

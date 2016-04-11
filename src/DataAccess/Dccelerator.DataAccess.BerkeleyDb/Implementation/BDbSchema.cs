@@ -4,22 +4,22 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BerkeleyDB;
 using Dccelerator.Reflection;
 using Dccelerator.DataAccess.Infrastructure;
+using JetBrains.Annotations;
+
 
 namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
     public class BDbSchema : IBDbSchema {
         readonly string _environmentPath;
         readonly string _dbPath;
         string _password;
-        //readonly ConcurrentDictionary<string, Database> _primaryReadOnlyDbs = new ConcurrentDictionary<string, Database>();
-        readonly ConcurrentDictionary<string, SecondaryDatabase> _secondaryReadOnlyDbs = new ConcurrentDictionary<string, SecondaryDatabase>();
 
-        readonly ConcurrentDictionary<string, Database> _primaryWritableDbs = new ConcurrentDictionary<string, Database>();
-        readonly ConcurrentDictionary<string, SecondaryDatabase> _foreignKeyWritableDbs = new ConcurrentDictionary<string, SecondaryDatabase>();
-        readonly ConcurrentDictionary<string, SecondaryDatabase> _secondaryKeyWritableDbs = new ConcurrentDictionary<string, SecondaryDatabase>();
-
+        readonly ConcurrentDictionary<string, Database> _primaryDbs = new ConcurrentDictionary<string, Database>();
+        readonly ConcurrentDictionary<string, SecondaryDatabase> _secondaryDbs = new ConcurrentDictionary<string, SecondaryDatabase>();
         readonly HashSet<string> _transactionPreparedEntities = new HashSet<string>(); 
 
 
@@ -75,75 +75,43 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
 
 
 
-        public Database GetPrimaryDb(string dbName, bool readOnly) {
+        public virtual Database GetPrimaryDb(string dbName) {
             Database database;
-            if (_primaryWritableDbs.TryGetValue(dbName, out database))
+            if (_primaryDbs.TryGetValue(dbName, out database))
                 return database;
 
             database = OpenDatabase(dbName);
-            if (_primaryWritableDbs.TryAdd(dbName, database))
+            if (_primaryDbs.TryAdd(dbName, database))
                 return database;
 
             database.Close();
-            database = _primaryWritableDbs[dbName];
+            database = _primaryDbs[dbName];
             return database;
         }
+        
 
-
-        public SecondaryDatabase GetReadOnlySecondaryDb(Database primaryDb, SecondaryKeyAttribute secondaryKey) {
-            var dbName = SecondaryKeyDbName(primaryDb, secondaryKey);
-
-            SecondaryDatabase database;
-            if (_secondaryReadOnlyDbs.TryGetValue(dbName, out database))
-                return database;
-
-            database = OpenReadOnlySecondaryDb(primaryDb, secondaryKey);
-
-            if (_secondaryReadOnlyDbs.TryAdd(dbName, database))
-                return database;
-
-            database.Close();
-            database = _secondaryReadOnlyDbs[dbName];
-            return database;
-        }
-
-        public SecondaryDatabase GetWritableForeignKeyDatabase(Database primaryDb, Database foreignDb, SecondaryKeyAttribute foreignKeyMapping) {
-            var dbName = SecondaryKeyDbName(primaryDb, foreignKeyMapping);
-
-            SecondaryDatabase database;
-
-            if (_foreignKeyWritableDbs.TryGetValue(dbName, out database))
-                return database;
-
-            database = OpenWritableForeignKeyDatabase(primaryDb, foreignDb, foreignKeyMapping, dbName);
-            
-            if (_foreignKeyWritableDbs.TryAdd(dbName, database))
-                return database;
-
-            database.Close();
-            database = _foreignKeyWritableDbs[dbName];
-            return database;
-        }
-
-
-        public SecondaryDatabase GetWritableSecondaryKeyDatabase(Database primaryDb, SecondaryKeyAttribute secondaryKey) {
+        public virtual SecondaryDatabase GetSecondaryDb(Database primaryDb, SecondaryKeyAttribute secondaryKey, Database foreignDb = null) {
             var dbName = SecondaryKeyDbName(primaryDb, secondaryKey);
 
             SecondaryDatabase database;
 
-            if (_secondaryKeyWritableDbs.TryGetValue(dbName, out database))
+            if (_secondaryDbs.TryGetValue(dbName, out database))
                 return database;
 
-            database = OpenWritableSecondaryDatabase(primaryDb, secondaryKey, dbName);
+            database = OpenWritableSecondaryDatabase(primaryDb, secondaryKey, dbName, foreignDb);
 
-            if (_secondaryKeyWritableDbs.TryAdd(dbName, database))
+            if (_secondaryDbs.TryAdd(dbName, database))
                 return database;
 
             database.Close();
-            database = _secondaryKeyWritableDbs[dbName];
+            database = _secondaryDbs[dbName];
             return database;
         }
 
+        
+        
+
+        
 
         public virtual Transaction BeginTransactionFor(ICollection<IBDbEntityInfo> entityInfos) {
             var needToPrepare = new List<IBDbEntityInfo>();
@@ -153,15 +121,15 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
             }
 
             foreach (var info in needToPrepare) {
-                var primaryDb = GetPrimaryDb(info.EntityName, readOnly:false);
+                var primaryDb = GetPrimaryDb(info.EntityName);
 
                 foreach (var keyMapping in info.ForeignKeys.Values) {
-                    var foreignDb = GetPrimaryDb(keyMapping.ForeignEntityName, readOnly:false);
-                    GetWritableForeignKeyDatabase(primaryDb, foreignDb, keyMapping);
+                    var foreignDb = GetPrimaryDb(keyMapping.ForeignEntityName);
+                    GetSecondaryDb(primaryDb, keyMapping, foreignDb);
                 }
 
-                foreach (var keyMapping in info.SecondaryKeys.Where(x => !info.ForeignKeys.ContainsKey(x.Key))) {
-                    GetWritableSecondaryKeyDatabase(primaryDb, keyMapping.Value);
+                foreach (var keyMapping in info.SecondaryKeys.Where(x => !info.ForeignKeys.ContainsKey(x.Key)).Select(x => x.Value)) {
+                    GetSecondaryDb(primaryDb, keyMapping);
                 }
 
                 lock (_transactionPreparedEntities) {
@@ -172,9 +140,9 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
             return Environment.BeginTransaction();
         }
 
-
-        protected virtual SecondaryDatabase OpenWritableForeignKeyDatabase(Database primaryDb, Database foreignDb, SecondaryKeyAttribute secondaryForeingKey, string dbName) {
-            var foreignKeyConfig = new SecondaryBTreeDatabaseConfig(primaryDb, GetForeignKeyGenerator(secondaryForeingKey)) {
+        
+        protected virtual SecondaryDatabase OpenWritableSecondaryDatabase(Database primaryDb,SecondaryKeyAttribute secondaryForeingKey, string dbName, [CanBeNull] Database foreignDb = null) {
+            var config = new SecondaryBTreeDatabaseConfig(primaryDb, GetForeignKeyGenerator(secondaryForeingKey)) {
                 Env = Environment,
                 Encrypted = IsEncrypted,
                 Duplicates = (BerkeleyDB.DuplicatesPolicy)secondaryForeingKey.DuplicatesPolicy,
@@ -184,49 +152,12 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
                 AutoCommit = true,
             };
 
-            foreignKeyConfig.SetForeignKeyConstraint(foreignDb, ForeignKeyDeleteAction.ABORT);
+            if (foreignDb != null)
+                config.SetForeignKeyConstraint(foreignDb, ForeignKeyDeleteAction.ABORT);
 
-            return SecondaryBTreeDatabase.Open(_dbPath, dbName, foreignKeyConfig);
+            return SecondaryBTreeDatabase.Open(_dbPath, dbName, config);
         }
-        protected virtual SecondaryDatabase OpenWritableSecondaryDatabase(Database primaryDb, SecondaryKeyAttribute secondaryForeingKey, string dbName) {
-            var foreignKeyConfig = new SecondaryBTreeDatabaseConfig(primaryDb, GetForeignKeyGenerator(secondaryForeingKey)) {
-                Env = Environment,
-                Encrypted = IsEncrypted,
-                Duplicates = (BerkeleyDB.DuplicatesPolicy)secondaryForeingKey.DuplicatesPolicy,
-                Creation = CreatePolicy.IF_NEEDED,
-                ReadUncommitted = true,
-                FreeThreaded = IsFreeThreaded,
-                AutoCommit = true,
-            };
-
-            return SecondaryBTreeDatabase.Open(_dbPath, dbName, foreignKeyConfig);
-        }
-
-
-        protected virtual SecondaryDatabase OpenReadOnlySecondaryDb(Database primaryDb, SecondaryKeyAttribute secondaryKey) {
-            return SecondaryBTreeDatabase.Open(_dbPath, //bug: when open fails - it means that key is new, so we should open new writtable db and make indexes for existed values
-                SecondaryKeyDbName(primaryDb, secondaryKey),
-                new SecondaryBTreeDatabaseConfig(primaryDb, (key, data) => null) {
-                    Env = Environment,
-                    Encrypted = IsEncrypted,
-                    Duplicates = (BerkeleyDB.DuplicatesPolicy)secondaryKey.DuplicatesPolicy,
-                    Creation = CreatePolicy.NEVER,
-                    ReadOnly = true,
-                    AutoCommit = true,
-                    FreeThreaded = IsFreeThreaded,
-                    ReadUncommitted = true
-                });
-        }
-
-
-/*        protected virtual string SecondaryDbName(Database primaryDb, string indexSubName) {
-            return $"{primaryDb.DatabaseName}-->{indexSubName}";
-        }*/
-
-/*        [Obsolete]
-        protected virtual string ForeignKeyDbName(Database primaryDb, Database foreignDb) {
-            return $"{primaryDb.DatabaseName}-->{foreignDb.DatabaseName}";
-        }*/
+        
 
         protected virtual string SecondaryKeyDbName(Database primaryDb, SecondaryKeyAttribute secondaryKey) {
             return $"{primaryDb.DatabaseName}-->{secondaryKey.Name}";
@@ -239,7 +170,18 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
                 if (!string.IsNullOrWhiteSpace(password)) {
                     environmentConfig.SetEncryption(_password, EncryptionAlgorithm.AES);
                 }
-                return DatabaseEnvironment.Open(_environmentPath, environmentConfig);
+                var environment = DatabaseEnvironment.Open(_environmentPath, environmentConfig);
+
+/*
+                Task.Factory.StartNew(() => {
+                    while (true) {
+                        environment.DetectDeadlocks(DeadlockPolicy.MIN_WRITE);
+                        Thread.Sleep(10);
+                    }
+                }, TaskCreationOptions.LongRunning);
+*/
+
+                return environment;
             }
             catch (RunRecoveryException e) {
                 try {
@@ -276,32 +218,44 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
                 UseLocking = true,
                 FreeThreaded = true,
                 UseTxns = true,
-                LockSystemCfg = GetLockSystemConfig(),
-                LogSystemCfg = GetLogSystemConfig(),
-                MPoolSystemCfg = GetMPoolSystemConfig()
+                ForceFlush = true,
+                LockSystemCfg = GetLockingConfig(),
+                LogSystemCfg = GetLogsConfig(),
+                MPoolSystemCfg = GetMPoolConfig(),
+                MutexSystemCfg = GetMutexesConfig(),
             };
+
             return environmentConfig;
         }
 
 
-        protected virtual LockingConfig GetLockSystemConfig() {
+        protected virtual MutexConfig GetMutexesConfig() {
+            return new MutexConfig {
+                InitMutexes = 0,
+                MaxMutexes = 0,
+                Increment = 0
+            };
+        }
+
+
+        protected virtual LockingConfig GetLockingConfig() {
             return new LockingConfig {
                 DeadlockResolution = DeadlockPolicy.MIN_WRITE,
             };
         }
 
 
-        protected virtual MPoolConfig GetMPoolSystemConfig() {
+        protected virtual MPoolConfig GetMPoolConfig() {
             return new MPoolConfig {
-                CacheSize = new CacheInfo(0, 500 * 1024 * 1024, 1)
+                CacheSize = new CacheInfo(0, 500 * 1024 * 1024, 2)
             };
         }
 
 
-        protected virtual LogConfig GetLogSystemConfig() {
+        protected virtual LogConfig GetLogsConfig() {
             return new LogConfig {
                 InMemory = false,
-                BufferSize = 500 * 1024 * 1024
+                BufferSize = 50 * 1024 * 1024
             };
         }
 
@@ -337,28 +291,18 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose() {
-            foreach (var db in _secondaryReadOnlyDbs) {
+
+            foreach (var db in _secondaryDbs) {
                 db.Value.Close(true);
                 db.Value.Dispose();
             }
 
-            foreach (var db in _foreignKeyWritableDbs) {
+            foreach (var db in _primaryDbs) {
                 db.Value.Close(true);
                 db.Value.Dispose();
             }
-
-            foreach (var db in _primaryWritableDbs) {
-                db.Value.Close(true);
-                db.Value.Dispose();
-            }
-
-
 
             Environment.Close();
-            _secondaryReadOnlyDbs.Clear();
-            _foreignKeyWritableDbs.Clear();
-            /*_primaryReadOnlyDbs.Clear();*/
-            _primaryWritableDbs.Clear();
         }
 
         #endregion

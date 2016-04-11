@@ -164,6 +164,7 @@ namespace Dccelerator
                     continue;
                 }
 
+                //todo: add handlers for all node types
 
                 if (expression.NodeType == ExpressionType.Lambda) {
                     var lambda = (LambdaExpression) expression;

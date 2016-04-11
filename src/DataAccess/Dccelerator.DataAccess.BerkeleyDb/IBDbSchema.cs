@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
 using BerkeleyDB;
+using JetBrains.Annotations;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {
     public interface IBDbSchema : IDisposable {
 
-        Database GetPrimaryDb(string dbName, bool readOnly);
+        Database GetPrimaryDb(string dbName);
 
-        SecondaryDatabase GetReadOnlySecondaryDb(Database primaryDb, SecondaryKeyAttribute secondaryKey);
-
-        SecondaryDatabase GetWritableForeignKeyDatabase(Database primaryDb, Database foreignDb, SecondaryKeyAttribute foreignKeyMapping);
+        SecondaryDatabase GetSecondaryDb(Database primaryDb, SecondaryKeyAttribute foreignKeyMapping, [CanBeNull] Database foreignDb = null);
 
         Transaction BeginTransactionFor(ICollection<IBDbEntityInfo> entityInfos);
 

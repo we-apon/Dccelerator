@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using BerkeleyDB;
 using Dccelerator.DataAccess.BerkeleyDb.Implementation;
 using Dccelerator.DataAccess.Infrastructure;
@@ -49,37 +48,61 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
             return new DatabaseEntry(entity.ToBinnary());
         }
-        
 
+
+        /// <exception cref="InvalidOperationException">Database already contains entity.</exception>
         protected virtual void Insert(TransactionElement element, Database primaryDb, Transaction transaction) {
             var key = KeyOf(element.Entity, element.Info);
-            var data = DataOf(element.Entity);
-            primaryDb.PutNoOverwrite(key, data, transaction);
+
+            var cursor = primaryDb.Cursor(transaction);
+            if (!cursor.Move(key, exact:true))
+                cursor.Add(new KeyValuePair<DatabaseEntry, DatabaseEntry>(key, DataOf(element.Entity)));
+            else {
+                var message = $"On inserting, database already contains entity with key {key.Data}\n{element.Entity}";
+                Internal.TraceEvent(TraceEventType.Error, message);
+                throw new InvalidOperationException(message);
+            }
         }
 
+
+        /// <exception cref="InvalidOperationException">Database doesn't contains entity.</exception>
         protected virtual void Update(TransactionElement element, Database primaryDb, Transaction transaction) {
             var key = KeyOf(element.Entity, element.Info);
-            var data = DataOf(element.Entity);
-            primaryDb.Put(key, data, transaction);
+
+            var cursor = primaryDb.Cursor(transaction);
+            if (cursor.Move(key, exact:true))
+                cursor.Overwrite(DataOf(element.Entity));
+            else {
+                var message = $"On updating, database doesn't contains entity with key {key.Data}\n{element.Entity}";
+                Internal.TraceEvent(TraceEventType.Error, message);
+                throw new InvalidOperationException(message);
+            }
         }
 
+
+        /// <exception cref="InvalidOperationException">Database doesn't contains entity.</exception>
+        /// <exception cref="KeyEmptyException">The element has already been deleted.</exception>
         protected virtual void Delete(TransactionElement element, Database primaryDb, Transaction transaction) {
             var key = KeyOf(element.Entity, element.Info);
-            primaryDb.Delete(key, transaction);
+
+            var cursor = primaryDb.Cursor(transaction);
+            if (cursor.Move(key, exact:true))
+                cursor.Delete();
+            else {
+                
+                var message = $"On deleting, database doesn't contains entity with key {key.Data}\n{element.Entity}";
+                Internal.TraceEvent(TraceEventType.Error, message);
+                throw new InvalidOperationException(message);
+            }
         }
 
 
-/*        protected virtual Transaction BeginTransaction(DatabaseEnvironment environment) {
-            return environment.BeginTransaction();
-        }*/
 
-
-        
 
         #region Implementation of IBDbRepository
 
         public virtual bool IsPrimaryKey(IDataCriterion criterion) {
-            return criterion.Name == nameof(IIdentified<int>.Id);
+            return criterion.Name == nameof(IIdentified<byte[]>.Id);
         }
 
 
@@ -88,10 +111,10 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        public IEnumerable<DatabaseEntry> ContinuouslyReadToEnd(string entityName) {
+        public virtual IEnumerable<DatabaseEntry> ContinuouslyReadToEnd(string entityName) {
             Cursor cursor = null;
             try {
-                var primaryDb = _schema.GetPrimaryDb(entityName, readOnly: true);
+                var primaryDb = _schema.GetPrimaryDb(entityName);
 
                 cursor = primaryDb.Cursor();
                 while (cursor.MoveNext())
@@ -103,33 +126,34 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         }
 
 
-        public IEnumerable<DatabaseEntry> GetByKeyFromPrimaryDb(DatabaseEntry key, string entityName) {
-            var primaryDb = _schema.GetPrimaryDb(entityName, readOnly: true);
-            if (primaryDb.Exists(key))
-                yield return primaryDb.Get(key).Value;
+        public virtual IEnumerable<DatabaseEntry> GetByKeyFromPrimaryDb(DatabaseEntry key, string entityName) {
+            var primaryDb = _schema.GetPrimaryDb(entityName);
+            var cursor = primaryDb.Cursor();
+            if (cursor.Move(key, exact: true))
+                yield return cursor.Current.Value;
         }
 
 
-        public IEnumerable<DatabaseEntry> GetFromSecondaryDb(DatabaseEntry key, string entityName, SecondaryKeyAttribute secondaryKey) {
+        public virtual IEnumerable<DatabaseEntry> GetFromSecondaryDb(DatabaseEntry key, string entityName, SecondaryKeyAttribute secondaryKey) {
             Cursor cursor = null;
             try {
-                var primaryDb = _schema.GetPrimaryDb(entityName, readOnly: true);
-                var secondaryDb = _schema.GetReadOnlySecondaryDb(primaryDb, secondaryKey);
-
-                if (secondaryKey.DuplicatesPolicy == DuplicatesPolicy.NONE) {
-                    if (secondaryDb.Exists(key))
-                        yield return secondaryDb.Get(key).Value;
-                }
+                var primaryDb = _schema.GetPrimaryDb(entityName);
+                var secondaryDb = _schema.GetSecondaryDb(primaryDb, secondaryKey);
 
                 cursor = secondaryDb.Cursor();
                 if (!cursor.Move(key, exact: true)) {
                     yield break;
                 }
 
-                yield return cursor.Current.Value;
-
-                while (cursor.MoveNextDuplicate())
+                if (secondaryKey.DuplicatesPolicy == DuplicatesPolicy.NONE) {
                     yield return cursor.Current.Value;
+                }
+                else {
+                    yield return cursor.Current.Value;
+
+                    while (cursor.MoveNextDuplicate())
+                        yield return cursor.Current.Value;
+                }
             }
             finally {
                 cursor?.Close();
@@ -138,14 +162,14 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
 
 
         /// <exception cref="InvalidOperationException">Missed secondary key for some criterion.</exception>
-        public IEnumerable<DatabaseEntry> GetByJoin(IBDbEntityInfo info, ICollection<IDataCriterion> criteria) {
+        public virtual IEnumerable<DatabaseEntry> GetByJoin(IBDbEntityInfo info, ICollection<IDataCriterion> criteria) {
 
             var cursorsLength = 0;
             var secondaryCursors = new SecondaryCursor[criteria.Count];
             JoinCursor joinCursor = null;
 
             try {
-                var primaryDb = _schema.GetPrimaryDb(info.EntityName, readOnly: true);
+                var primaryDb = _schema.GetPrimaryDb(info.EntityName);
 
                 foreach (var criterion in criteria) {
                     SecondaryKeyAttribute secondaryKey;
@@ -155,13 +179,13 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                         throw new InvalidOperationException(msg);
                     }
 
-                    var secondaryDb = _schema.GetReadOnlySecondaryDb(primaryDb, secondaryKey);
+                    var secondaryDb = _schema.GetSecondaryDb(primaryDb, secondaryKey);
 
                     var cursor = secondaryDb.SecondaryCursor();
                     secondaryCursors[cursorsLength++] = cursor;
 
                     var key = new DatabaseEntry(criterion.Value.ToBinnary());
-                    if (!cursor.Move(key, true))
+                    if (!cursor.Move(key, exact:true))
                         yield break;
                 }
 
@@ -182,7 +206,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
         protected virtual DuplicatesPolicy DefaultDuplicatesPolicy => DuplicatesPolicy.UNSORTED;
 
         
-        public bool PerformInTransaction(ICollection<IBDbEntityInfo> entityInfos, IEnumerable<TransactionElement> elements) {
+        public virtual bool PerformInTransaction(ICollection<IBDbEntityInfo> entityInfos, IEnumerable<TransactionElement> elements) {
 
             Transaction transaction = null;
 
@@ -191,7 +215,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 transaction = _schema.BeginTransactionFor(entityInfos);
                 
                 foreach (var element in elements) {
-                    var primaryDb = _schema.GetPrimaryDb(element.Info.EntityName, readOnly: false);
+                    var primaryDb = _schema.GetPrimaryDb(element.Info.EntityName);
 
                     switch (element.ActionType) {
                         case ActionType.Insert:
