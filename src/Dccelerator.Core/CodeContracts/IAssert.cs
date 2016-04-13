@@ -41,7 +41,7 @@ namespace Dccelerator.CodeContracts {
         bool IsValid();
 
 
-        [ContractAnnotation("=>true,error:notnull; =>false,error:null")]
+        [ContractAnnotation("=>true,error:null; =>false,error:notnull")]
         bool IsValid(out string error);
 
     }
