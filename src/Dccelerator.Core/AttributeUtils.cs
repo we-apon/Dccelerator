@@ -52,9 +52,9 @@ namespace Dccelerator
             var dataMember = data.SingleOrDefault(x => x.AttributeType.Name == "DataMemberAttribute");
 #endif
 
-            if (dataMember?.NamedArguments != null) {
-                var name = dataMember.NamedArguments.SingleOrDefault(x => x.MemberInfo.Name == "Name");
-                return name != null ? (string)name.TypedValue.Value : member.Name;
+            if (dataMember?.NamedArguments?.Any() == true) {
+                var name = dataMember.NamedArguments.Where(x => x.MemberInfo.Name == "Name").Select(x => x.TypedValue.Value as string).SingleOrDefault();
+                return name ?? member.Name;
             }
 
             return member.Name;

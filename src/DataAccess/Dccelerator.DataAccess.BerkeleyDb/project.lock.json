@@ -12,14 +12,14 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.11-beta-007": {
+      "Dccelerator.Core/0.0.11-beta-008": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.7-beta-002": {
+      "Dccelerator.DataAccess.Common/0.0.7-beta-003": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -46,14 +46,14 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.11-beta-007": {
+      "Dccelerator.Core/0.0.11-beta-008": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.7-beta-002": {
+      "Dccelerator.DataAccess.Common/0.0.7-beta-003": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -80,14 +80,14 @@
           "lib/net40/libdb_dotnet61.dll": {}
         }
       },
-      "Dccelerator.Core/0.0.11-beta-007": {
+      "Dccelerator.Core/0.0.11-beta-008": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "JetBrains.Annotations": "10.0.0"
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.7-beta-002": {
+      "Dccelerator.DataAccess.Common/0.0.7-beta-003": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -106,11 +106,11 @@
     }
   },
   "libraries": {
-    "Dccelerator.Core/0.0.11-beta-007": {
+    "Dccelerator.Core/0.0.11-beta-008": {
       "type": "project",
       "path": "../../Dccelerator.Core/project.json"
     },
-    "Dccelerator.DataAccess.Common/0.0.7-beta-002": {
+    "Dccelerator.DataAccess.Common/0.0.7-beta-003": {
       "type": "project",
       "path": "../Dccelerator.DataAccess.Common/project.json"
     },

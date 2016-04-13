@@ -251,7 +251,6 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
             };
         }
 
-
         protected virtual LogConfig GetLogsConfig() {
             return new LogConfig {
                 InMemory = false,
