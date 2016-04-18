@@ -114,8 +114,33 @@ namespace Dccelerator.DataAccess.Lazy {
             var link = GetCustomAttribute(targetLocation.PropertyInfo, typeof (ForeignKeyAttribute)) as ForeignKeyAttribute;
             if (link != null)
                 CriterionName = link.Name;
-            else if (targetLocation.DeclaringType == RealLocationType && IsCollection)
-                CriterionName = "ParentId";
+            else if (targetLocation.DeclaringType == RealLocationType && IsCollection) {
+                var properties = RealLocationType.Properties();
+                var sameTypeLazyProperties = properties.Values.Where(x => x.PropertyType.IsAssignableFrom(RealLocationType)).ToList();
+
+                var linkProperties = properties.Values.Where(x => x.GetCustomAttributes(typeof (ForeignKeyAttribute), true).OfType<ForeignKeyAttribute>()
+                        .Any(f => sameTypeLazyProperties.Any(z => z.Name == f.NavigationPropertyPath))).ToList();
+
+
+
+//                var linkProperties = sameTypeLazyProperties.Where(x => properties.Values.Any(z => {
+//                    var foreignKeyAttribute = z
+//                        .GetCustomAttributes(typeof (ForeignKeyAttribute), true)
+//                        .OfType<ForeignKeyAttribute>()
+//                        .SingleOrDefault(f => f.NavigationPropertyPath == x.Name);
+//
+//                    return foreignKeyAttribute != null;
+//                })).ToList();
+
+
+                if (linkProperties.Any())
+                    CriterionName = linkProperties.First().Name;
+                else {
+                    CriterionName = properties.Values.Select(x => x.Name)
+                        .SingleOrDefault(x => x == targetLocation.DeclaringType.Name + "Id" || x == RealLocationType.Name + "Id") ?? "ParentId";
+                }
+
+            }
             else if (IsCollection)
                 CriterionName = targetLocation.DeclaringType?.Name + "Id";
             else {
