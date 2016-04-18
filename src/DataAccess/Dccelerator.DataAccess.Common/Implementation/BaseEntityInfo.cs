@@ -22,11 +22,15 @@ namespace Dccelerator.DataAccess.Implementation {
                 Repository = entityAttribute.Repository?.CreateInstance() as TRepository;
 
                 var cachedEntityAttribute = entityAttribute as GloballyCachedEntityAttribute;
-                if (cachedEntityAttribute != null)
+                if (cachedEntityAttribute != null) {
                     CacheTimeout = cachedEntityAttribute.Timeout;
+                    IsGloballyCached = true;
+                }
             }
         }
 
+
+        public bool IsGloballyCached { get; set; }
 
         public TRepository Repository { get; set; }
 

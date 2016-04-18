@@ -8,7 +8,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
     public abstract class CachedReadingRepository : DirectReadingRepository
     {
         readonly ConcurrentDictionary<string, EntitiesCache> _entities = new ConcurrentDictionary<string, EntitiesCache>();
-        
+        static readonly ConcurrentDictionary<string, EntitiesCache> _globallyCachedEntities = new ConcurrentDictionary<string, EntitiesCache>();
 
 
         class EntitiesCache {
@@ -32,19 +32,29 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
         public override IEnumerable<object> Read(IEntityInfo info, ICollection<IDataCriterion> criteria) {
             var identityString = IdentityStringOf(info.EntityName, criteria);
 
+
             var timeout = CacheTimeoutOf((IAdoEntityInfo)info);
             if (timeout == TimeSpan.Zero)
                 return base.Read(info, criteria);
+            
+            if (info.IsGloballyCached) {
+                return GetFromCache(_globallyCachedEntities, info, criteria, identityString, timeout);
+            }
 
+            return GetFromCache(_entities, info, criteria, identityString, timeout);
+        }
+
+
+        IEnumerable<object> GetFromCache(ConcurrentDictionary<string, EntitiesCache> entities, IEntityInfo info, ICollection<IDataCriterion> criteria, string identityString, TimeSpan timeout) {
             EntitiesCache cache;
-            if (!_entities.TryGetValue(identityString, out cache) || (DateTime.UtcNow - cache.QueriedTime) > timeout) {
+            if (!entities.TryGetValue(identityString, out cache) || (DateTime.UtcNow - cache.QueriedTime) > timeout) {
                 cache = new EntitiesCache {
                     /*Entities = base.Read(info, criteria).ToArray(),*/
                     QueriedTime = DateTime.UtcNow
                 };
 
-                if (!_entities.TryAdd(identityString, cache))
-                    cache = _entities[identityString];
+                if (!entities.TryAdd(identityString, cache))
+                    cache = entities[identityString];
             }
 
             if (cache.Entities == null) {
@@ -55,10 +65,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
             }
 
             return cache.Entities;
-            
         }
-
-        
 
 
         /// <summary>

@@ -12,6 +12,8 @@ namespace Dccelerator.DataAccess {
 
         TimeSpan CacheTimeout { get; }
 
+        bool IsGloballyCached { get; }
+
         Dictionary<string, ForeignKeyAttribute> ForeignKeys { get; }
 
         Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get; }
