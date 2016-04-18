@@ -389,7 +389,9 @@ namespace Dccelerator.Convertion
                 return entity?.GetType().Properties() ?? unconvertedProps;
             }
 
-            var destinationProps = entity.GetType().Properties();
+            var sourceProps = other.GetType().Properties();
+            var destinationProps = entity.GetType().Properties().Where(x => sourceProps.ContainsKey(x.Key));
+
 
             foreach (var destinationProperty in destinationProps) {
                 object value;
