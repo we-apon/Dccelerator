@@ -5,8 +5,6 @@ using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Dccelerator.DataAccess.Ado.Implementation;
 using Dccelerator.DataAccess.Infrastructure;
@@ -38,6 +36,13 @@ namespace Dccelerator.DataAccess.Ado {
 
         protected abstract TCommand CommandFor(string commandText, TConnection connection, IEnumerable<TParameter> parameters, CommandType type = CommandType.StoredProcedure);
 
+        
+        protected virtual CommandBehavior GetBehaviorFor(IEntityInfo info) {
+            if (info.Inclusions?.Any() != true)
+                return CommandBehavior.SequentialAccess | CommandBehavior.SingleResult;
+
+            return CommandBehavior.SequentialAccess;
+        }
 
         
         protected virtual string NameOfReadProcedureFor( string entityName) {
@@ -109,11 +114,13 @@ namespace Dccelerator.DataAccess.Ado {
         public bool Any(IEntityInfo info, ICollection<IDataCriterion> criteria) {
             var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
 
+            var behavior = GetBehaviorFor(info) | CommandBehavior.SingleRow;
+
             var connection = GetConnection();
             try {
                 using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
                     connection.Open();
-                    using (var reader = command.ExecuteReader()) {
+                    using (var reader = command.ExecuteReader(behavior)) {
                         return reader.Read();
                     }
                 }
@@ -137,11 +144,12 @@ namespace Dccelerator.DataAccess.Ado {
 
             var idx = info.ReaderColumns != null ? info.IndexOf(columnName) : -1;
 
+            var behavior = GetBehaviorFor(info);
             var connection = GetConnection();
             try {
                 using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
                     connection.Open();
-                    using (var reader = command.ExecuteReader()) {
+                    using (var reader = command.ExecuteReader(behavior)) {
                         if (idx < 0) {
                             info.InitReaderColumns(reader);
                             idx = info.IndexOf(columnName);
@@ -164,11 +172,12 @@ namespace Dccelerator.DataAccess.Ado {
         public int CountOf(IEntityInfo info, ICollection<IDataCriterion> criteria) {
             var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
 
+            var behavior = GetBehaviorFor(info);
             var connection = GetConnection();
             try {
                 using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
                     connection.Open();
-                    using (var reader = command.ExecuteReader()) {
+                    using (var reader = command.ExecuteReader(behavior)) {
                         return RowsCount(reader);
                     }
                 }
@@ -359,10 +368,11 @@ namespace Dccelerator.DataAccess.Ado {
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
         protected virtual IEnumerable<object> GetMainEntities(IAdoEntityInfo info, IEnumerable<TParameter> parameters) {
             var connection = GetConnection();
+            var behavior = GetBehaviorFor(info);
             try {
                 using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
                     connection.Open();
-                    using (var reader = command.ExecuteReader()) {
+                    using (var reader = command.ExecuteReader(behavior)) {
                         info.InitReaderColumns(reader);
 
                         while (reader.Read()) {
@@ -382,10 +392,12 @@ namespace Dccelerator.DataAccess.Ado {
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
         protected virtual IEnumerable<object> ReadToEnd(IAdoEntityInfo mainObjectInfo, IEnumerable<TParameter> parameters) {
             var connection = GetConnection();
+
+            var behavior = GetBehaviorFor(mainObjectInfo);
             try {
                 using (var command = CommandFor(NameOfReadProcedureFor(mainObjectInfo.EntityName), connection, parameters)) {
                     connection.Open();
-                    using (var reader = command.ExecuteReader()) {
+                    using (var reader = command.ExecuteReader(behavior)) {
 
                         mainObjectInfo.InitReaderColumns(reader);
 
