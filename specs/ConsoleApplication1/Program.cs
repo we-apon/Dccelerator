@@ -14,6 +14,7 @@ using Dccelerator.DataAccess;
 using Dccelerator.DataAccess.BerkeleyDb;
 using Dccelerator.DataAccess.Lazy;
 using Dccelerator.NumberExtensions;
+using Dccelerator.Reflection;
 using DuplicatesPolicy = Dccelerator.DataAccess.DuplicatesPolicy;
 
 
@@ -56,6 +57,7 @@ namespace ConsoleApplication1
         #endregion
     }*/
 
+        
 
 
     class Program
@@ -65,7 +67,9 @@ namespace ConsoleApplication1
 
 
         static void Main(string[] args) {
-            
+
+                
+                
             _logTxt = Path.Combine(_home, "log.txt");
             if (!Directory.Exists(_home))
                 Directory.CreateDirectory(_home);

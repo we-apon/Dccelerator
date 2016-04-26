@@ -69,12 +69,11 @@ namespace Dccelerator.Reflection
                     : Expression.Convert(parameters[j], ParameterTypes[j]);
             }
 
+
             var context = Expression.Parameter(args[0]);
-            var callContext = DeclaringType.IsAssignableFrom(args[0])
-                ? (Expression) context
-                : Expression.Convert(context, DeclaringType);
-
-
+            var callContext = Method.IsStatic
+                ? null
+                : (DeclaringType.IsAssignableFrom(args[0]) ? (Expression) context : Expression.Convert(context, DeclaringType));
 
 
             var lambdaParameters = new ParameterExpression[args.Length - (isAction ? 0 : 1)];

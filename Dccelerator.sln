@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}"
 EndProject
@@ -89,5 +89,8 @@ Global
 		{EDF7CE71-93E7-4F81-9BFF-66D732B89674} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
 		{F728ADB4-7247-49DF-A6D7-B0C2805095CE} = {8FCF91C8-AB08-4481-BBEE-94F54CF7F170}
 		{5C576A43-3EE7-48CB-8A8C-9B58BECFF0AE} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = d277d950-8cb6-443a-bb7f-3da78e68f24d
 	EndGlobalSection
 EndGlobal
