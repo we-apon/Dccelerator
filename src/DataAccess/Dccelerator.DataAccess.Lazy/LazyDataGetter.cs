@@ -58,19 +58,21 @@ namespace Dccelerator.DataAccess.Lazy {
             if (info.Inclusions == null)
                 return;
 
-            foreach (var inclusion in _mainEntityInfo.Inclusions) {
+            foreach (var inclusion in info.Inclusions) {
                 object child;
                 if (!entity.TryGetValueOnPath(inclusion.TargetPath, out child)) {
                     Infrastructure.Internal.TraceEvent(TraceEventType.Warning, $"Can't get property {inclusion.TargetPath} on {_mainEntityInfo.EntityType} to setup it's loading context.");
                     continue;
                 }
 
+                if (child == null)
+                    continue;
+
                 if (!inclusion.IsCollection) {
                     SetupLazyChildren(child as LazyEntity, inclusion.Info, context);
                     continue;
                 }
-
-
+                
                 foreach (var item in (IEnumerable)child) {
                     SetupLazyChildren(item as LazyEntity, inclusion.Info, context);
                 }
