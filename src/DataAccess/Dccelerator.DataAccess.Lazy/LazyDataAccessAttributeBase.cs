@@ -201,9 +201,21 @@ namespace Dccelerator.DataAccess.Lazy {
             }
 
             var lazyEntity = (LazyEntity) args.Instance;
-            if (!lazyEntity.Context.IsLoadingAllowed)
+            if (!lazyEntity.Context.IsLoadingAllowed) {
+                if (!IsCollection || args.Value != null)
+                    return;
+                
+                //? then property is collection - we initialize it with empty collection if it now initialized yet, to avoid null reference exceptions
+                InitializeCollectionPropertyWithEmptyCollection(args);
                 return;
+            }
 
+
+            LazyLoadValueFromDatabase(args, lazyEntity);
+        }
+
+
+        void LazyLoadValueFromDatabase(LocationInterceptionArgs args, LazyEntity lazyEntity) {
             lock (_writeLock) {
                 args.ProceedGetValue();
 
@@ -219,10 +231,27 @@ namespace Dccelerator.DataAccess.Lazy {
                     AlreadyLoaded = true; //?if Read callback is null - it means that entity was created by the client code, and not was getted from db, so it's not persisted at all.
                     return;
                 }
-                
+
                 var value = GetValueFor(args, lazyEntity, lazyEntity.Read);
                 args.SetNewValue(value);
                 AlreadyLoaded = true;
+                args.ProceedGetValue();
+            }
+        }
+
+
+        void InitializeCollectionPropertyWithEmptyCollection(LocationInterceptionArgs args) {
+            lock (_writeLock) {
+                args.ProceedGetValue();
+
+                if (AlreadyLoaded)
+                    return;
+
+                if (args.Value != null)
+                    return;
+
+                var targetCollection = Activator.CreateInstance(TargetCollectionType);
+                args.SetNewValue(targetCollection);
                 args.ProceedGetValue();
             }
         }
