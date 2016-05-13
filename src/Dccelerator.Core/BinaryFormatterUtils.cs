@@ -1,6 +1,7 @@
 ﻿#if NET40 || NET45
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -22,14 +23,17 @@ namespace Dccelerator {
                 return entity as byte[];
 
             if (_nullableGuid.IsAssignableFrom(type))
-                return entity.SafeCastTo<Guid?>().Value.ToByteArray();
-
-
-            var formatter = new BinaryFormatter();
+                return entity.SafeCastTo<Guid?>()?.ToByteArray();
 
             using (var stream = new MemoryStream()) {
-                formatter.Serialize(stream, entity);
-                return stream.ToArray();
+                try {
+                    new BinaryFormatter().Serialize(stream, entity);
+                    return stream.ToArray();
+                }
+                catch (Exception e) {
+                    Internal.TraceEvent(TraceEventType.Error, $"Can't serialize entity {entity} to {nameof(Byte)}[].\n\n{e}");
+                    return null;
+                }
             }
         }
 
