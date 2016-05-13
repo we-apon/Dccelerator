@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -13,6 +14,7 @@ namespace Dccelerator.Reflection
 
         Type _declaringType;
         Type _delegateType;
+        bool? _isAction;
 
 
         protected MethodDelegateBase(MethodInfo method) : base(method.Name, MemberKind.Method) {
@@ -22,6 +24,9 @@ namespace Dccelerator.Reflection
 
 
         public MethodInfo Method { get; set; }
+
+        public bool IsAction => _isAction ?? (_isAction = Method.ReturnType == typeof(void)).Value;
+
         public ParameterInfo[] Parameters => _parameters ?? (_parameters = Method.GetParameters());
 
         public Type[] ParameterTypes => _parameterTypes ?? (_parameterTypes = Parameters.Select(x => x.ParameterType).ToArray());
@@ -51,47 +56,52 @@ namespace Dccelerator.Reflection
 
 
 
-        protected TFunc GetLambda<TFunc>() {
-            var type = typeof (TFunc);
-            var generic = type.GetGenericTypeDefinition();
-            var args = type.GetGenericArguments();
+        protected TFunc GetDelegate<TFunc>() {
+            var delegateArgs = typeof(TFunc).GetGenericArguments();
+            var delegateParametersCount = delegateArgs.Length - (IsAction ? 0 : 1);
 
-            var isAction = generic.FullName.StartsWith("System.Action");
-            var systemArgsCount = isAction ? 1 : 2;
-
-            var parameters = new ParameterExpression[args.Length - systemArgsCount];
-            var callParameters = new Expression[parameters.Length];
-            for (var i = 1; i < args.Length - (isAction ? 0 : 1); i++) {
-                var j = i - 1;
-                parameters[j] = Expression.Parameter(args[i]);
-                callParameters[j] = ParameterTypes[j].IsAssignableFrom(args[i])
-                    ? (Expression) parameters[j]
-                    : Expression.Convert(parameters[j], ParameterTypes[j]);
+            if (delegateParametersCount != Parameters.Length + 1) {
+                Internal.TraceEvent(TraceEventType.Warning, $"Delegate {typeof(TFunc)} has {delegateParametersCount} parameters, but should has {Parameters.Length + 1} for calling method {DeclaringType.FullName}.{Method.Name}()");
             }
 
 
-            var context = Expression.Parameter(args[0]);
-            var callContext = Method.IsStatic
+            var delegateParameters = new ParameterExpression[delegateParametersCount];
+            var methodParameters = new Expression[Parameters.Length];
+
+
+
+            var delegateContext = Expression.Parameter(delegateArgs[0]);
+            delegateParameters[0] = delegateContext;
+
+            var methodContext = Method.IsStatic
                 ? null
-                : (DeclaringType.IsAssignableFrom(args[0]) ? (Expression) context : Expression.Convert(context, DeclaringType));
+                : (DeclaringType.IsAssignableFrom(delegateArgs[0]) ? (Expression) delegateContext : Expression.Convert(delegateContext, DeclaringType));
 
 
-            var lambdaParameters = new ParameterExpression[args.Length - (isAction ? 0 : 1)];
-            lambdaParameters[0] = context;
-            Array.Copy(parameters, 0, lambdaParameters, 1, parameters.Length);
 
+
+            for (var i = 1; i < delegateParametersCount; i++) {
+                delegateParameters[i] = Expression.Parameter(delegateArgs[i]);
+
+                var j = i - 1;
+                methodParameters[j] = ParameterTypes[j].IsAssignableFrom(delegateArgs[i])
+                    ? (Expression) delegateParameters[i]
+                    : Expression.Convert(delegateParameters[i], ParameterTypes[j]);
+            }
+
+            
             try {
-                var body = (Expression) Expression.Call(callContext, Method, callParameters);
-                if (!isAction) {
-                    body = args[args.Length - 1].IsAssignableFrom(Method.ReturnType)
-                        ? body
-                        : Expression.Convert(body, Method.ReturnType);
+                var methodCall = (Expression) Expression.Call(methodContext, Method, methodParameters);
+                if (!IsAction) {
+                    methodCall = delegateArgs[delegateArgs.Length - 1].IsAssignableFrom(Method.ReturnType)
+                        ? methodCall
+                        : Expression.Convert(methodCall, Method.ReturnType);
                 }
 
-                var lambda = Expression.Lambda<TFunc>(body, lambdaParameters).Compile();
-                return lambda;
+                return Expression.Lambda<TFunc>(methodCall, delegateParameters).Compile();
             }
-            catch (Exception) {
+            catch (Exception e) {
+                Internal.TraceEvent(TraceEventType.Critical, $"Failed generating delegate to method {DeclaringType.FullName}.{Method.Name}()\n\n{e}");
                 return default(TFunc);
             }
         }

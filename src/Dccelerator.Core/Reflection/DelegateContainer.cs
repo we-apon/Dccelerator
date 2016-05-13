@@ -10,7 +10,7 @@ namespace Dccelerator.Reflection
 
         TDelegate _delegate;
 
-        public TDelegate Delegate => _delegate ?? (_delegate = GetLambda<TDelegate>());
+        public TDelegate Delegate => _delegate ?? (_delegate = GetDelegate<TDelegate>());
 
 
 
