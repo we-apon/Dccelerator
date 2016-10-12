@@ -41,7 +41,7 @@ namespace Dccelerator
 #endif
 
 
-#if !DOTNET
+#if !(NET_CORE_APP || NET_STANDARD)
 
         public static string XmlName(this MemberInfo member) {
             var data = member.GetCustomAttributesData();

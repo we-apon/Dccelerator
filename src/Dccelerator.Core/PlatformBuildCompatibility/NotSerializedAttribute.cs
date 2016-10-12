@@ -1,5 +1,5 @@
 ﻿
-#if DOTNET
+#if NET_CORE_APP || NET_STANDARD
 
 // ReSharper disable CheckNamespace
 namespace System

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Dccelerator.DataAccess;
 using JetBrains.Annotations;
 
@@ -21,7 +22,7 @@ namespace Dccelerator.Logging {
         public string Type { get; set; }
 
         /// <summary>
-        /// Assembly name (<see cref="System.Type.Assembly"/>
+        /// Assembly name (<see cref="System.Reflection.Assembly"/>
         /// </summary>
         [NotNull, SecondaryKey]
         public string Assembly { get; set; }
