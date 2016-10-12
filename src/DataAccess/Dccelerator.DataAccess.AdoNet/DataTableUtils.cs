@@ -1,3 +1,5 @@
+#if (NET40 || NET45)
+ 
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -110,3 +112,5 @@ namespace Dccelerator.DataAccess.Ado {
         }
     }
 }
+
+#endif

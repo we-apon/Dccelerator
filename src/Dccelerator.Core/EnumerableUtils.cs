@@ -208,8 +208,8 @@ namespace Dccelerator
         /// </code>
         /// </example>
         public static void ToEnd<T>( this IEnumerable<T> collection) {
-            var enumerator = collection.GetEnumerator();
-            while (enumerator.MoveNext()) { /*do_nothing()*/ }
+            using (var enumerator = collection.GetEnumerator())
+                while (enumerator.MoveNext()) { /*do_nothing()*/ }
         }
 
 

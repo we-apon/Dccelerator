@@ -1,31 +1,30 @@
 {
-  "version": "0.0.6-beta-005",
+  "version": "0.0.7",
   "title": "Berkeley Db adapter for Dccelerator.DataAccess ORM",
   "description": "Berkeley Db adapter for Dccelerator.DataAccess ORM",
   "authors": [ "Kirill Dubinkin" ],
-  "tags": [ "ORM BerkeleyDb" ],
-  "projectUrl": "https://github.com/we-apon/Dccelerator",
-  "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE",
+  "packOptions": {
+    "tags": [ "ORM BerkeleyDb" ],
+    "projectUrl": "https://github.com/we-apon/Dccelerator",
+    "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE"
+  },
 
   "frameworks": {
     "net40": {
-      "compilationOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] }
+      "buildOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] }
     }
 
   },
 
   "dependencies": {
-    "Dccelerator.DataAccess.Common": "",
+    "Dccelerator.DataAccess.Common": "0.0.8",
     "Berkeley.DB": "6.1.26"
   },
 
 
   "scripts": {
-    "postbuild": [
-      "if not exist \"%project:BuildOutputDir%\\..\\Last\\net40\" mkdir %project:BuildOutputDir%\\..\\Last\\net40",
-      "if not exist \"%project:BuildOutputDir%\\..\\Last\\net45\" mkdir %project:BuildOutputDir%\\..\\Last\\net45",
-      "if not exist \"%project:BuildOutputDir%\\..\\Last\\dnx45\" mkdir %project:BuildOutputDir%\\..\\Last\\dnx45",
-      "copy /V /Y %project:BuildOutputDir%\\Debug\\net40\\* %project:BuildOutputDir%\\..\\Last\\net40 /B"
+    "postcompile": [
+      "../../../NugetPack.bat %compile:Configuration% Release ../../../publish"
     ]
   }
 }

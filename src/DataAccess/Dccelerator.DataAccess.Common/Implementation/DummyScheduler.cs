@@ -21,7 +21,7 @@ namespace Dccelerator.DataAccess.Implementation {
             }
 
             var result = true;
-#if !DOTNET
+#if !(NET_CORE_APP || NET_STANDARD)
             Parallel.ForEach(preparedTransactions, transaction => {
                 if (transaction.Commit())
                     return;

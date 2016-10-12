@@ -1,16 +1,18 @@
 {
-  "version": "0.0.3-beta-005",
+  "version": "0.0.4",
   "title": "Dccelerator.DataAccess.Adapters.MsSql",
   "description": "Contains Microsoft SQL Server adapter for Dccelerator.DataAccess ORM.",
-  "summary": "Microsoft SQL Server adapter for Dccelerator.DataAccess ORM.",
   "authors": [ "Kirill Dubinkin" ],
-  "tags": [ "ORM ADO.NET SQLClient MSSQL SQL" ],
-  "projectUrl": "https://github.com/we-apon/Dccelerator",
-  "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE",
+  "packOptions": {
+    "summary": "Microsoft SQL Server adapter for Dccelerator.DataAccess ORM.",
+    "tags": [ "ORM ADO.NET SQLClient MSSQL SQL" ],
+    "projectUrl": "https://github.com/we-apon/Dccelerator",
+    "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE"
+  },
 
   "frameworks": {
     "net40": {
-      "compilationOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] },
+      "buildOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] },
 
       "frameworkAssemblies": {
         "System.Xml": "4.0.0.0",
@@ -19,16 +21,7 @@
     },
 
     "net45": {
-      "compilationOptions": { "define": [ "NET45", "JETBRAINS_ANNOTATIONS" ] },
-
-      "frameworkAssemblies": {
-        "System.Xml": "4.0.0.0",
-        "System.Transactions": "4.0.0.0"
-      }
-    },
-
-    "dnx45": {
-      "compilationOptions": { "define": [ "NET45", "JETBRAINS_ANNOTATIONS" ] },
+      "buildOptions": { "define": [ "NET45", "JETBRAINS_ANNOTATIONS" ] },
 
       "frameworkAssemblies": {
         "System.Xml": "4.0.0.0",
@@ -36,21 +29,15 @@
       }
     }
 
-
   },
   "dependencies": {
-    "Dccelerator.DataAccess.AdoNet": ""
+    "Dccelerator.DataAccess.AdoNet": "0.0.6"
   },
 
 
   "scripts": {
-    "postbuild": [
-      "if not exist \"%project:BuildOutputDir%\\..\\Last\\net40\" mkdir %project:BuildOutputDir%\\..\\Last\\net40",
-      "if not exist \"%project:BuildOutputDir%\\..\\Last\\net45\" mkdir %project:BuildOutputDir%\\..\\Last\\net45",
-      "if not exist \"%project:BuildOutputDir%\\..\\Last\\dnx45\" mkdir %project:BuildOutputDir%\\..\\Last\\dnx45",
-      "copy /V /Y %project:BuildOutputDir%\\Debug\\net40\\* %project:BuildOutputDir%\\..\\Last\\net40 /B",
-      "copy /V /Y %project:BuildOutputDir%\\Debug\\net45\\* %project:BuildOutputDir%\\..\\Last\\net45 /B",
-      "copy /V /Y %project:BuildOutputDir%\\Debug\\dnx45\\* %project:BuildOutputDir%\\..\\Last\\dnx45 /B"
+    "postcompile": [
+      "../../../NugetPack.bat %compile:Configuration% Release ../../../publish"
     ]
   }
 }

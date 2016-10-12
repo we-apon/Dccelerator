@@ -155,15 +155,8 @@ namespace Dccelerator.DataAccess.Implementation {
         internal static readonly Func<PropertyInfo, bool> IsPersistedProperty = property => {
 
             //? if marked with NotPersistedAttribute
-            if (property.GetCustomAttributesData().Any(x => {
-#if NET40
-                return x.Constructor.DeclaringType == _notPersistedAttributeType;
-#else
-                return x.AttributeType == _notPersistedAttributeType;
-#endif
-            }))
+            if (property.GetCustomAttributesData().Any(x => x.AttributeType() == _notPersistedAttributeType))
                 return false;
-
 
             if (!property.CanRead)
                 return false;
@@ -173,7 +166,7 @@ namespace Dccelerator.DataAccess.Implementation {
             if (type == _stringType || type.IsAssignableFrom(_byteArrayType))
                 return true;
 
-            if (_enumerableType.IsAssignableFrom(type) || type.IsClass)
+            if (_enumerableType.IsAssignableFrom(type) || type.GetInfo().IsClass)
                 return false;
 
             return true;

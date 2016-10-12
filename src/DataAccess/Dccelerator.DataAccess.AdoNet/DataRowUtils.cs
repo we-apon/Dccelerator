@@ -1,3 +1,5 @@
+#if (NET40 || NET45)
+ 
 using System;
 using System.Data;
 using System.Diagnostics;
@@ -251,3 +253,6 @@ namespace Dccelerator.DataAccess.Ado {
         }
     }
 }
+
+
+#endif

@@ -35,77 +35,80 @@ namespace Dccelerator
         }
 
 
-
-#if NET40
-
+#if (NET_CORE_APP || NET_STANDARD)
+        public static IEnumerable<CustomAttributeData> GetCustomAttributesData(this MemberInfo member) => member.CustomAttributes;
 #endif
 
 
-#if !(NET_CORE_APP || NET_STANDARD)
 
+#if NET40
+        public static string MemberName(this CustomAttributeNamedArgument argument) => argument.MemberInfo.Name;
+
+        public static Type AttributeType(this CustomAttributeData attribute) => attribute.Constructor.ReflectedType ?? attribute.Constructor.DeclaringType;
+#else
+        public static string MemberName(this CustomAttributeNamedArgument argument) => argument.MemberName;
+        public static Type AttributeType(this CustomAttributeData attribute) => attribute.AttributeType;
+#endif
+
+
+        
         public static string XmlName(this MemberInfo member) {
             var data = member.GetCustomAttributesData();
-
-#if NET40
-            var dataMember = data.SingleOrDefault(x => x.Constructor.DeclaringType?.Name == "DataMemberAttribute");
-#else
-            var dataMember = data.SingleOrDefault(x => x.AttributeType.Name == "DataMemberAttribute");
-#endif
+            
+            var dataMember = data.SingleOrDefault(x => x.AttributeType()?.Name == "DataMemberAttribute");
 
             if (dataMember?.NamedArguments?.Any() == true) {
-                var name = dataMember.NamedArguments.Where(x => x.MemberInfo.Name == "Name").Select(x => x.TypedValue.Value as string).SingleOrDefault();
+                var name = dataMember.NamedArguments.Where(x => x.MemberName() == "Name").Select(x => x.TypedValue.Value as string).SingleOrDefault();
                 return name ?? member.Name;
             }
 
             return member.Name;
         }
 
-#endif
+
+        /*
+
+                            /// <summary>
+                            /// Returns <see langword="true"/> if can get <typeparamref name="T"/>, otherwise returns <see langword="false"/>
+                            /// </summary>
+                            /// <typeparam name="T"><see cref="Attribute"/>'s type</typeparam>
+                            /// <param name="member">Member maked with <typeparamref name="T"/></param>
+                            /// <param name="attribute"><typeparamref name="T"/> instance</param>
+                            /// <exception cref="InvalidOperationException">When <paramref name="member"/> contains more than one <typeparamref name="T"/>.</exception>
+                            public static bool TryGet<T>( this MemberInfo member, out T attribute) where T : Attribute {
+                                var attributes = Gik.Attributes.Of(member, typeof (T));
+                                attribute = attributes.Length == 1 ? (T) attributes[0] : null;
+                                return attribute != null;
+                            }
 
 
-/*
-
-                    /// <summary>
-                    /// Returns <see langword="true"/> if can get <typeparamref name="T"/>, otherwise returns <see langword="false"/>
-                    /// </summary>
-                    /// <typeparam name="T"><see cref="Attribute"/>'s type</typeparam>
-                    /// <param name="member">Member maked with <typeparamref name="T"/></param>
-                    /// <param name="attribute"><typeparamref name="T"/> instance</param>
-                    /// <exception cref="InvalidOperationException">When <paramref name="member"/> contains more than one <typeparamref name="T"/>.</exception>
-                    public static bool TryGet<T>( this MemberInfo member, out T attribute) where T : Attribute {
-                        var attributes = Gik.Attributes.Of(member, typeof (T));
-                        attribute = attributes.Length == 1 ? (T) attributes[0] : null;
-                        return attribute != null;
-                    }
-
-
-                    /// <summary>
-                    /// Returns <see langword="true"/> if can get <typeparamref name="T"/>, otherwise returns <see langword="false"/>
-                    /// </summary>
-                    /// <typeparam name="T"><see cref="Attribute"/>'s type</typeparam>
-                    /// <param name="member">Member maked with <typeparamref name="T"/></param>
-                    /// <param name="attributes">Collection of <typeparamref name="T"/> instances</param>
-                    public static bool TryGet<T>( this MemberInfo member, out IEnumerable<T> attributes) where T : Attribute {
-                        var attrs = Gik.Attributes.Of(member, typeof (T));
-                        attributes = attrs.Cast<T>();
-                        return attrs.Length > 0;
-                    }
-*/
+                            /// <summary>
+                            /// Returns <see langword="true"/> if can get <typeparamref name="T"/>, otherwise returns <see langword="false"/>
+                            /// </summary>
+                            /// <typeparam name="T"><see cref="Attribute"/>'s type</typeparam>
+                            /// <param name="member">Member maked with <typeparamref name="T"/></param>
+                            /// <param name="attributes">Collection of <typeparamref name="T"/> instances</param>
+                            public static bool TryGet<T>( this MemberInfo member, out IEnumerable<T> attributes) where T : Attribute {
+                                var attrs = Gik.Attributes.Of(member, typeof (T));
+                                attributes = attrs.Cast<T>();
+                                return attrs.Length > 0;
+                            }
+        */
 
 
 
-            /// <summary>
-            /// Checks, is <paramref name="member"/> marked with <typeparamref name="T"/>.
-            /// <typeparamref name="T"/> should be concrete attribute type. Inheritance is not allowed.
-            /// </summary>
-            /// <param name="member">Member marked with <typeparamref name="T"/></param>
-            /// <seealso cref="IsDefinedAny{T}"/>
-            /// <param name="includeInherited">
-            /// In .net 4.0: if <see langword="true"/> - also search attribute in ancensor of <paramref name="member"/>. 
-            /// In other target frameworks parameter does nothing.
-            /// Default is <see langword="true"/>.
-            /// </param>
-            /// <seealso cref="IsDefinedAny{T}"/>
+        /// <summary>
+        /// Checks, is <paramref name="member"/> marked with <typeparamref name="T"/>.
+        /// <typeparamref name="T"/> should be concrete attribute type. Inheritance is not allowed.
+        /// </summary>
+        /// <param name="member">Member marked with <typeparamref name="T"/></param>
+        /// <seealso cref="IsDefinedAny{T}"/>
+        /// <param name="includeInherited">
+        /// In .net 4.0: if <see langword="true"/> - also search attribute in ancensor of <paramref name="member"/>. 
+        /// In other target frameworks parameter does nothing.
+        /// Default is <see langword="true"/>.
+        /// </param>
+        /// <seealso cref="IsDefinedAny{T}"/>
         public static bool IsDefined<T>(this MemberInfo member, bool includeInherited = true) where T : Attribute {
             return IsDefined(member, typeof (T), includeInherited);
         }
