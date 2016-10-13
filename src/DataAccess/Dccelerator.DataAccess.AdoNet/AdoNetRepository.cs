@@ -18,10 +18,10 @@ namespace Dccelerator.DataAccess.Ado {
     /// <summary>
     /// Am <see cref="IAdoNetRepository"/> what defines special names of CRUD-operation stored procedures.
     /// </summary>
-    /// <seealso cref="NameOfReadProcedureFor"/>
-    /// <seealso cref="NameOfInsertProcedureFor"/>
-    /// <seealso cref="NameOfUpdateProcedureFor"/>
-    /// <seealso cref="NameOfDeleteProcedureFor"/>
+    /// <seealso cref="ReadCommandText"/>
+    /// <seealso cref="InsertCommandText"/>
+    /// <seealso cref="UpdateCommandText"/>
+    /// <seealso cref="DeleteCommandText"/>
     public abstract class AdoNetRepository<TCommand, TParameter, TConnection> : IAdoNetRepository
         where TCommand : DbCommand
         where TParameter: DbParameter
@@ -32,7 +32,7 @@ namespace Dccelerator.DataAccess.Ado {
 
         protected abstract TConnection GetConnection();
 
-        protected abstract TParameter ParameterWith(string name, Type type, object value);
+        protected abstract TParameter ParameterWith(IEntityInfo info, IDataCriterion criterion);
 
         protected abstract TCommand CommandFor(string commandText, TConnection connection, IEnumerable<TParameter> parameters, CommandType type = CommandType.StoredProcedure);
 
@@ -45,26 +45,28 @@ namespace Dccelerator.DataAccess.Ado {
         }
 
         
-        protected virtual string NameOfReadProcedureFor( string entityName) {
-            return string.Concat("obj_", entityName, "_get_by_criteria");
+        protected virtual string ReadCommandText(IEntityInfo info, IEnumerable<IDataCriterion> dataCriterion) {
+            return string.Concat("obj_", info.EntityName, "_get_by_criteria");
         }
 
 
         
-        protected virtual string NameOfInsertProcedureFor( string entityName) {
-            return string.Concat("obj_", entityName, "_insert");
+        protected virtual string InsertCommandText<TEntity>(IEntityInfo info, TEntity entity) {
+            return string.Concat("obj_", info.EntityName, "_insert");
         }
 
 
         
-        protected virtual string NameOfUpdateProcedureFor( string entityName) {
-            return string.Concat("obj_", entityName, "_update");
+        protected virtual string UpdateCommandText<TEntity>(IEntityInfo info, TEntity entity)
+        {
+            return string.Concat("obj_", info.EntityName, "_update");
         }
 
 
         
-        protected virtual string NameOfDeleteProcedureFor( string entityName) {
-            return string.Concat("obj_", entityName, "_delete");
+        protected virtual string DeleteCommandText<TEntity>(IEntityInfo info, TEntity entity)
+        {
+            return string.Concat("obj_", info.EntityName, "_delete");
         }
 
 
@@ -74,8 +76,13 @@ namespace Dccelerator.DataAccess.Ado {
                 if (!RUtils<TEntity>.TryGetValueOnPath(entity, x.Key, out value))
                     throw new InvalidOperationException($"Entity of type {entity.GetType()} should contain property '{x.Key}', " +
                                                         $"but in some reason value or that property could not be getted.");
-
-                return ParameterWith(x.Key, x.Value.PropertyType, value);
+                var criterion = new DataCriterion()
+                {
+                    Name = x.Key,
+                    Type = x.Value.PropertyType,
+                    Value = x.Value
+                };
+                return ParameterWith(null, criterion);
             });
         }
         
@@ -91,16 +98,14 @@ namespace Dccelerator.DataAccess.Ado {
         }
 
         protected virtual IEnumerable<object> Read(IAdoEntityInfo info, ICollection<IDataCriterion> criteria) {
-            var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
-
             if (info.Inclusions?.Any() != true)
-                return GetMainEntities(info, parameters);;
+                return GetMainEntities(info, criteria);;
 
-            return ReadToEnd(info, parameters);
+            return ReadToEnd(info, criteria);
 /*
 
             using (var connection = GetConnection())
-            using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
+            using (var command = CommandFor(ReadCommandText(info.EntityName), connection, parameters)) {
                 connection.Open();
                 using (var reader = command.ExecuteReader())
                     return ReadToEnd(reader, info);
@@ -111,14 +116,18 @@ namespace Dccelerator.DataAccess.Ado {
 
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
         /// <exception cref="Exception">.</exception>
-        public bool Any(IEntityInfo info, ICollection<IDataCriterion> criteria) {
-            var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
+        public bool Any(IEntityInfo info, ICollection<IDataCriterion> criteria)
+        {
+
+            var parameters =
+                criteria.Select(
+                    x => ParameterWith(null, new DataCriterion() {Name = x.Name, Type = x.Type, Value = x.Value}));
 
             var behavior = GetBehaviorFor(info) | CommandBehavior.SingleRow;
 
             var connection = GetConnection();
             try {
-                using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
+                using (var command = CommandFor(ReadCommandText(info, criteria), connection, parameters)) {
                     connection.Open();
                     using (var reader = command.ExecuteReader(behavior)) {
                         return reader.Read();
@@ -139,15 +148,18 @@ namespace Dccelerator.DataAccess.Ado {
 
 
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        protected virtual IEnumerable<object> ReadColumn(string columnName, IAdoEntityInfo info, ICollection<IDataCriterion> criteria) {
-            var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
+        protected virtual IEnumerable<object> ReadColumn(string columnName, IAdoEntityInfo info, ICollection<IDataCriterion> criteria)
+        {
+            var parameters =
+                criteria.Select(
+                    x => ParameterWith(null, new DataCriterion() {Name = x.Name, Type = x.Type, Value = x.Value}));
 
             var idx = info.ReaderColumns != null ? info.IndexOf(columnName) : -1;
 
             var behavior = GetBehaviorFor(info);
             var connection = GetConnection();
             try {
-                using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
+                using (var command = CommandFor(ReadCommandText(info, criteria), connection, parameters)) {
                     connection.Open();
                     using (var reader = command.ExecuteReader(behavior)) {
                         if (idx < 0) {
@@ -169,13 +181,16 @@ namespace Dccelerator.DataAccess.Ado {
 
 
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        public int CountOf(IEntityInfo info, ICollection<IDataCriterion> criteria) {
-            var parameters = criteria.Select(x => ParameterWith(x.Name, x.Type, x.Value));
+        public int CountOf(IEntityInfo info, ICollection<IDataCriterion> criteria)
+        {
+            var parameters =
+                criteria.Select(
+                    x => ParameterWith(null, new DataCriterion() {Name = x.Name, Type = x.Type, Value = x.Value}));
 
             var behavior = GetBehaviorFor(info);
             var connection = GetConnection();
             try {
-                using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
+                using (var command = CommandFor(ReadCommandText(info, criteria), connection, parameters)) {
                     connection.Open();
                     using (var reader = command.ExecuteReader(behavior)) {
                         return RowsCount(reader);
@@ -198,7 +213,7 @@ namespace Dccelerator.DataAccess.Ado {
             var parameters = ParametersFrom(info, entity);
             var connection = GetConnection();
             try {
-                using (var command = CommandFor(NameOfInsertProcedureFor(info.EntityName), connection, parameters)) {
+                using (var command = CommandFor(InsertCommandText(info, entity), connection, parameters)) {
                     connection.Open();
                     return command.ExecuteNonQuery() > 0;
                 }
@@ -216,7 +231,7 @@ namespace Dccelerator.DataAccess.Ado {
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
         public virtual bool InsertMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class {
-            var name = NameOfInsertProcedureFor(info.EntityName);
+            var name = InsertCommandText(info, entities);
             var connection = GetConnection();
 
             try {
@@ -250,7 +265,7 @@ namespace Dccelerator.DataAccess.Ado {
             var parameters = ParametersFrom(info, entity);
             var connection = GetConnection();
             try {
-                using (var command = CommandFor(NameOfUpdateProcedureFor(info.EntityName), connection, parameters)) {
+                using (var command = CommandFor(UpdateCommandText(info, entity), connection, parameters)) {
                     connection.Open();
                     return command.ExecuteNonQuery() > 0;
                 }
@@ -268,7 +283,7 @@ namespace Dccelerator.DataAccess.Ado {
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
         public virtual bool UpdateMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class {
-            var name = NameOfUpdateProcedureFor(info.EntityName);
+            var name = UpdateCommandText(info, entities);
             var connection = GetConnection();
             try {
                 connection.Open();
@@ -302,7 +317,7 @@ namespace Dccelerator.DataAccess.Ado {
             var parameters = new [] { PrimaryKeyParameterOf(info, entity) };
             var connection = GetConnection();
             try {
-                using (var command = CommandFor(NameOfDeleteProcedureFor(info.EntityName), connection, parameters)) {
+                using (var command = CommandFor(DeleteCommandText(info, entity), connection, parameters)) {
                     connection.Open();
                     return command.ExecuteNonQuery() > 0;
                 }
@@ -320,7 +335,7 @@ namespace Dccelerator.DataAccess.Ado {
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
         public virtual bool DeleteMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class {
-            var name = NameOfDeleteProcedureFor(info.EntityName);
+            var name = DeleteCommandText(info, entities);
             var connection = GetConnection();
             try {
                 connection.Open();
@@ -366,11 +381,15 @@ namespace Dccelerator.DataAccess.Ado {
 
 
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        protected virtual IEnumerable<object> GetMainEntities(IAdoEntityInfo info, IEnumerable<TParameter> parameters) {
+        protected virtual IEnumerable<object> GetMainEntities(IAdoEntityInfo info, ICollection<IDataCriterion> criteria)
+        {
+            var parameters =
+                criteria.Select(
+                    x => ParameterWith(null, new DataCriterion() {Name = x.Name, Type = x.Type, Value = x.Value}));
             var connection = GetConnection();
             var behavior = GetBehaviorFor(info);
             try {
-                using (var command = CommandFor(NameOfReadProcedureFor(info.EntityName), connection, parameters)) {
+                using (var command = CommandFor(ReadCommandText(info, criteria), connection, parameters)) {
                     connection.Open();
                     using (var reader = command.ExecuteReader(behavior)) {
                         info.InitReaderColumns(reader);
@@ -390,12 +409,16 @@ namespace Dccelerator.DataAccess.Ado {
 
 
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        protected virtual IEnumerable<object> ReadToEnd(IAdoEntityInfo mainObjectInfo, IEnumerable<TParameter> parameters) {
+        protected virtual IEnumerable<object> ReadToEnd(IAdoEntityInfo mainObjectInfo, ICollection<IDataCriterion> criteria)
+        {
+            var parameters =
+                criteria.Select(
+                    x => ParameterWith(null, new DataCriterion() {Name = x.Name, Type = x.Type, Value = x.Value}));
             var connection = GetConnection();
 
             var behavior = GetBehaviorFor(mainObjectInfo);
             try {
-                using (var command = CommandFor(NameOfReadProcedureFor(mainObjectInfo.EntityName), connection, parameters)) {
+                using (var command = CommandFor(ReadCommandText(mainObjectInfo, criteria), connection, parameters)) {
                     connection.Open();
                     using (var reader = command.ExecuteReader(behavior)) {
 

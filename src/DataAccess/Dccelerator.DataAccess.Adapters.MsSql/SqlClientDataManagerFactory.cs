@@ -3,12 +3,8 @@ using Dccelerator.DataAccess.Ado.SqlClient.Implementation;
 
 
 namespace Dccelerator.DataAccess.Ado.SqlClient {
-    public abstract class SqlClientDataManagerFactory<TRepository> : DataManagerAdoFactoryBase<TRepository> where TRepository : class, IAdoNetRepository {
+    public abstract class SqlClientDataManagerFactory<TRepository> : DataManagerAdoFactoryBase<TRepository, SqlEntityInfo<TRepository>> where TRepository : class, IAdoNetRepository {
         #region Overrides of DataManagerAdoFactoryBase
-
-        protected override ForcedCacheReadingRepository ForcedCachedReadingRepository<TEntity>() {
-            return new SqlClientForcedCacheReadingRepository();
-        }
 
 
         protected override DirectReadingRepository NotCachedReadingRepository<TEntity>() {

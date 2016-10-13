@@ -33,6 +33,8 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ConsoleApp1", "specs\Consol
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Dccelerator.DataAccess.Lazy", "src\DataAccess\Dccelerator.DataAccess.Lazy\Dccelerator.DataAccess.Lazy.xproj", "{5C576A43-3EE7-48CB-8A8C-9B58BECFF0AE}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Dccelerator.DataAccess.Adapters.Oracle", "src\DataAccess\Dccelerator.DataAccess.Adapters.Oracle\Dccelerator.DataAccess.Adapters.Oracle.xproj", "{5A19F9B4-4A6B-4893-AFAE-567A0B00B6F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{5C576A43-3EE7-48CB-8A8C-9B58BECFF0AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C576A43-3EE7-48CB-8A8C-9B58BECFF0AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C576A43-3EE7-48CB-8A8C-9B58BECFF0AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A19F9B4-4A6B-4893-AFAE-567A0B00B6F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A19F9B4-4A6B-4893-AFAE-567A0B00B6F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A19F9B4-4A6B-4893-AFAE-567A0B00B6F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A19F9B4-4A6B-4893-AFAE-567A0B00B6F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -90,6 +96,7 @@ Global
 		{EDF7CE71-93E7-4F81-9BFF-66D732B89674} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
 		{F728ADB4-7247-49DF-A6D7-B0C2805095CE} = {8FCF91C8-AB08-4481-BBEE-94F54CF7F170}
 		{5C576A43-3EE7-48CB-8A8C-9B58BECFF0AE} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
+		{5A19F9B4-4A6B-4893-AFAE-567A0B00B6F9} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
 	EndGlobalSection
 	GlobalSection(CodealikeProperties) = postSolution
 		SolutionGuid = d277d950-8cb6-443a-bb7f-3da78e68f24d

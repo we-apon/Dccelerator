@@ -13,15 +13,33 @@ using System.Reflection;
 
 namespace Dccelerator.DataAccess.Ado.Implementation {
 
-    public class AdoEntityInfo<TRepository> : BaseEntityInfo<TRepository>, IAdoEntityInfo where TRepository : class, IAdoNetRepository {
+    public abstract class AdoEntityInfo<TRepository, TDbTypeEnum> : BaseEntityInfo<TRepository>, IAdoEntityInfo<TDbTypeEnum> 
+        where TRepository : class, IAdoNetRepository
+        where TDbTypeEnum : struct 
+    {
+
+        //        class DefaultAdoEntityInfo : AdoEntityInfo<TRepository, TDbTypeEnum> {
+        //            public DefaultAdoEntityInfo(Type entityType) : base(entityType) {}
+        //            protected override TDbTypeEnum GetDefaultDbType(Type propertyType) {
+        //                return default(TDbTypeEnum);
+        //            }
+        //        }
+        //
+        //        internal static AdoEntityInfo<TRepository> GetInstanse(Type entityInfo) {
+        //            return new DefaultAdoEntityInfo(entityInfo);
+        //        }
+
+
+        protected abstract IAdoEntityInfo GetInstanse(Type type);
+        public abstract TDbTypeEnum GetDefaultDbType(Type propertyType);
+
 
         readonly object _lock = new object();
 
+        protected AdoEntityInfo(Type entityType) : base(entityType) { }
 
-        public AdoEntityInfo(Type entityType) : base(entityType) { }
 
-
-        internal void SetRepository(IAdoNetRepository repository) {
+        void IAdoEntityInfo.SetupRepository(IAdoNetRepository repository) {
             var genericRepository = repository as TRepository;
             if (genericRepository == null)
                 throw new InvalidOperationException($"{nameof(repository)} should be of type {typeof(TRepository)}.");
@@ -33,15 +51,68 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
         }
 
 
+
+
+        private Dictionary<string, TDbTypeEnum> _typeMappings;
+
+        protected virtual Dictionary<string, TDbTypeEnum> TypeMappings {
+            get {
+                if (_typeMappings != null)
+                    return _typeMappings;
+
+                return _typeMappings = GetDbTypeMappings();
+            }
+        }
+
+
+
+        public virtual TDbTypeEnum GetParameterDbType(string parameterName) {
+            TDbTypeEnum type;
+            if (!TypeMappings.TryGetValue(parameterName, out type))
+                throw new InvalidOperationException($"Parameter with name {parameterName} not exist in {nameof(TypeMappings)} of {EntityType}.");
+
+            return type;
+        }
+
+
         #region Implementation of IAdoEntityInfo
 
-        public Dictionary<string, PropertyInfo> NavigationProperties { get; }
+        public virtual Dictionary<string, PropertyInfo> NavigationProperties { get; }
 
 
         IAdoNetRepository IAdoEntityInfo.Repository => Repository;
 
-        public string[] ReaderColumns { get; private set; }
+        public virtual string[] ReaderColumns { get; protected set; }
 
+
+        protected virtual Dictionary<string, TDbTypeEnum> GetDbTypeMappings()
+        {
+            var mappings = new Dictionary<string, TDbTypeEnum>();
+            foreach (var property in PersistedProperties.Values)
+            {
+                TDbTypeEnum result;
+
+                var dbTypeAttribute =
+                    property.GetMany<DbTypeAttribute>()
+                        .FirstOrDefault(x => x.RepositoryType == (Repository?.GetType() ?? typeof(TRepository)));
+                if (dbTypeAttribute != null)
+                {
+                    if (dbTypeAttribute.DbTypeName is TDbTypeEnum)
+                        result = (TDbTypeEnum)dbTypeAttribute.DbTypeName;
+                    else if (!Enum.TryParse(dbTypeAttribute.DbTypeName.ToString(), out result))
+                        result = GetDefaultDbType(property.PropertyType);
+                }
+                else
+                {
+                    result = GetDefaultDbType(property.PropertyType);
+                }
+
+                mappings.Add(property.Name, result);
+            }
+
+
+            return mappings;
+        }
 
         Dictionary<string, int> _readerColumnsIndexes;
         public int IndexOf(string columnName) {
@@ -112,12 +183,14 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 return inclusions;
 
             foreach (var inclusionAttribute in inclusionAttributes) {
-                var includeon = new Includeon(inclusionAttribute, this, type => new AdoEntityInfo<TRepository>(type));
+                var includeon = new Includeon(inclusionAttribute, this, GetInstanse);
                 inclusions.Add(inclusionAttribute.ResultSetIndex, includeon);
             }
 
             return inclusions;
         }
+        
+
 
         #endregion
     }

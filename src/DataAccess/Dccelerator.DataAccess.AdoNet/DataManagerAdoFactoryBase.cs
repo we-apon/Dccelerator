@@ -6,10 +6,16 @@ using Dccelerator.DataAccess.Implementation.Internal;
 
 
 namespace Dccelerator.DataAccess.Ado {
-    public abstract class DataManagerAdoFactoryBase<TRepository> : IDataManagerAdoFactory where TRepository : class, IAdoNetRepository {
+    public abstract class DataManagerAdoFactoryBase<TRepository, TEntityInfo> : IDataManagerAdoFactory 
+        where TRepository : class, IAdoNetRepository
+        where TEntityInfo : IAdoEntityInfo
+    {
 
-        protected abstract ForcedCacheReadingRepository ForcedCachedReadingRepository<TEntity>() where TEntity : class;
         protected abstract DirectReadingRepository NotCachedReadingRepository<TEntity>() where TEntity : class;
+
+        public abstract IReadingRepository ReadingRepository();
+        public abstract IAdoNetRepository AdoNetRepository();
+        protected abstract TEntityInfo GetEntityInfo(Type type);
 
 
         /// <summary>
@@ -17,7 +23,7 @@ namespace Dccelerator.DataAccess.Ado {
         /// This method will be called one time for each <typeparamref name="TEntity"/> requested in each data manager.
         /// </summary>
         public virtual IDataGetter<TEntity> GetterFor<TEntity>() where TEntity : class, new() {
-            return new ForcedCacheDataGetter<TEntity>(ReadingRepository(), InfoAbout<TEntity>());
+            return new DefaultDataGetter<TEntity>(ReadingRepository(), InfoAbout<TEntity>());
         }
 
 
@@ -26,7 +32,7 @@ namespace Dccelerator.DataAccess.Ado {
         /// This method will be called on each request of any not cached entity.
         /// </summary>
         public virtual IDataGetter<TEntity> NotCachedGetterFor<TEntity>() where TEntity : class, new() {
-            return new NotCachedDataGetter<TEntity>(ReadingRepository(), InfoAbout<TEntity>());
+            return new DefaultDataGetter<TEntity>(NotCachedReadingRepository<TEntity>(), InfoAbout<TEntity>());
         }
         
 
@@ -36,7 +42,7 @@ namespace Dccelerator.DataAccess.Ado {
         /// This method will be called on each delete request.
         /// </summary>
         public virtual IDataExistenceChecker<TEntity> DataExistenceChecker<TEntity>() where TEntity : class {
-            return new DataExistenceChecker<TEntity>(ForcedCachedReadingRepository<TEntity>(), AdoInfoAbout<TEntity>());
+            return new DataExistenceChecker<TEntity>(ReadingRepository(), AdoInfoAbout<TEntity>());
         }
 
 
@@ -56,7 +62,7 @@ namespace Dccelerator.DataAccess.Ado {
         /// This method will be called on each delete request.
         /// </summary>
         public virtual IDataCountChecker<TEntity> DataCountChecker<TEntity>() where TEntity : class {
-            return new DataCountChecker<TEntity>(ForcedCachedReadingRepository<TEntity>(), AdoInfoAbout<TEntity>());
+            return new DataCountChecker<TEntity>(ReadingRepository(), AdoInfoAbout<TEntity>());
         }
 
 
@@ -107,34 +113,34 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <seealso cref="IDataManagerFactory.InfoAbout{TEntity}"/>
         public virtual IEntityInfo InfoAbout(Type entityType) {
-            var info = new AdoNetInfoAboutEntity<TRepository>(entityType).Info;
+            var info = new AdoNetInfoCacheContainer<TEntityInfo>(entityType, GetEntityInfo).Info;
             if (info.Repository == null) {
                 lock (info) {
                     if (info.Repository == null)
-                        info.SetRepository(AdoNetRepository());
+                        info.SetupRepository(AdoNetRepository());
                 }
             }
             return info;
         }
 
 
-        public abstract IReadingRepository ReadingRepository();
 
         
 
         public virtual IAdoEntityInfo AdoInfoAbout<TEntity>() {
-            var info = AdoNetInfoAbout<TRepository, TEntity>.Info;
+            var info = AdoNetInfoCache<TEntityInfo, TEntity>.Info;
             if (info.Repository == null) {
                 lock (info) {
                     if (info.Repository == null)
-                        info.SetRepository(AdoNetRepository());
+                        info.SetupRepository(AdoNetRepository());
                 }
             }
             return info;
         }
 
 
-        public abstract IAdoNetRepository AdoNetRepository();
 
     }
+
+   
 }

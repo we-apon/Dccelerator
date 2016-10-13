@@ -7,9 +7,9 @@ namespace Dccelerator.DataAccess.Ado.Implementation.Internal {
     /// This manager is never caches anything.
     /// </summary>
     /// <typeparam name="TEntity">Entity that will be getted with current getter instance.</typeparam>
-    sealed class NotCachedDataGetter<TEntity> : DataGetterBase<TEntity> where TEntity : class, new() {
+    class DefaultDataGetter<TEntity> : DataGetterBase<TEntity> where TEntity : class, new() {
 
         
-        public NotCachedDataGetter(IReadingRepository readingRepository, IEntityInfo info) : base(readingRepository, info) { }
+        public DefaultDataGetter(IReadingRepository readingRepository, IEntityInfo info) : base(readingRepository, info) { }
     }
 }
