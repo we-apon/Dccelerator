@@ -29,23 +29,14 @@ namespace Dccelerator.DataAccess.Ado {
 
         DbConnection IAdoNetRepository.GetConnection() => GetConnection();
 
-        protected abstract TParameter PrimaryKeyParameterOf<TEntity>(IEntityInfo info, TEntity entity);
-
-        protected abstract TConnection GetConnection();
-
-
-        protected abstract TParameter ParameterWith(IEntityInfo info, IDataCriterion criterion);
-
-        protected abstract TCommand CommandFor(string commandText, TConnection connection, IEnumerable<TParameter> parameters, CommandType type = CommandType.StoredProcedure);
-
-
-        protected abstract string ReadCommandText(IEntityInfo info, IEnumerable<IDataCriterion> criteria);
-
-        protected abstract string InsertCommandText<TEntity>(IEntityInfo info, TEntity entity);
-
-        protected abstract string UpdateCommandText<TEntity>(IEntityInfo info, TEntity entity);
-
-        protected abstract string DeleteCommandText<TEntity>(IEntityInfo info, TEntity entity);
+        protected internal abstract TParameter PrimaryKeyParameterOf<TEntity>(IEntityInfo info, TEntity entity);
+        protected internal abstract TConnection GetConnection();
+        protected internal abstract TParameter ParameterWith(IEntityInfo info, IDataCriterion criterion);
+        protected internal abstract TCommand CommandFor(string commandText, TConnection connection, IEnumerable<TParameter> parameters, CommandType type = CommandType.StoredProcedure);
+        protected internal abstract string ReadCommandText(IEntityInfo info, IEnumerable<IDataCriterion> criteria);
+        protected internal abstract string InsertCommandText<TEntity>(IEntityInfo info, TEntity entity);
+        protected internal abstract string UpdateCommandText<TEntity>(IEntityInfo info, TEntity entity);
+        protected internal abstract string DeleteCommandText<TEntity>(IEntityInfo info, TEntity entity);
 
         
 

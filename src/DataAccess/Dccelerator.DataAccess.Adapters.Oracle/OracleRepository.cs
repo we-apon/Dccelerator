@@ -83,14 +83,15 @@ namespace Dccelerator.DataAccess.Adapters.Oracle {
 
         protected internal virtual string UpdateQuery<TEntity>(IEntityInfo info, TEntity entity) {
             var builder = new StringBuilder("update ").Append(info.EntityName).Append(" set ");
-            foreach (var property in info.PersistedProperties.Keys) {
-                builder.Append(property).Append(" = :").Append(property).Append(",\n");
-            }
-
             var key = PrimaryKeyParameterOf(info, entity);
 
+            foreach (var property in info.PersistedProperties.Keys) {
+                if (property == key.ParameterName) continue;
+                builder.Append(property).Append(" = :").Append(property).Append(", ");
+            }
+
             builder.Remove(builder.Length - 2, 2);
-            builder.Append("\nwhere ").Append(key.ParameterName).Append(" = :").Append(key.ParameterName);
+            builder.Append(" where ").Append(key.ParameterName).Append(" = :").Append(key.ParameterName);
             return builder.ToString();
         }
 
@@ -100,7 +101,7 @@ namespace Dccelerator.DataAccess.Adapters.Oracle {
 
             var key = PrimaryKeyParameterOf(info, entity);
 
-            builder.Append("\nwhere").Append(key.ParameterName).Append(" = :").Append(key.ParameterName);
+            builder.Append(" where").Append(key.ParameterName).Append(" = :").Append(key.ParameterName);
             return builder.ToString();
         }
 
