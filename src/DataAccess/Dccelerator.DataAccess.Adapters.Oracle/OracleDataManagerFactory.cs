@@ -17,7 +17,7 @@ namespace Dccelerator.DataAccess.Adapters.Oracle {
         /// </summary>
         public override IDataTransaction DataTransaction(ITransactionScheduler scheduler,
             IsolationLevel isolationLevel = IsolationLevel.ReadCommitted) {
-            return new OracleClientSimpleScheduledTransaction(scheduler, this, isolationLevel);
+            return new OracleSimpleScheduledTransaction(scheduler, this, isolationLevel);
         }
 
 

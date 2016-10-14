@@ -13,10 +13,9 @@ namespace Dccelerator.DataAccess.Adapters.Oracle {
     }
 
 
-
     //BUG: implement transaction scope!!
-    class OracleClientSimpleScheduledTransaction : SimpleScheduledTransaction {
-        public OracleClientSimpleScheduledTransaction(ITransactionScheduler scheduler, IDataManagerAdoFactory factory,
+    class OracleSimpleScheduledTransaction : SimpleScheduledTransaction {
+        public OracleSimpleScheduledTransaction(ITransactionScheduler scheduler, IDataManagerAdoFactory factory,
             IsolationLevel isolationLevel) : base(scheduler, factory, isolationLevel) {}
 
 
@@ -36,10 +35,8 @@ namespace Dccelerator.DataAccess.Adapters.Oracle {
 
 
         protected override ISpecificTransactionScope BeginTransactionScope(IsolationLevel isolationLevel) {
-            return
-                new Scope(new TransactionScope(TransactionScopeOption.Required,
-                    new TransactionOptions {IsolationLevel = (System.Transactions.IsolationLevel) isolationLevel}));
+            return new Scope(new TransactionScope(TransactionScopeOption.Required, new TransactionOptions {IsolationLevel = (System.Transactions.IsolationLevel) isolationLevel}));
         }
-
     }
+
 }

@@ -31,3 +31,4 @@ packages/*
 .vs/*
 publish/*
 artifacts/*
+output/*
