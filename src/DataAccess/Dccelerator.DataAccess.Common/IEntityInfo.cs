@@ -14,6 +14,8 @@ namespace Dccelerator.DataAccess {
 
         bool IsGloballyCached { get; }
 
+        bool UsingQueries { get; }
+
         Dictionary<string, ForeignKeyAttribute> ForeignKeys { get; }
 
         Dictionary<string, SecondaryKeyAttribute> SecondaryKeys { get; }

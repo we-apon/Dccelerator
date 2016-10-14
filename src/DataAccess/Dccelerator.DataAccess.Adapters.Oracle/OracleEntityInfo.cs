@@ -5,7 +5,7 @@ using Dccelerator.DataAccess.Ado;
 
 namespace Dccelerator.DataAccess.Adapters.Oracle {
 
-    public class OracleEntityInfo<TRepository> : AdoEntityInfo<TRepository, OracleDbType> where TRepository : class, IAdoNetRepository {
+    public sealed class OracleEntityInfo<TRepository> : AdoEntityInfo<TRepository, OracleDbType> where TRepository : class, IAdoNetRepository {
         public OracleEntityInfo(Type entityType) : base(entityType) {}
         
 

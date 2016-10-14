@@ -5,12 +5,10 @@ using System.Data.SqlClient;
 
 namespace Dccelerator.DataAccess.Ado.SqlClient {
     public abstract class SqlClientRepository : AdoNetRepository<SqlCommand, SqlParameter, SqlConnection> {
-        #region Overrides of AdoNetRepository<SqlCommand,SqlParameter,SqlConnection>
-        
 
         protected override SqlParameter ParameterWith(IEntityInfo info, IDataCriterion criterion) {
             var sqlInfo = (IAdoEntityInfo<SqlDbType>) info;
-            return new SqlParameter('@' + criterion.Name, sqlInfo.GetParameterDbType(criterion.Name)) { Value = criterion.Value };
+            return new SqlParameter('@' + criterion.Name, sqlInfo.GetParameterDbType(criterion.Name)) {Value = criterion.Value};
         }
 
 
@@ -22,6 +20,28 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
             return command;
         }
 
-        #endregion
+
+
+        protected override string ReadCommandText(IEntityInfo info, IEnumerable<IDataCriterion> criteria) {
+            return string.Concat("obj_", info.EntityName, "_get_by_criteria");
+        }
+
+
+
+        protected override string InsertCommandText<TEntity>(IEntityInfo info, TEntity entity) {
+            return string.Concat("obj_", info.EntityName, "_insert");
+        }
+
+
+
+        protected override string UpdateCommandText<TEntity>(IEntityInfo info, TEntity entity) {
+            return string.Concat("obj_", info.EntityName, "_update");
+        }
+
+
+
+        protected override string DeleteCommandText<TEntity>(IEntityInfo info, TEntity entity) {
+            return string.Concat("obj_", info.EntityName, "_delete");
+        }
     }
 }

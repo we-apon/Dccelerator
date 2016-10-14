@@ -27,46 +27,33 @@ namespace Dccelerator.DataAccess.Ado {
         where TParameter: DbParameter
         where TConnection : DbConnection {
 
+        DbConnection IAdoNetRepository.GetConnection() => GetConnection();
 
         protected abstract TParameter PrimaryKeyParameterOf<TEntity>(IEntityInfo info, TEntity entity);
 
         protected abstract TConnection GetConnection();
 
+
         protected abstract TParameter ParameterWith(IEntityInfo info, IDataCriterion criterion);
 
         protected abstract TCommand CommandFor(string commandText, TConnection connection, IEnumerable<TParameter> parameters, CommandType type = CommandType.StoredProcedure);
 
+
+        protected abstract string ReadCommandText(IEntityInfo info, IEnumerable<IDataCriterion> criteria);
+
+        protected abstract string InsertCommandText<TEntity>(IEntityInfo info, TEntity entity);
+
+        protected abstract string UpdateCommandText<TEntity>(IEntityInfo info, TEntity entity);
+
+        protected abstract string DeleteCommandText<TEntity>(IEntityInfo info, TEntity entity);
+
         
+
         protected virtual CommandBehavior GetBehaviorFor(IEntityInfo info) {
             if (info.Inclusions?.Any() != true)
                 return CommandBehavior.SequentialAccess | CommandBehavior.SingleResult;
 
             return CommandBehavior.SequentialAccess;
-        }
-
-        
-        protected virtual string ReadCommandText(IEntityInfo info, IEnumerable<IDataCriterion> dataCriterion) {
-            return string.Concat("obj_", info.EntityName, "_get_by_criteria");
-        }
-
-
-        
-        protected virtual string InsertCommandText<TEntity>(IEntityInfo info, TEntity entity) {
-            return string.Concat("obj_", info.EntityName, "_insert");
-        }
-
-
-        
-        protected virtual string UpdateCommandText<TEntity>(IEntityInfo info, TEntity entity)
-        {
-            return string.Concat("obj_", info.EntityName, "_update");
-        }
-
-
-        
-        protected virtual string DeleteCommandText<TEntity>(IEntityInfo info, TEntity entity)
-        {
-            return string.Concat("obj_", info.EntityName, "_delete");
         }
 
 
@@ -202,25 +189,18 @@ namespace Dccelerator.DataAccess.Ado {
                 connection.Dispose();
             }
         }
-
+        
 
         /// <summary>
         /// Inserts an <paramref name="entity"/> using it's database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        public virtual bool Insert<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class {
+        public virtual bool Insert<TEntity>(IEntityInfo info, TEntity entity, DbConnection connection) where TEntity : class {
             var parameters = ParametersFrom(info, entity);
-            var connection = GetConnection();
-            try {
-                using (var command = CommandFor(InsertCommandText(info, entity), connection, parameters)) {
-                    connection.Open();
-                    return command.ExecuteNonQuery() > 0;
-                }
-            }
-            finally {
-                connection.Close();
-                connection.Dispose();
+
+            using (var command = CommandFor(InsertCommandText(info, entity), (TConnection)connection, parameters)) {
+                return command.ExecuteNonQuery() > 0;
             }
         }
 
@@ -230,17 +210,14 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        public virtual bool InsertMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class {
+        public virtual bool InsertMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbConnection connection) where TEntity : class {
             var name = InsertCommandText(info, entities);
-            var connection = GetConnection();
 
-            try {
-                connection.Open();
 
                 foreach (var entity in entities) {
                     var parameters = ParametersFrom(info, entity);
 
-                    using (var command = CommandFor(name, connection, parameters)) {
+                    using (var command = CommandFor(name, (TConnection)connection, parameters)) {
                         if (command.ExecuteNonQuery() <= 0) {
                             return false;
                         }
@@ -248,11 +225,7 @@ namespace Dccelerator.DataAccess.Ado {
                 }
 
                 return true;
-            }
-            finally {
-                connection.Close();
-                connection.Dispose();
-            }
+
         }
 
 
@@ -261,19 +234,11 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        public virtual bool Update<T>(IEntityInfo info, T entity) where T : class {
+        public virtual bool Update<T>(IEntityInfo info, T entity, DbConnection connection) where T : class {
             var parameters = ParametersFrom(info, entity);
-            var connection = GetConnection();
-            try {
-                using (var command = CommandFor(UpdateCommandText(info, entity), connection, parameters)) {
-                    connection.Open();
+                using (var command = CommandFor(UpdateCommandText(info, entity), (TConnection)connection, parameters)) {
                     return command.ExecuteNonQuery() > 0;
                 }
-            }
-            finally {
-                connection.Close();
-                connection.Dispose();
-            }
         }
 
 
@@ -282,16 +247,13 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        public virtual bool UpdateMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class {
+        public virtual bool UpdateMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbConnection connection) where TEntity : class {
             var name = UpdateCommandText(info, entities);
-            var connection = GetConnection();
-            try {
-                connection.Open();
 
                 foreach (var entity in entities) {
                     var parameters = ParametersFrom(info, entity);
 
-                    using (var command = CommandFor(name, connection, parameters)) {
+                    using (var command = CommandFor(name, (TConnection)connection, parameters)) {
 
                         if (command.ExecuteNonQuery() <= 0) {
                             return false;
@@ -300,11 +262,6 @@ namespace Dccelerator.DataAccess.Ado {
                 }
 
                 return true;
-            }
-            finally {
-                connection.Close();
-                connection.Dispose();
-            }
         }
 
 
@@ -313,19 +270,11 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        public virtual bool Delete<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class {
+        public virtual bool Delete<TEntity>(IEntityInfo info, TEntity entity, DbConnection connection) where TEntity : class {
             var parameters = new [] { PrimaryKeyParameterOf(info, entity) };
-            var connection = GetConnection();
-            try {
-                using (var command = CommandFor(DeleteCommandText(info, entity), connection, parameters)) {
-                    connection.Open();
+                using (var command = CommandFor(DeleteCommandText(info, entity), (TConnection)connection, parameters)) {
                     return command.ExecuteNonQuery() > 0;
                 }
-            }
-            finally {
-                connection.Close();
-                connection.Dispose();
-            }
         }
 
 
@@ -334,16 +283,13 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        public virtual bool DeleteMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class {
+        public virtual bool DeleteMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbConnection connection) where TEntity : class {
             var name = DeleteCommandText(info, entities);
-            var connection = GetConnection();
-            try {
-                connection.Open();
 
                 foreach (var entity in entities) {
                     var parameters = new[] {PrimaryKeyParameterOf(info, entity)};
 
-                    using (var command = CommandFor(name, connection, parameters)) {
+                    using (var command = CommandFor(name, (TConnection)connection, parameters)) {
 
                         if (command.ExecuteNonQuery() <= 0)
                             return false;
@@ -351,25 +297,11 @@ namespace Dccelerator.DataAccess.Ado {
                 }
 
                 return true;
-            }
-            finally {
-                connection.Close();
-                connection.Dispose();
-            }
 
         }
 
 
-
-
-
-        /*
-        protected virtual IEnumerable<object> SelectColumn(DbDataReader reader, int columnIndex) {
-            while (reader.Read()) {
-                yield return reader.GetValue(columnIndex);
-            }
-        }
-*/
+        
 
         protected virtual int RowsCount(DbDataReader reader) {
             var count = 0;
@@ -544,129 +476,7 @@ namespace Dccelerator.DataAccess.Ado {
                 connection.Dispose();
             }
         }
-
-/*
-
-        protected virtual IEnumerable<object> ReadToEnd(DbDataReader reader, IAdoEntityInfo mainObjectInfo) {
-
-            if (mainObjectInfo?.Inclusions.Any() != true)
-                return GetMainEntities(reader, mainObjectInfo);
-
-
-            var mainObjects = new Dictionary<object, object>();
-
-            mainObjectInfo.InitReaderColumns(reader);
-
-            while (reader.Read()) {
-                object keyId;
-                var item = ReadItem(reader, mainObjectInfo, null, out keyId);
-                try {
-                    mainObjects.Add(keyId, item);
-                }
-                catch (Exception e) {
-                    Internal.TraceEvent(TraceEventType.Critical,
-                        $"On reading '{mainObjectInfo.EntityType}' using special name {mainObjectInfo.EntityName} getted exception, " +
-                        "possibly because reader contains more then one object with same identifier.\n" +
-                        $"Identifier: {keyId}\n" +
-                        $"Exception: {e}");
-
-                    throw;
-                }
-            }
-
-
-            var tableIndex = 0;
-
-            while (reader.NextResult()) {
-                tableIndex++;
-
-                Includeon includeon;
-                if (!mainObjectInfo.Inclusions.TryGetValue(tableIndex, out includeon)) {
-                    Internal.TraceEvent(TraceEventType.Warning, $"Reader for object {mainObjectInfo.EntityType.FullName} returned more than one table, " +
-                                                                $"but it has not includeon information for table#{tableIndex}.");
-                    continue;
-                }
-
-                var info = includeon.Info;
-
-                info.InitReaderColumns(reader);
-
-
-                if (!includeon.IsCollection) {
-                    while (reader.Read()) {
-                        object keyId;
-                        var item = ReadItem(reader, mainObjectInfo, includeon, out keyId);
-
-                        if (keyId == null) {
-                            Internal.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.EntityType}, {includeon.Attribute.TargetPath} (used on entity {mainObjectInfo.EntityType}");
-                            break;
-                        }
-
-                        var index = tableIndex;
-                        Parallel.ForEach(mainObjects.Values,
-                            mainObject => {
-                                object value;
-                                if (!mainObject.TryGetValueOnPath(includeon.ForeignKeyFromMainEntityToCurrent, out value) || !keyId.Equals(value)) // target path should be ServiceWorkplaceId, but it ServiceWorkPlace
-                                    return; //keyId should be just primary key of ServiceWorkPlace
-
-                                if (!mainObject.TrySetValueOnPath(includeon.Attribute.TargetPath, item))
-                                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {includeon.Attribute.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.EntityType} in result set #{index}.");
-                            });
-                    }
-
-                }
-                else {
-                    var children = new Dictionary<object, IList>(); //? Key is Main Object Primary Key, Value is children collection of main object's navigation property
-
-                    while (reader.Read()) {
-                        object keyId;
-                        var item = ReadItem(reader, mainObjectInfo, includeon, out keyId);
-
-                        if (keyId == null) {
-                            Internal.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.EntityType}, {includeon.Attribute.TargetPath} (used on entity {mainObjectInfo.EntityType}");
-                            break;
-                        }
-
-
-                        IList collection;
-                        if (!children.TryGetValue(keyId, out collection)) {
-                            collection = (IList) Activator.CreateInstance(includeon.TargetCollectionType);
-                            children.Add(keyId, collection);
-                        }
-
-                        collection.Add(item);
-                    }
-
-
-                    var index = tableIndex;
-                    Parallel.ForEach(children,
-                        child => {
-                            object mainObject;
-                            if (!mainObjects.TryGetValue(child.Key, out mainObject)) {
-                                Internal.TraceEvent(TraceEventType.Warning, $"In result set #{index} finded data row of type {info.EntityType}, that doesn't has owner object in result set #1.\nOwner Id is {child.Key}.\nTarget path is '{includeon.Attribute.TargetPath}'.");
-                                return;
-                            }
-
-                            if (!mainObject.TrySetValueOnPath(includeon.Attribute.TargetPath, child.Value))
-                                Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {includeon.Attribute.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.EntityType} in result set #{index}.");
-
-                            if (string.IsNullOrWhiteSpace(includeon.OwnerNavigationReferenceName))
-                                return;
-
-                            foreach (var item in child.Value) {
-                                if (!item.TrySetValueOnPath(includeon.OwnerNavigationReferenceName, mainObject))
-                                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {includeon.OwnerNavigationReferenceName} from '{info.EntityType}' context. This should be reference to owner object ({mainObject})");
-                            }
-                        });
-                }
-            }
-
-            
-
-            return mainObjects.Values;
-        }
-*/
-
+        
 
         protected virtual object ReadItem(DbDataReader reader, IAdoEntityInfo mainEntityInfo, [CanBeNull] Includeon includeon, out object keyId) {
             var entityType = includeon?.Info.EntityType ?? mainEntityInfo.EntityType;
@@ -698,27 +508,7 @@ namespace Dccelerator.DataAccess.Ado {
             }
             return item;
         }
-
-/*
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="mainEntityInfo">
-        ///     If <see langword="null"/> - <paramref name="currentEntityInfo"/> is information about main object 
-        ///     and <paramref name="propertyName"/> is main object's property, 
-        ///     if not - <paramref name="currentEntityInfo"/> is information about child of main object
-        /// </param>
-        /// <param name="currentEntityInfo"></param>
-        /// <returns>
-        ///     Is property with givent <paramref name="propertyName"/> are primary key of main object (then it's property of main object),
-        ///     or is that property are foreign key from child object to main (if includeon is <paramref name="currentEntityInfo.IsCollection"/>),
-        ///     or is that property are foreign key from main object to other (if current includeon is not collection).
-        /// </returns>
-        protected abstract bool IsMainObjectKey(string propertyName, [CanBeNull] IAdoEntityInfo mainEntityInfo, IAdoEntityInfo currentEntityInfo); //todo: rename, because it's not always PrimaryKey
-
-*/
+        
 
         protected abstract bool IsPrimaryKey([NotNull] string propertyName, [NotNull]  IAdoEntityInfo mainEntityInfo,[CanBeNull] Includeon includeon);
 

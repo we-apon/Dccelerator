@@ -20,6 +20,7 @@ namespace Dccelerator.DataAccess.Implementation {
             if (entityAttribute != null) {
                 EntityName = entityAttribute.Name ?? EntityType.Name;
                 Repository = entityAttribute.Repository?.CreateInstance() as TRepository;
+                UsingQueries = entityAttribute.UseQueries;
 
                 var cachedEntityAttribute = entityAttribute as GloballyCachedEntityAttribute;
                 if (cachedEntityAttribute != null) {
@@ -29,6 +30,8 @@ namespace Dccelerator.DataAccess.Implementation {
             }
         }
 
+
+        public bool UsingQueries { get; set; }
 
         public bool IsGloballyCached { get; set; }
 

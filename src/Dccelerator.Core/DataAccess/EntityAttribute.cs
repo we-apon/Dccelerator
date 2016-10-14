@@ -25,6 +25,10 @@ namespace Dccelerator.DataAccess
         [CanBeNull]
         public Type Repository { get; set; }
 
+        /// <summary>
+        /// If true - sql queries will be used, instead of stored procedures to operate with entity.
+        /// </summary>
+        public bool UseQueries { get; set; }
         
         /// <summary>
         /// Overrides <see cref="Name"/> of entity globally, or in concrete <see cref="Repository"/>.

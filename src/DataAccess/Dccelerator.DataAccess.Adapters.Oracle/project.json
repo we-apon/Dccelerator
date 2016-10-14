@@ -2,7 +2,11 @@
   "version": "1.0.0-*",
 
 
-  
+  "configurations": {
+    "Debug": { "buildOptions": { "define": [ "DEBUG" ] } },
+    "Release": { "buildOptions": { "optimize": true } }
+  },
+
   "frameworks": {
     "net40": {
       "buildOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] },

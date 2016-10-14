@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics;
 
 namespace Dccelerator.DataAccess.Ado.Implementation {
@@ -12,9 +13,8 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
     public abstract class NotScheduledDataTransaction : IDataTransaction {
         readonly IDataManagerAdoFactory _factory;
         readonly IsolationLevel _isolationLevel;
-        readonly object _lock = new object();
 
-        readonly ConcurrentQueue<Func<IDataManagerFactory, bool>> _actions = new ConcurrentQueue<Func<IDataManagerFactory, bool>>();
+        readonly ConcurrentQueue<Func<DbConnection, bool>> _actions = new ConcurrentQueue<Func<DbConnection, bool>>();
         bool _isCommited;
 
 
@@ -56,7 +56,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
             var info = _factory.AdoInfoAbout<TEntity>();
-            _actions.Enqueue(factory => info.Repository.InsertMany(info, entities));
+            _actions.Enqueue(connection => info.Repository.InsertMany(info, entities, connection));
         }
 
 
@@ -69,7 +69,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
 
 
             var info = _factory.AdoInfoAbout<TEntity>();
-            _actions.Enqueue(factory => info.Repository.Insert(info, entity));
+            _actions.Enqueue(connection => info.Repository.Insert(info, entity, connection));
         }
 
 
@@ -81,7 +81,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
             var info = _factory.AdoInfoAbout<TEntity>();
-            _actions.Enqueue(factory => info.Repository.Update(info, entity));
+            _actions.Enqueue(connection => info.Repository.Update(info, entity, connection));
         }
 
 
@@ -93,7 +93,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
             var info = _factory.AdoInfoAbout<TEntity>();
-            _actions.Enqueue(factory => info.Repository.UpdateMany(info, entities));
+            _actions.Enqueue(connection => info.Repository.UpdateMany(info, entities, connection));
         }
 
 
@@ -105,7 +105,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
             var info = _factory.AdoInfoAbout<TEntity>();
-            _actions.Enqueue(factory => info.Repository.Delete(info, entity));
+            _actions.Enqueue(connection => info.Repository.Delete(info, entity, connection));
         }
 
 
@@ -117,7 +117,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
             var info = _factory.AdoInfoAbout<TEntity>();
-            _actions.Enqueue(factory => info.Repository.DeleteMany(info, entities));
+            _actions.Enqueue(connection => info.Repository.DeleteMany(info, entities, connection));
         }
 
 
@@ -134,22 +134,50 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
             return RetryOnDeadlock(() => {
                 var queue = _actions.ToArray();
 
-                using (var scope = BeginTransactionScope(_isolationLevel)) {
-                    foreach (var action in queue) {
-                        if (!action(_factory)) {
-                            _isCommited = false;
-                            return false;
-                        }
-                    }
+                try {
+                    using (var connection = _factory.AdoNetRepository().GetConnection()) {
+                        connection.Open();
+                        using (var transaction = connection.BeginTransaction((System.Data.IsolationLevel) _isolationLevel)) {
+                            foreach (var action in queue) {
+                                if (!action(connection)) {
+                                    _isCommited = false;
+                                    transaction.Rollback();
+                                    return false;
+                                }
+                            }
 
-                    scope.Complete();
-                    return true;
+                            transaction.Commit();
+                            return true;
+                        }
+
+
+//                    using (var scope = BeginTransactionScope(_isolationLevel, connection)) {
+//                        foreach (var action in queue) {
+//                            if (!action(connection)) {
+//                                _isCommited = false;
+//                                scope.Rollback();
+//                                return false;
+//                            }
+//                        }
+//
+//                        scope.Complete();
+//                        return true;
+//                    }
+                    }
                 }
+                catch (Exception e) {
+                    new TraceSource("Dccelerator.DataAccess").TraceEvent(TraceEventType.Critical, 0, e.ToString());
+                    return false;
+                }
+//                finally {
+//                    connection.Close();
+//                    connection.Dispose();
+//                }
             });
         }
 
 
-        protected abstract ISpecificTransactionScope BeginTransactionScope(IsolationLevel isolationLevel);
+        //protected abstract ISpecificTransactionScope BeginTransactionScope(IsolationLevel isolationLevel, DbConnection connection);
 
 
 

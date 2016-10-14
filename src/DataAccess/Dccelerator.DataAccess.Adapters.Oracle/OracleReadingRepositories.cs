@@ -2,11 +2,11 @@
 using Dccelerator.DataAccess.Ado.Implementation;
 
 namespace Dccelerator.DataAccess.Adapters.Oracle {
-    public class OracleDirectReadingRepository : DirectReadingRepository {
+    public sealed class OracleDirectReadingRepository : DirectReadingRepository {
         protected override bool IsDeadlock(Exception exception) => exception.IsDeadLock();
     }
 
-    public class OracleCommonReadingRepository : CachedReadingRepository {
+    public sealed class OracleCommonReadingRepository : CachedReadingRepository {
         protected override bool IsDeadlock(Exception exception) => exception.IsDeadLock();
     }
 

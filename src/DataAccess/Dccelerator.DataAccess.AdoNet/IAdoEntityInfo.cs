@@ -29,6 +29,7 @@ namespace Dccelerator.DataAccess.Ado {
 
 
         void SetupRepository(IAdoNetRepository repository);
+
     }
 
 }
