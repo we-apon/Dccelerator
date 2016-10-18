@@ -21,3 +21,7 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("802e612e-433f-4974-8c7a-38398a982275")]
+
+#if DEBUG
+[assembly: InternalsVisibleTo("Dccelerator.Specifications.Net40")]
+#endif

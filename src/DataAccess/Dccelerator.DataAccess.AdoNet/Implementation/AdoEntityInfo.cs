@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -17,20 +18,8 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
         where TRepository : class, IAdoNetRepository
         where TDbTypeEnum : struct 
     {
-
-        //        class DefaultAdoEntityInfo : AdoEntityInfo<TRepository, TDbTypeEnum> {
-        //            public DefaultAdoEntityInfo(Type entityType) : base(entityType) {}
-        //            protected override TDbTypeEnum GetDefaultDbType(Type propertyType) {
-        //                return default(TDbTypeEnum);
-        //            }
-        //        }
-        //
-        //        internal static AdoEntityInfo<TRepository> GetInstanse(Type entityInfo) {
-        //            return new DefaultAdoEntityInfo(entityInfo);
-        //        }
-
-
-        protected abstract IAdoEntityInfo GetInstanse(Type type);
+        
+        protected abstract IAdoEntityInfo GetInstance(Type type);
         public abstract TDbTypeEnum GetDefaultDbType(Type propertyType);
 
 
@@ -78,6 +67,21 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
         #region Implementation of IAdoEntityInfo
 
         public virtual Dictionary<string, PropertyInfo> NavigationProperties { get; }
+
+        /// <summary>
+        /// Cached insert sql queries. Key is FullName of repository type.
+        /// </summary>
+        public ConcurrentDictionary<string, string> CachedInsertQueries { get; } = new ConcurrentDictionary<string, string>();
+
+        /// <summary>
+        /// Cached update sql queries. Key is FullName of repository type.
+        /// </summary>
+        public ConcurrentDictionary<string, string> CachedUpdateQueries { get; } = new ConcurrentDictionary<string, string>();
+
+        /// <summary>
+        /// Cached delete sql queries. Key is FullName of repository type.
+        /// </summary>
+        public ConcurrentDictionary<string, string> CachedDeleteQueries { get; } = new ConcurrentDictionary<string, string>();
 
 
         IAdoNetRepository IAdoEntityInfo.Repository => Repository;
@@ -183,7 +187,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 return inclusions;
 
             foreach (var inclusionAttribute in inclusionAttributes) {
-                var includeon = new Includeon(inclusionAttribute, this, GetInstanse);
+                var includeon = new Includeon(inclusionAttribute, this, GetInstance);
                 inclusions.Add(inclusionAttribute.ResultSetIndex, includeon);
             }
 

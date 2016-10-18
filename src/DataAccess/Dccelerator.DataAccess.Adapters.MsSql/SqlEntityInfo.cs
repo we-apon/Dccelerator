@@ -6,7 +6,7 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
     public sealed class SqlEntityInfo<TRepository> : AdoEntityInfo<TRepository, SqlDbType> where TRepository : class, IAdoNetRepository {
         public SqlEntityInfo(Type entityType) : base(entityType) {}
 
-        protected override IAdoEntityInfo GetInstanse(Type type) {
+        protected override IAdoEntityInfo GetInstance(Type type) {
             return new SqlEntityInfo<TRepository>(type);
         }
 

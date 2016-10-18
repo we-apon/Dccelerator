@@ -9,7 +9,7 @@ namespace Dccelerator.DataAccess.Adapters.Oracle {
         public OracleEntityInfo(Type entityType) : base(entityType) {}
         
 
-        protected override IAdoEntityInfo GetInstanse(Type type) {
+        protected override IAdoEntityInfo GetInstance(Type type) {
             return new OracleEntityInfo<TRepository>(type);
         }
 

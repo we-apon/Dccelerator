@@ -1,5 +1,4 @@
 ﻿using Dccelerator.DataAccess.Ado.Implementation;
-using Dccelerator.DataAccess.Ado.SqlClient.Implementation;
 
 
 namespace Dccelerator.DataAccess.Ado.SqlClient {

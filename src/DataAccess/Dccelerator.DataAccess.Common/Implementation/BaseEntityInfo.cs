@@ -10,7 +10,6 @@ namespace Dccelerator.DataAccess.Implementation {
 
     public abstract class BaseEntityInfo<TRepository> where TRepository : class {
 
-
         protected BaseEntityInfo(Type entityType) {
             EntityType = entityType;
             EntityName = entityType.Name;

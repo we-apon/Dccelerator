@@ -14,8 +14,8 @@ namespace Dccelerator.DataAccess.Ado.Implementation.Internal {
 
 
     class AdoNetInfoCacheContainer<TEntityInfo> where TEntityInfo : IAdoEntityInfo {
-        [SuppressMessage("ReSharper", "StaticMemberInGenericType")] static readonly
-            ConcurrentDictionary<Type, TEntityInfo> _infoCache = new ConcurrentDictionary<Type, TEntityInfo>();
+        [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
+        static readonly ConcurrentDictionary<Type, TEntityInfo> _infoCache = new ConcurrentDictionary<Type, TEntityInfo>();
 
 
         public TEntityInfo Info { get; }

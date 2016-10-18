@@ -54,6 +54,30 @@ namespace Dccelerator.Reflection
         }
 
 
+        public bool TryGetValueOfTargetProperty<TValue>(object context, out TValue value) {
+            var current = this;
+            var curContext = context;
+
+            while (current.Nested != null) {
+                object curValue;
+                if (!current.Property.TryGetValue(curContext, out curValue) || curValue == null) {
+                    value = default(TValue);
+                    return false;
+                }
+
+                curContext = curValue;
+                current = current.Nested;
+            }
+
+            var typedProp = current.Property as IProperty<TValue>;
+            if (typedProp != null)
+                return typedProp.TryGetValue(curContext, out value);
+
+            value = default(TValue);
+            return false;
+        }
+
+
 
 
         public IProperty GetTargetProperty() {

@@ -4,12 +4,13 @@ using System.Reflection;
 using Dccelerator.Convertion;
 
 
-namespace Dccelerator.Reflection
-{
-    class Property<TContext, TType> : MemberBase, IProperty
-    {
+namespace Dccelerator.Reflection {
+    class Property<TContext, TType> : MemberBase, IProperty<TContext, TType> {
+
         MethodDelegate<TContext, TType> _getter;
         ActionDelegate<TContext, TType> _setter;
+
+
         public PropertyInfo Info { get; }
 
 
@@ -27,22 +28,31 @@ namespace Dccelerator.Reflection
 
 
         public bool TryGetValue(object context, out object value) {
+            TType val;
+            var result = TryGetValue((TContext) context, out val);
+            value = val;
+            return result;
+        }
+        
+
+        public bool TryGetValue(object context, out TType value) {
+            return TryGetValue((TContext) context, out value);
+        }
+
+
+        public bool TryGetValue(TContext context, out TType value) {
             try {
-                TType val;
-                if (Getter.TryInvoke((TContext) context, out val)) {
-                    value = val;
+                if (Getter.TryInvoke(context, out value))
                     return true;
-                }
             }
             catch (Exception e) {
                 Internal.TraceEvent(TraceEventType.Error, e.ToString());
             }
 
-            value = null;
+            value = default(TType);
             return false;
         }
 
-        
 
         public bool TrySetValue(object context, object value) {
             try {

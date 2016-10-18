@@ -213,6 +213,16 @@ namespace Dccelerator.Reflection
 
 
         /// <summary>
+        /// Returns value of static property placed on <paramref name="path"/> with started point at <typeparamref name="TType"/>.
+        /// </summary>
+        /// <param name="path">Path to requested property</param>
+        /// <param name="value">Value</param>
+        public static bool TryGetValueOnPath<TValue>(string path, out TValue value) {
+            return TryGetValueOnPath(null, path, out value);
+        }
+
+
+        /// <summary>
         /// Returns value of property placed on <paramref name="path"/> with started point at <paramref name="context"/>.
         /// </summary>
         /// <param name="context">
@@ -227,6 +237,25 @@ namespace Dccelerator.Reflection
                 return propertyPath.TryGetValueOfTargetProperty(context, out value);
 
             value = null;
+            return false;
+        }
+
+
+        /// <summary>
+        /// Returns value of property placed on <paramref name="path"/> with started point at <paramref name="context"/>.
+        /// </summary>
+        /// <param name="context">
+        /// Object that has property on passed <paramref name="path"/>. 
+        /// It can be <see langword="null"/> for static properties.
+        /// </param>
+        /// <param name="path">Path to requested property</param>
+        /// <param name="value">Value</param>
+        public static bool TryGetValueOnPath<TValue>(object context, string path, out TValue value) {
+            var propertyPath = get_me_property_path_for(path);
+            if (propertyPath != null)
+                return propertyPath.TryGetValueOfTargetProperty(context, out value);
+
+            value = default(TValue);
             return false;
         }
 

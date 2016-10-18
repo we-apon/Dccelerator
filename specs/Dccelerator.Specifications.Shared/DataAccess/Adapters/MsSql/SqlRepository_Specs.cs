@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Reflection;
 using Dccelerator.DataAccess;
-using Dccelerator.DataAccess.Adapters.Oracle;
 using Dccelerator.DataAccess.Ado;
+using Dccelerator.DataAccess.Ado.SqlClient;
 using FakeItEasy;
 using Machine.Specifications;
-using Oracle.ManagedDataAccess.Client;
 
-namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.Oracle {
-    
-    [Subject(typeof(OracleRepository))]
+namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.MsSql {
+
+    [Subject(typeof(SqlClientRepository))]
     class When_getting_select_query {
         Establish context = () => {
-            _repository = A.Fake<OracleRepository>(options => options.CallsBaseMethods());
+            _repository = A.Fake<SqlClientRepository>(options => options.CallsBaseMethods());
 
             _info = A.Fake<IAdoEntityInfo>();
             A.CallTo(() => _info.EntityName).Returns(_entityName);
@@ -28,12 +28,14 @@ namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.Oracle {
         Because of = () => _query = _repository.SelectQuery(_info, _criteria);
 
         It should_be_correct = () => {
+            Console.WriteLine($"Expected:\n{_validQuery}\nActual:\n{_query}");
+
             var expectedWords = _validQuery.Split(new[] {' ', '\n', '\t'}, StringSplitOptions.RemoveEmptyEntries);
             var actualWords = _query.Split(new[] {' ', '\n', '\t'}, StringSplitOptions.RemoveEmptyEntries);
             actualWords.ShouldEqual(expectedWords);
         };
 
-        static OracleRepository _repository;
+        static SqlClientRepository _repository;
         static IAdoEntityInfo _info;
         static string _entityName = "EntName";
         static IDataCriterion[] _criteria;
@@ -41,16 +43,16 @@ namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.Oracle {
 
         static string _validQuery = "select * " +
                                     "from EntName " +
-                                    "where Name1 = :Name1 " +
-                                    "and Name2 = :Name2 " +
-                                    "and Name3 = :Name3";
+                                    "where Name1 = @Name1 " +
+                                    "and Name2 = @Name2 " +
+                                    "and Name3 = @Name3";
     }
 
 
-    [Subject(typeof(OracleRepository))]
+    [Subject(typeof(SqlClientRepository))]
     class When_getting_insert_query {
         Establish context = () => {
-            _repository = A.Fake<OracleRepository>(options => options.CallsBaseMethods());
+            _repository = A.Fake<SqlClientRepository>(options => options.CallsBaseMethods());
 
             _info = A.Fake<IAdoEntityInfo>();
             A.CallTo(() => _info.EntityName).Returns(_entityName);
@@ -75,22 +77,22 @@ namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.Oracle {
         };
 
         static object _entity;
-        static OracleRepository _repository;
+        static SqlClientRepository _repository;
         static IAdoEntityInfo _info;
         static string _entityName = "EntName";
         static string _query;
 
         static string _validQuery = "insert into EntName ( Name1, Name2, Name3 ) " +
-                                    "values ( :Name1, :Name2, :Name3 ) ";
+                                    "values ( @Name1, @Name2, @Name3 ) ";
     }
 
 
-    [Subject(typeof(OracleRepository))]
+    [Subject(typeof(SqlClientRepository))]
     class When_getting_update_query {
         Establish context = () => {
-            _repository = A.Fake<OracleRepository>(options => options.CallsBaseMethods());
+            _repository = A.Fake<SqlClientRepository>(options => options.CallsBaseMethods());
             A.CallTo(() => _repository.PrimaryKeyParameterOf(A<IAdoEntityInfo>.Ignored, A<object>.Ignored))
-                .Returns(new OracleParameter() {ParameterName = "Id"});
+                .Returns(new SqlParameter() {ParameterName = "Id"});
 
             _info = A.Fake<IAdoEntityInfo>();
             A.CallTo(() => _info.EntityName).Returns(_entityName);
@@ -116,24 +118,24 @@ namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.Oracle {
         };
 
         static object _entity;
-        static OracleRepository _repository;
+        static SqlClientRepository _repository;
         static IAdoEntityInfo _info;
         static string _entityName = "EntName";
         static string _query;
 
         static string _validQuery = "update EntName " +
-                                    "set Name1 = :Name1, " +
-                                    "Name2 = :Name2, " +
-                                    "Name3 = :Name3 " +
-                                    "where Id = :Id";
+                                    "set Name1 = @Name1, " +
+                                    "Name2 = @Name2, " +
+                                    "Name3 = @Name3 " +
+                                    "where Id = @Id";
     }
 
-    [Subject(typeof(OracleRepository))]
+    [Subject(typeof(SqlClientRepository))]
     class When_getting_delete_query {
         Establish context = () => {
-            _repository = A.Fake<OracleRepository>(options => options.CallsBaseMethods());
+            _repository = A.Fake<SqlClientRepository>(options => options.CallsBaseMethods());
             A.CallTo(() => _repository.PrimaryKeyParameterOf(A<IAdoEntityInfo>.Ignored, A<object>.Ignored))
-                .Returns(new OracleParameter() {ParameterName = "Id"});
+                .Returns(new SqlParameter() {ParameterName = "Id"});
 
             _info = A.Fake<IAdoEntityInfo>();
             A.CallTo(() => _info.EntityName).Returns(_entityName);
@@ -159,14 +161,14 @@ namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.Oracle {
         };
 
         static object _entity;
-        static OracleRepository _repository;
+        static SqlClientRepository _repository;
         static IAdoEntityInfo _info;
         static string _entityName = "EntName";
         static string _query;
 
         static string _validQuery = "delete from EntName " +
-                                    "where Id = :Id";
+                                    "where Id = @Id";
     }
 
-    
+
 }

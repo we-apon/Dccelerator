@@ -11,7 +11,7 @@ namespace Dccelerator.DataAccess
     public class EntityAttribute : Attribute
     {
         /// <summary>
-        /// Overiden name of the entity. 
+        /// Overridden name of the entity. 
         /// If null - name of class used as name of entity.
         /// </summary>
         [CanBeNull]
@@ -19,7 +19,7 @@ namespace Dccelerator.DataAccess
 
 
         /// <summary>
-        /// If null - attriute <see cref="Name"/> overides <see cref="Name"/> in all repositories.
+        /// If null - attribute <see cref="Name"/> overides <see cref="Name"/> in all repositories.
         /// If not null - attribute overides <see cref="Name"/> of entity in concrete repository.
         /// </summary>
         [CanBeNull]

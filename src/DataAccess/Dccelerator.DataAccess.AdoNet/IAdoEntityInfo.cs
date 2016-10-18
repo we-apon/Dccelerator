@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using Dccelerator.DataAccess.Ado.Implementation;
@@ -27,8 +28,22 @@ namespace Dccelerator.DataAccess.Ado {
 
         new Dictionary<int, Includeon> Inclusions { get; }
 
-
         void SetupRepository(IAdoNetRepository repository);
+
+        /// <summary>
+        /// Cached insert sql queries. Key is FullName of repository type.
+        /// </summary>
+        ConcurrentDictionary<string, string> CachedInsertQueries { get; }
+
+        /// <summary>
+        /// Cached update sql queries. Key is FullName of repository type.
+        /// </summary>
+        ConcurrentDictionary<string, string> CachedUpdateQueries { get; }
+
+        /// <summary>
+        /// Cached delete sql queries. Key is FullName of repository type.
+        /// </summary>
+        ConcurrentDictionary<string, string> CachedDeleteQueries { get; }
 
     }
 
