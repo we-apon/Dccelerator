@@ -19,7 +19,6 @@ namespace Dccelerator.DataAccess.Ado {
         
         IAdoNetRepository Repository { get; }
 
-        TimeSpan CacheTimeout { get; }
         string[] ReaderColumns { get; }
 
         int IndexOf(string columnName);
