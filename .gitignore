@@ -32,3 +32,4 @@ packages/*
 publish/*
 artifacts/*
 output/*
+.idea/*
