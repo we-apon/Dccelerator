@@ -6,9 +6,8 @@ using System.Data.SqlClient;
 namespace Dccelerator.DataAccess.Ado.SqlClient {
     public abstract class SqlClientRepository : AdoNetRepository<SqlCommand, SqlParameter, SqlConnection> {
 
-        protected override string DatabaseSpecificNameOf(string parameter) {
-            return "@" + parameter;
-        }
+        protected override string DatabaseSpecificNameOf(string parameter) => "@" + parameter;
+
 
         protected override SqlParameter ParameterWith(IEntityInfo info, IDataCriterion criterion) {
             var sqlInfo = (IAdoEntityInfo<SqlDbType>) info;

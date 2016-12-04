@@ -183,7 +183,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
 
                 return environment;
             }
-            catch (RunRecoveryException e) {
+            catch (RunRecoveryException) {
                 try {
                     var environmentConfig = GetDefaultEnvironmentConfig();
                     environmentConfig.RunRecovery = true;
@@ -192,7 +192,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
                     }
                     return DatabaseEnvironment.Open(_environmentPath, environmentConfig);
                 }
-                catch (RunRecoveryException exception) {
+                catch (RunRecoveryException) {
                     try {
                         var environmentConfig = GetDefaultEnvironmentConfig();
                         environmentConfig.RunFatalRecovery = true;
@@ -202,7 +202,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
                         return DatabaseEnvironment.Open(_environmentPath, environmentConfig);
                     }
                     catch (Exception ex) {
-                        throw new InvalidOperationException($"Can't open environment even with recovery!", ex);
+                        throw new InvalidOperationException("Can't open environment even with recovery!", ex);
                     }
                 }
             }
