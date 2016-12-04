@@ -13,7 +13,17 @@ using JetBrains.Annotations;
 namespace Dccelerator.DataAccess.Ado.SqlClient {
     public static class SqlClientParameterExtensions {
         static readonly ConcurrentDictionary<Type, SqlDbType> _sqlDbTypes = new ConcurrentDictionary<Type, SqlDbType>();
-        
+
+        /// <summary>
+        /// <para>Returns <see cref="SqlDbType"/> most likelly corresponding to passed <paramref name="type"/></para>
+        /// <para>Mappings are following:<br/>
+        /// An <see langword="enum"/>: <see cref="SqlDbType.Int"/> <br/>
+        /// <see cref="Guid"/> and <see cref="Nullable{Guid}"/>: <see cref="SqlDbType.UniqueIdentifier"/><br/>
+        /// <see cref="string"/>: <see cref="SqlDbType.NVarChar"/><br/>
+        /// <see cref="DateTime"/> and <see cref="Nullable{DateTime}"/>: <see cref="SqlDbType.DateTime"/><br/>
+        /// ...todo: more comments
+        /// </para>
+        /// </summary>
         public static SqlDbType SqlType([NotNull] this Type type) {
             SqlDbType sqlType;
             if (_sqlDbTypes.TryGetValue(type, out sqlType))
@@ -23,15 +33,23 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
                 sqlType = SqlDbType.UniqueIdentifier;
             else if (type.IsAssignableFrom(_stringType))
                 sqlType = SqlDbType.NVarChar;
+            else if (type.IsEnum)
+                sqlType = SqlDbType.Int;
             else if (type.IsAssignableFrom(_dateTimeType))
                 sqlType = SqlDbType.DateTime;
             else if (type.IsAssignableFrom(_booleanType))
                 sqlType = SqlDbType.Bit;
+            else if (type.IsAssignableFrom(_byteType))
+                sqlType = SqlDbType.TinyInt;
+            else if (type.IsAssignableFrom(_shortType))
+                sqlType = SqlDbType.SmallInt;
             else if (type.IsAssignableFrom(_intType))
                 sqlType = SqlDbType.Int;
             else if (type.IsAssignableFrom(_longType))
                 sqlType = SqlDbType.BigInt;
-            else if (type.IsAssignableFrom(_floatType) || type.IsAssignableFrom(_doubleType))
+            else if (type.IsAssignableFrom(_floatType))
+                sqlType = SqlDbType.Real;
+            else if (type.IsAssignableFrom(_doubleType))
                 sqlType = SqlDbType.Float;
             else if (type.IsAssignableFrom(_decimalType))
                 sqlType = SqlDbType.Decimal;
@@ -96,6 +114,8 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
         static readonly Type _booleanType = typeof (bool);
         static readonly Type _dateTimeType = typeof (DateTime);
         static readonly Type _guidType = typeof (Guid);
+        static readonly Type _byteType = typeof(byte);
+        static readonly Type _shortType = typeof(short);
         static readonly Type _intType = typeof(int);
         static readonly Type _longType = typeof(long);
         static readonly Type _floatType = typeof (float);
