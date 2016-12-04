@@ -19,7 +19,7 @@ namespace Dccelerator.DataAccess.Lazy
         /// This method will be called one time for each <typeparamref name="TEntity"/> requested in each data manager.
         /// </summary>
         public IDataGetter<TEntity> GetterFor<TEntity>() where TEntity : class, new() {
-            return NotCachedGetterFor<TEntity>();
+            return new LazyDataGetter<TEntity>(_factory.GetterFor<TEntity>(), this);
         }
 
 
@@ -28,7 +28,7 @@ namespace Dccelerator.DataAccess.Lazy
         /// This method will be called on each request of any not cached entity.
         /// </summary>
         public IDataGetter<TEntity> NotCachedGetterFor<TEntity>() where TEntity : class, new() {
-            return new LazyDataGetter<TEntity>(_factory.GetterFor<TEntity>(), this);
+            return new LazyDataGetter<TEntity>(_factory.NotCachedGetterFor<TEntity>(), this);
         }
 
 
