@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using Dccelerator.Convertion;
+using JetBrains.Annotations;
 
 
 namespace Dccelerator.Reflection {
@@ -10,7 +11,42 @@ namespace Dccelerator.Reflection {
     /// </summary>
     public static class ReflectionExtensions {
 
-        
+        /// <summary>
+        /// Returns number of inheritance generator from <paramref name="parent"/> to <paramref name="child"/> type.
+        /// </summary>
+        /// <returns>
+        /// Returns 0, if <paramref name="parent"/> is interface, and it can be assigranble from <paramref name="child"/>.
+        /// Othrewise returns number of ingeritrance iterations fro <paramref name="parent"/> to <paramref name="child"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">When <paramref name="parent"/> or <paramref name="child"/> is null</exception>
+        /// <exception cref="InvalidOperationException">When <paramref name="parent"/> and <paramref name="child"/> arguments are not siblings.</exception>
+        public static int GetGenerationNumberTo(this Type parent, [NotNull] Type child) {
+            if (parent == null)
+                throw new ArgumentNullException(nameof(parent));
+
+            if (child == null)
+                throw new ArgumentNullException(nameof(child));
+
+            if (!parent.IsAssignableFrom(child))
+                throw new InvalidOperationException($"Type '{parent}' is not parent of type '{child}'");
+
+            if (parent.GetInfo().IsInterface)
+                return 0;
+
+            var sum = 0;
+
+            do {
+                if (parent == child)
+                    return sum;
+                
+                child = child.GetInfo().BaseType;
+                sum++;
+            } while (child != null);
+
+            return sum;
+        }
+
+
         /// <summary>
         /// Returns true if can get <paramref name="value"/> from <paramref name="property"/> in passed <paramref name="context"/>.
         /// </summary>
