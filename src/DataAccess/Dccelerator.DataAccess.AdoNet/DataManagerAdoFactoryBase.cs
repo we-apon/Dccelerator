@@ -6,8 +6,7 @@ using Dccelerator.DataAccess.Implementation.Internal;
 
 
 namespace Dccelerator.DataAccess.Ado {
-    public abstract class DataManagerAdoFactoryBase<TRepository, TEntityInfo> : IDataManagerAdoFactory 
-        where TRepository : class, IAdoNetRepository
+    public abstract class DataManagerAdoFactoryBase<TEntityInfo> : IDataManagerAdoFactory 
         where TEntityInfo : IAdoEntityInfo
     {
 

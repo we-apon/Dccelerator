@@ -2,14 +2,11 @@
 
 
 namespace Dccelerator.DataAccess.Ado.SqlClient {
-    public abstract class SqlClientDataManagerFactory<TRepository> : DataManagerAdoFactoryBase<TRepository, SqlEntityInfo<TRepository>> where TRepository : class, IAdoNetRepository {
-        #region Overrides of DataManagerAdoFactoryBase
-
+    public abstract class SqlClientDataManagerFactory<TRepository> : DataManagerAdoFactoryBase<SqlEntityInfo<TRepository>> where TRepository : class, IAdoNetRepository {
 
         protected override DirectReadingRepository NotCachedReadingRepository<TEntity>() {
             return new SqlClientDirectReadingRepository();
         }
-
 
         /// <summary>
         /// Instantinate an <see cref="IDataTransaction"/>.
@@ -21,10 +18,8 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
 
 
         public override IReadingRepository ReadingRepository() {
-            return new SqlClientCommonReadingRepository();
+            return new SqlClientForcedCacheReadingRepository();
         }
 
-
-        #endregion
     }
 }

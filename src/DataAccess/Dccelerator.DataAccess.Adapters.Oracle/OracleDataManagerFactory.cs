@@ -2,7 +2,7 @@
 using Dccelerator.DataAccess.Ado.Implementation;
 
 namespace Dccelerator.DataAccess.Adapters.Oracle {
-    public abstract class OracleDataManagerFactory<TRepository> : DataManagerAdoFactoryBase<TRepository, OracleEntityInfo<TRepository>> where TRepository : class, IAdoNetRepository {
+    public abstract class OracleDataManagerFactory<TRepository> : DataManagerAdoFactoryBase<OracleEntityInfo<TRepository>> where TRepository : class, IAdoNetRepository {
 
         protected override DirectReadingRepository NotCachedReadingRepository<TEntity>() {
             return new OracleDirectReadingRepository();
@@ -19,7 +19,7 @@ namespace Dccelerator.DataAccess.Adapters.Oracle {
 
 
         public override IReadingRepository ReadingRepository() {
-            return new OracleCommonReadingRepository();
+            return new OracleForcedCacheReadingRepository();
         }
 
     }
