@@ -8,10 +8,6 @@ using System.Reflection;
 using Dccelerator.DataAccess.Implementation;
 using Dccelerator.Reflection;
 
-#if !NET40
-using System.Reflection;
-#endif
-
 namespace Dccelerator.DataAccess.Ado.Implementation {
 
     public abstract class AdoEntityInfo<TRepository, TDbTypeEnum> : BaseEntityInfo<TRepository>, IAdoEntityInfo<TDbTypeEnum> 
@@ -89,25 +85,21 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
         public virtual string[] ReaderColumns { get; protected set; }
 
 
-        protected virtual Dictionary<string, TDbTypeEnum> GetDbTypeMappings()
-        {
+
+        protected virtual Dictionary<string, TDbTypeEnum> GetDbTypeMappings() {
             var mappings = new Dictionary<string, TDbTypeEnum>();
-            foreach (var property in PersistedProperties.Values)
-            {
+            foreach (var property in PersistedProperties.Values) {
                 TDbTypeEnum result;
 
-                var dbTypeAttribute =
-                    property.GetMany<DbTypeAttribute>()
-                        .FirstOrDefault(x => x.RepositoryType == (Repository?.GetType() ?? typeof(TRepository)));
-                if (dbTypeAttribute != null)
-                {
+                var dbTypeAttribute = property.GetMany<DbTypeAttribute>().MostApplicableToRepository(Repository?.GetType() ?? typeof(TRepository));
+
+                if (dbTypeAttribute != null) {
                     if (dbTypeAttribute.DbTypeName is TDbTypeEnum)
-                        result = (TDbTypeEnum)dbTypeAttribute.DbTypeName;
+                        result = (TDbTypeEnum) dbTypeAttribute.DbTypeName;
                     else if (!Enum.TryParse(dbTypeAttribute.DbTypeName.ToString(), out result))
                         result = GetDefaultDbType(property.PropertyType);
                 }
-                else
-                {
+                else {
                     result = GetDefaultDbType(property.PropertyType);
                 }
 
@@ -117,6 +109,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
 
             return mappings;
         }
+
 
         Dictionary<string, int> _readerColumnsIndexes;
         public int IndexOf(string columnName) {
