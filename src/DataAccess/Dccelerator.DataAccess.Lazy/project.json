@@ -1,5 +1,5 @@
 {
-  "version": "0.0.4",
+  "version": "0.0.12-*",
   "title": "Dccelerator.DataAccess.Lazy",
   "description": "Lazy Loading and navigation properties support for Dccelerator.DataAccess ORM.",
   "authors": [ "Kirill Dubinkin" ],
@@ -9,6 +9,19 @@
     "projectUrl": "https://github.com/we-apon/Dccelerator",
     "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE"
   },
+
+
+
+  "configurations": {
+    "Debug": { "buildOptions": { "define": [ "DEBUG" ] } },
+    "Release": {
+      "buildOptions": {
+        "optimize": true,
+        "xmlDoc": true
+      }
+    }
+  },
+
 
   "frameworks": {
 
@@ -25,8 +38,8 @@
 
 
   "dependencies": {
-    "Dccelerator.DataAccess.Common": "[0.0.8]",
-    "PostSharp": "4.3.21"
+    "Dccelerator.DataAccess.Common": "0.0.12-*",
+    "PostSharp": "4.3.24"
   },
 
 

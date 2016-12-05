@@ -1,1 +1,16 @@
-﻿if "%1" == "%2" dotnet pack --no-build --configuration %1 -o %3
+
+set versionSuffix=--version-suffix rc1
+set output=publish
+set buildConfiguration=Release
+
+
+del /F /Q %output%\*
+
+dotnet pack src\Dccelerator.Core -c %buildConfiguration% %versionSuffix% -o %output%
+dotnet pack src\DataAccess\Dccelerator.DataAccess.Common -c %buildConfiguration% %versionSuffix% -o %output%
+dotnet pack src\DataAccess\Dccelerator.DataAccess.Lazy -c %buildConfiguration% %versionSuffix% -o %output%
+dotnet pack src\DataAccess\Dccelerator.DataAccess.BerkeleyDb -c %buildConfiguration% %versionSuffix% -o %output%
+dotnet pack src\DataAccess\Dccelerator.DataAccess.AdoNet -c %buildConfiguration% %versionSuffix% -o %output%
+dotnet pack src\DataAccess\Dccelerator.DataAccess.Adapters.Oracle -c %buildConfiguration% %versionSuffix% -o %output%
+dotnet pack src\DataAccess\Dccelerator.DataAccess.Adapters.MsSql -c %buildConfiguration% %versionSuffix% -o %output%
+

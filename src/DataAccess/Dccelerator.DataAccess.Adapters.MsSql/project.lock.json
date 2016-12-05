@@ -25,11 +25,11 @@
           "net40/Dccelerator.Core.dll": {}
         }
       },
-      "Dccelerator.DataAccess.AdoNet/0.0.6": {
+      "Dccelerator.DataAccess.AdoNet/0.0.12-rc1": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
-          "Dccelerator.DataAccess.Common": "0.0.8"
+          "Dccelerator.DataAccess.Common": "0.0.12"
         },
         "frameworkAssemblies": [
           "System.Data",
@@ -42,7 +42,7 @@
           "net40/Dccelerator.DataAccess.AdoNet.dll": {}
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.8": {
+      "Dccelerator.DataAccess.Common/0.0.12": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -79,11 +79,11 @@
           "net45/Dccelerator.Core.dll": {}
         }
       },
-      "Dccelerator.DataAccess.AdoNet/0.0.6": {
+      "Dccelerator.DataAccess.AdoNet/0.0.12-rc1": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
-          "Dccelerator.DataAccess.Common": "0.0.8"
+          "Dccelerator.DataAccess.Common": "0.0.12"
         },
         "frameworkAssemblies": [
           "System.Data",
@@ -96,7 +96,7 @@
           "net45/Dccelerator.DataAccess.AdoNet.dll": {}
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.8": {
+      "Dccelerator.DataAccess.Common/0.0.12": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -134,12 +134,12 @@
       "path": "../../Dccelerator.Core/project.json",
       "msbuildProject": "../../Dccelerator.Core/Dccelerator.Core.xproj"
     },
-    "Dccelerator.DataAccess.AdoNet/0.0.6": {
+    "Dccelerator.DataAccess.AdoNet/0.0.12-rc1": {
       "type": "project",
       "path": "../Dccelerator.DataAccess.AdoNet/project.json",
       "msbuildProject": "../Dccelerator.DataAccess.AdoNet/Dccelerator.DataAccess.AdoNet.xproj"
     },
-    "Dccelerator.DataAccess.Common/0.0.8": {
+    "Dccelerator.DataAccess.Common/0.0.12": {
       "type": "project",
       "path": "../Dccelerator.DataAccess.Common/project.json",
       "msbuildProject": "../Dccelerator.DataAccess.Common/Dccelerator.DataAccess.Common.xproj"
@@ -147,7 +147,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Dccelerator.DataAccess.AdoNet >= 0.0.6"
+      "Dccelerator.DataAccess.AdoNet >= 0.0.12-*"
     ],
     ".NETFramework,Version=v4.0": [
       "System.Transactions >= 4.0.0",

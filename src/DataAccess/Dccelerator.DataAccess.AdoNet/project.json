@@ -1,5 +1,5 @@
 {
-  "version": "0.0.6",
+  "version": "0.0.12-*",
   "title": "Dccelerator.DataAccess.AdoNet",
   "description": "Contains ADO.NET adapter classes for Dccelerator.DataAccess ORM",
   "authors": [ "Kirill Dubinkin" ],
@@ -13,7 +13,12 @@
 
   "configurations": {
     "Debug": { "buildOptions": { "define": [ "DEBUG" ] } },
-    "Release": { "buildOptions": { "optimize": true } }
+    "Release": {
+      "buildOptions": {
+        "optimize": true,
+        "xmlDoc": true
+      }
+    }
   },
 
 
@@ -34,17 +39,16 @@
       }
     }
 
+    /*
+    "netstandard1.3": {
+      "buildOptions": { "define": [ "NET_STANDARD", "JETBRAINS_ANNOTATIONS" ] }
+    }*/
+
   },
 
 
   "dependencies": {
-    "Dccelerator.DataAccess.Common": "0.0.8"
+    "Dccelerator.DataAccess.Common": "0.0.12-*"
   },
 
-
-  "scripts": {
-    "postcompile": [
-      "../../../NugetPack.bat %compile:Configuration% Release ../../../publish"
-    ]
-  }
 }

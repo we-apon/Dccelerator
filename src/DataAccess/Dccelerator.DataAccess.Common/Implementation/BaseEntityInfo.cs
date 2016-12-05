@@ -120,8 +120,11 @@ namespace Dccelerator.DataAccess.Implementation {
 
             var dict = new Dictionary<string, TAttribute>();
 
+#if (NET_STANDARD || NET_CORE_APP)
+            var properties = typeInfo.AsType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+#else
             var properties = typeInfo.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
+#endif
             var attributeType = RUtils<TAttribute>.Type;
 
             foreach (var property in properties) {

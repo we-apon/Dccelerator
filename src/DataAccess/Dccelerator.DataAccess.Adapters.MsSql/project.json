@@ -1,5 +1,5 @@
 {
-  "version": "0.0.4",
+  "version": "0.0.12-*",
   "title": "Dccelerator.DataAccess.Adapters.MsSql",
   "description": "Contains Microsoft SQL Server adapter for Dccelerator.DataAccess ORM.",
   "authors": [ "Kirill Dubinkin" ],
@@ -8,6 +8,16 @@
     "tags": [ "ORM ADO.NET SQLClient MSSQL SQL" ],
     "projectUrl": "https://github.com/we-apon/Dccelerator",
     "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE"
+  },
+
+  "configurations": {
+    "Debug": { "buildOptions": { "define": [ "DEBUG" ] } },
+    "Release": {
+      "buildOptions": {
+        "optimize": true,
+        "xmlDoc": true
+      }
+    }
   },
 
   "frameworks": {
@@ -31,13 +41,7 @@
 
   },
   "dependencies": {
-    "Dccelerator.DataAccess.AdoNet": "0.0.6"
+    "Dccelerator.DataAccess.AdoNet": "0.0.12-*"
   },
 
-
-  "scripts": {
-    "postcompile": [
-      "../../../NugetPack.bat %compile:Configuration% Release ../../../publish"
-    ]
-  }
 }

@@ -210,12 +210,7 @@ namespace Dccelerator
             else if (includeGuids && _guidType.IsAssignableFrom(type))
                 value = Guid.NewGuid();
 
-
-            if (value == null)
-                return false;
-
-            prop.SmartSetValue(entity, value);
-            return true;
+            return value != null && entity.TrySetValueOnPath(prop.Name, value);
         }
 
         #endregion

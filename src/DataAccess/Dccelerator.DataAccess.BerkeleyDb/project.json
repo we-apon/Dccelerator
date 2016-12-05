@@ -1,5 +1,5 @@
 {
-  "version": "0.0.7",
+  "version": "0.0.12-*",
   "title": "Berkeley Db adapter for Dccelerator.DataAccess ORM",
   "description": "Berkeley Db adapter for Dccelerator.DataAccess ORM",
   "authors": [ "Kirill Dubinkin" ],
@@ -7,6 +7,17 @@
     "tags": [ "ORM BerkeleyDb" ],
     "projectUrl": "https://github.com/we-apon/Dccelerator",
     "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE"
+  },
+
+
+  "configurations": {
+    "Debug": { "buildOptions": { "define": [ "DEBUG" ] } },
+    "Release": {
+      "buildOptions": {
+        "optimize": true,
+        "xmlDoc": true
+      }
+    }
   },
 
   "frameworks": {
@@ -17,7 +28,7 @@
   },
 
   "dependencies": {
-    "Dccelerator.DataAccess.Common": "0.0.8",
+    "Dccelerator.DataAccess.Common": "0.0.12-*",
     "Berkeley.DB": "6.1.26"
   },
 

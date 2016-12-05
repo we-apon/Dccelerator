@@ -34,7 +34,7 @@
           "net40/Dccelerator.Core.dll": {}
         }
       },
-      "Dccelerator.DataAccess.Common/0.0.8": {
+      "Dccelerator.DataAccess.Common/0.0.12": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
@@ -85,7 +85,7 @@
       "path": "../../Dccelerator.Core/project.json",
       "msbuildProject": "../../Dccelerator.Core/Dccelerator.Core.xproj"
     },
-    "Dccelerator.DataAccess.Common/0.0.8": {
+    "Dccelerator.DataAccess.Common/0.0.12": {
       "type": "project",
       "path": "../Dccelerator.DataAccess.Common/project.json",
       "msbuildProject": "../Dccelerator.DataAccess.Common/Dccelerator.DataAccess.Common.xproj"
@@ -94,7 +94,7 @@
   "projectFileDependencyGroups": {
     "": [
       "Berkeley.DB >= 6.1.26",
-      "Dccelerator.DataAccess.Common >= 0.0.8"
+      "Dccelerator.DataAccess.Common >= 0.0.12-*"
     ],
     ".NETFramework,Version=v4.0": []
   },
