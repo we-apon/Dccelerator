@@ -6,9 +6,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
         protected SimpleScheduledTransaction(ITransactionScheduler scheduler, IDataManagerAdoFactory factory, IsolationLevel isolationLevel) : base(factory, isolationLevel) {
             _scheduler = scheduler;
         }
-
-
-        #region Overrides of NotScheduledDataTransaction
+        
 
         /// <summary>
         /// Doing nothing.
@@ -19,7 +17,6 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
 
             _scheduler.Append(this); //todo: this is will be work, but that is bad way.
         }
-
-        #endregion
+        
     }
 }

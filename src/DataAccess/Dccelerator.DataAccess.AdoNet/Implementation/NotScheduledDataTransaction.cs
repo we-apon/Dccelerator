@@ -121,6 +121,26 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
         }
 
 
+
+        protected virtual System.Data.IsolationLevel GetDataIsolationLevel(IsolationLevel localIsolationLevel) {
+            switch (localIsolationLevel) {
+                    case IsolationLevel.Serializable: return System.Data.IsolationLevel.Serializable;
+                    case IsolationLevel.RepeatableRead: return System.Data.IsolationLevel.RepeatableRead;
+                    case IsolationLevel.ReadCommitted: return System.Data.IsolationLevel.ReadCommitted;
+                    case IsolationLevel.ReadUncommitted: return System.Data.IsolationLevel.ReadUncommitted;
+                    case IsolationLevel.Snapshot: return System.Data.IsolationLevel.Snapshot;
+                    case IsolationLevel.Chaos: return System.Data.IsolationLevel.Chaos;
+                    case IsolationLevel.Unspecified: return System.Data.IsolationLevel.Unspecified;
+
+                default:
+                    System.Data.IsolationLevel level;
+                    return Enum.TryParse(localIsolationLevel.ToString("G"), out level)
+                        ? level
+                        : System.Data.IsolationLevel.Unspecified;
+            }
+        }
+
+
         /// <summary>
         /// Doing nothing.
         /// </summary>
@@ -137,7 +157,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 try {
                     using (var connection = _factory.AdoNetRepository().GetConnection()) {
                         connection.Open();
-                        using (var transaction = connection.BeginTransaction((System.Data.IsolationLevel) _isolationLevel)) {
+                        using (var transaction = connection.BeginTransaction(GetDataIsolationLevel(_isolationLevel))) {
                             foreach (var action in queue) {
                                 if (!action(connection)) {
                                     _isCommited = false;
@@ -150,36 +170,16 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                             return true;
                         }
 
-
-//                    using (var scope = BeginTransactionScope(_isolationLevel, connection)) {
-//                        foreach (var action in queue) {
-//                            if (!action(connection)) {
-//                                _isCommited = false;
-//                                scope.Rollback();
-//                                return false;
-//                            }
-//                        }
-//
-//                        scope.Complete();
-//                        return true;
-//                    }
                     }
                 }
                 catch (Exception e) {
                     new TraceSource("Dccelerator.DataAccess").TraceEvent(TraceEventType.Critical, 0, e.ToString());
                     return false;
                 }
-//                finally {
-//                    connection.Close();
-//                    connection.Dispose();
-//                }
             });
         }
 
-
-        //protected abstract ISpecificTransactionScope BeginTransactionScope(IsolationLevel isolationLevel, DbConnection connection);
-
-
+        
 
 
 

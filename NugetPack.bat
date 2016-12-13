@@ -1,5 +1,5 @@
 
-set versionSuffix=--version-suffix rc1
+set versionSuffix=--version-suffix rc2
 set output=publish
 set buildConfiguration=Release
 
