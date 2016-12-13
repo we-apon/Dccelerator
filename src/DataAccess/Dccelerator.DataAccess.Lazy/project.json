@@ -40,12 +40,6 @@
   "dependencies": {
     "Dccelerator.DataAccess.Common": "0.0.12-*",
     "PostSharp": "4.3.24"
-  },
-
-
-  "scripts": {
-    "postcompile": [
-      "../../../NugetPack.bat %compile:Configuration% Release ../../../publish"
-    ]
   }
+
 }

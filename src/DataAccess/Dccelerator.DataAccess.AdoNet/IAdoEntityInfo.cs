@@ -12,7 +12,8 @@ namespace Dccelerator.DataAccess.Ado {
 
         TDbTypeEnum GetDefaultDbType(Type type);
 
-        TDbTypeEnum GetParameterDbType(string parameterName);
+        TDbTypeEnum GetParameterDbType(IDataCriterion criterion);
+
     }
 
     public interface IAdoEntityInfo : IEntityInfo {

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Dccelerator.DataAccess.Implementation;
@@ -51,13 +52,9 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
 
 
 
-        public virtual TDbTypeEnum GetParameterDbType(string parameterName) {
-            TDbTypeEnum type;
-            if (!TypeMappings.TryGetValue(parameterName, out type))
-                throw new InvalidOperationException($"Parameter with name {parameterName} not exist in {nameof(TypeMappings)} of {EntityType}.");
-
-            return type;
-        }
+        public virtual TDbTypeEnum GetParameterDbType(IDataCriterion criterion) =>
+            TypeMappings.Value(criterion.Name)
+                .Or(() => GetDefaultDbType(criterion.Type ?? criterion.Value?.GetType()));
 
 
         #region Implementation of IAdoEntityInfo

@@ -30,6 +30,8 @@ namespace Dccelerator.DataAccess.Ado {
 
         protected internal abstract string DatabaseSpecificNameOf(string parameter);
 
+        protected internal virtual string DatabaseSpecificNameOf(IDataCriterion criterion) => DatabaseSpecificNameOf(criterion.Name);
+
         Type _repositoryType;
         protected Type RepositoryType => _repositoryType ?? (_repositoryType = GetType());
 

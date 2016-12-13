@@ -11,7 +11,7 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
 
         protected override SqlParameter ParameterWith(IEntityInfo info, IDataCriterion criterion) {
             var sqlInfo = (IAdoEntityInfo<SqlDbType>) info;
-            return new SqlParameter(DatabaseSpecificNameOf(criterion.Name), sqlInfo.GetParameterDbType(criterion.Name)) {Value = criterion.Value};
+            return new SqlParameter(DatabaseSpecificNameOf(criterion), sqlInfo.GetParameterDbType(criterion)) {Value = criterion.Value};
         }
 
 
