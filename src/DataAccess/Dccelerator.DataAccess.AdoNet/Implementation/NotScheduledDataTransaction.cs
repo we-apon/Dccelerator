@@ -14,7 +14,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
         readonly IDataManagerAdoFactory _factory;
         readonly IsolationLevel _isolationLevel;
 
-        readonly ConcurrentQueue<Func<DbConnection, bool>> _actions = new ConcurrentQueue<Func<DbConnection, bool>>();
+        readonly ConcurrentQueue<Func<DbActionArgs, bool>> _actions = new ConcurrentQueue<Func<DbActionArgs, bool>>();
         bool _isCommited;
 
 
@@ -56,7 +56,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
             var info = _factory.AdoInfoAbout<TEntity>();
-            _actions.Enqueue(connection => info.Repository.InsertMany(info, entities, connection));
+            _actions.Enqueue(args => info.Repository.InsertMany(info, entities, args));
         }
 
 
@@ -69,7 +69,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
 
 
             var info = _factory.AdoInfoAbout<TEntity>();
-            _actions.Enqueue(connection => info.Repository.Insert(info, entity, connection));
+            _actions.Enqueue(args => info.Repository.Insert(info, entity, args));
         }
 
 
@@ -81,7 +81,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
             var info = _factory.AdoInfoAbout<TEntity>();
-            _actions.Enqueue(connection => info.Repository.Update(info, entity, connection));
+            _actions.Enqueue(args => info.Repository.Update(info, entity, args));
         }
 
 
@@ -93,7 +93,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
             var info = _factory.AdoInfoAbout<TEntity>();
-            _actions.Enqueue(connection => info.Repository.UpdateMany(info, entities, connection));
+            _actions.Enqueue(args => info.Repository.UpdateMany(info, entities, args));
         }
 
 
@@ -105,7 +105,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
             var info = _factory.AdoInfoAbout<TEntity>();
-            _actions.Enqueue(connection => info.Repository.Delete(info, entity, connection));
+            _actions.Enqueue(args => info.Repository.Delete(info, entity, args));
         }
 
 
@@ -117,7 +117,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 throw new InvalidOperationException($"Transaction is locked. It means that it already commited or rolled back.");
 
             var info = _factory.AdoInfoAbout<TEntity>();
-            _actions.Enqueue(connection => info.Repository.DeleteMany(info, entities, connection));
+            _actions.Enqueue(args => info.Repository.DeleteMany(info, entities, args));
         }
 
 
@@ -158,8 +158,10 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                     using (var connection = _factory.AdoNetRepository().GetConnection()) {
                         connection.Open();
                         using (var transaction = connection.BeginTransaction(GetDataIsolationLevel(_isolationLevel))) {
+                            var args = new DbActionArgs(connection, transaction);
+
                             foreach (var action in queue) {
-                                if (!action(connection)) {
+                                if (!action(args)) {
                                     _isCommited = false;
                                     transaction.Rollback();
                                     return false;

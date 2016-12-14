@@ -36,7 +36,7 @@ namespace Dccelerator.DataAccess.Ado {
         protected Type RepositoryType => _repositoryType ?? (_repositoryType = GetType());
 
         /// <summary>
-        /// Get instance of <see cref="TParameter" /> that represents primary key.
+        /// Get instance of <typeparamref name="TParameter" /> that represents primary key.
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="info">Information about entity</param>
@@ -45,14 +45,14 @@ namespace Dccelerator.DataAccess.Ado {
         protected internal abstract TParameter PrimaryKeyParameterOf<TEntity>(IEntityInfo info, TEntity entity);
 
         /// <summary> 
-        /// Get instance <see cref="TConnection" /> for database.
+        /// Get instance <typeparamref name="TConnection" /> for database.
         /// </summary>
         /// <remarks>Connection should be instantiated, but unopened.</remarks>
         /// <returns>Return instance of connection</returns>
         protected internal abstract TConnection GetConnection();
 
         /// <summary>
-        /// Get instance of <see cref="TParameter" /> for queries based on input info and entity.
+        /// Get instance of <typeparamref name="TParameter" /> for queries based on input info and entity.
         /// </summary>
         /// <param name="info">Information about entity</param>
         /// <param name="criterion">Criterion that should be represented by returned <typeparamref name="TParameter"/></param>
@@ -63,11 +63,11 @@ namespace Dccelerator.DataAccess.Ado {
         /// Represents a command that will be executed against a database.
         /// </summary>
         /// <param name="commandText">String that represent query for command</param>
-        /// <param name="connection">Instance of connection</param>
+        /// <param name="args">Database action arguments. Connection and transaction</param>
         /// <param name="parameters">List of parameters</param>
         /// <param name="type">Type of command</param>
         /// <returns>Return instance of command</returns>
-        protected internal abstract TCommand CommandFor(string commandText, TConnection connection, IEnumerable<TParameter> parameters, CommandType type = CommandType.StoredProcedure);
+        protected internal abstract TCommand CommandFor(string commandText, DbActionArgs args, IEnumerable<TParameter> parameters, CommandType type = CommandType.StoredProcedure);
 
 
         /// <summary>
@@ -272,7 +272,7 @@ namespace Dccelerator.DataAccess.Ado {
 
             var connection = GetConnection();
             try {
-                using (var command = CommandFor(ReadCommandText(info, criteria), connection, parameters)) {
+                using (var command = CommandFor(ReadCommandText(info, criteria), new DbActionArgs(connection), parameters)) {
                     connection.Open();
                     using (var reader = command.ExecuteReader(behavior)) {
                         return reader.Read();
@@ -306,7 +306,7 @@ namespace Dccelerator.DataAccess.Ado {
             var behavior = GetBehaviorFor(info);
             var connection = GetConnection();
             try {
-                using (var command = CommandFor(ReadCommandText(info, criteria), connection, parameters)) {
+                using (var command = CommandFor(ReadCommandText(info, criteria), new DbActionArgs(connection), parameters)) {
                     connection.Open();
                     using (var reader = command.ExecuteReader(behavior)) {
                         if (idx < 0) {
@@ -338,7 +338,7 @@ namespace Dccelerator.DataAccess.Ado {
             var behavior = GetBehaviorFor(info);
             var connection = GetConnection();
             try {
-                using (var command = CommandFor(ReadCommandText(info, criteria), connection, parameters)) {
+                using (var command = CommandFor(ReadCommandText(info, criteria), new DbActionArgs(connection), parameters)) {
                     connection.Open();
                     using (var reader = command.ExecuteReader(behavior)) {
                         return RowsCount(reader);
@@ -357,10 +357,10 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        public virtual bool Insert<TEntity>(IEntityInfo info, TEntity entity, DbConnection connection) where TEntity : class {
+        public virtual bool Insert<TEntity>(IEntityInfo info, TEntity entity, DbActionArgs args) where TEntity : class {
             var parameters = ParametersFrom(info, entity);
 
-            using (var command = CommandFor(InsertCommandText(info, entity), (TConnection) connection, parameters)) {
+            using (var command = CommandFor(InsertCommandText(info, entity), args, parameters)) {
                 return command.ExecuteNonQuery() > 0;
             }
         }
@@ -371,14 +371,14 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        public virtual bool InsertMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbConnection connection) where TEntity : class {
+        public virtual bool InsertMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbActionArgs args) where TEntity : class {
             var name = InsertCommandText(info, entities);
 
 
             foreach (var entity in entities) {
                 var parameters = ParametersFrom(info, entity);
 
-                using (var command = CommandFor(name, (TConnection) connection, parameters)) {
+                using (var command = CommandFor(name, args, parameters)) {
                     if (command.ExecuteNonQuery() <= 0) {
                         return false;
                     }
@@ -394,9 +394,9 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        public virtual bool Update<T>(IEntityInfo info, T entity, DbConnection connection) where T : class {
+        public virtual bool Update<T>(IEntityInfo info, T entity, DbActionArgs args) where T : class {
             var parameters = ParametersFrom(info, entity);
-            using (var command = CommandFor(UpdateCommandText(info, entity), (TConnection) connection, parameters)) {
+            using (var command = CommandFor(UpdateCommandText(info, entity), args, parameters)) {
                 return command.ExecuteNonQuery() > 0;
             }
         }
@@ -407,13 +407,13 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        public virtual bool UpdateMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbConnection connection) where TEntity : class {
+        public virtual bool UpdateMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbActionArgs args) where TEntity : class {
             var name = UpdateCommandText(info, entities);
 
             foreach (var entity in entities) {
                 var parameters = ParametersFrom(info, entity);
 
-                using (var command = CommandFor(name, (TConnection) connection, parameters)) {
+                using (var command = CommandFor(name, args, parameters)) {
                     if (command.ExecuteNonQuery() <= 0) {
                         return false;
                     }
@@ -429,9 +429,9 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        public virtual bool Delete<TEntity>(IEntityInfo info, TEntity entity, DbConnection connection) where TEntity : class {
+        public virtual bool Delete<TEntity>(IEntityInfo info, TEntity entity, DbActionArgs args) where TEntity : class {
             var parameters = new[] {PrimaryKeyParameterOf(info, entity)};
-            using (var command = CommandFor(DeleteCommandText(info, entity), (TConnection) connection, parameters)) {
+            using (var command = CommandFor(DeleteCommandText(info, entity), args, parameters)) {
                 return command.ExecuteNonQuery() > 0;
             }
         }
@@ -442,13 +442,13 @@ namespace Dccelerator.DataAccess.Ado {
         /// </summary>
         /// <returns>Result of operation</returns>
         /// <exception cref="DbException">The connection-level error that occurred while opening the connection. </exception>
-        public virtual bool DeleteMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbConnection connection) where TEntity : class {
+        public virtual bool DeleteMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbActionArgs args) where TEntity : class {
             var name = DeleteCommandText(info, entities);
 
             foreach (var entity in entities) {
                 var parameters = new[] {PrimaryKeyParameterOf(info, entity)};
 
-                using (var command = CommandFor(name, (TConnection) connection, parameters)) {
+                using (var command = CommandFor(name, args, parameters)) {
                     if (command.ExecuteNonQuery() <= 0)
                         return false;
                 }
@@ -479,7 +479,7 @@ namespace Dccelerator.DataAccess.Ado {
             var connection = GetConnection();
             var behavior = GetBehaviorFor(info);
             try {
-                using (var command = CommandFor(ReadCommandText(info, criteria), connection, parameters)) {
+                using (var command = CommandFor(ReadCommandText(info, criteria), new DbActionArgs(connection), parameters)) {
                     connection.Open();
                     using (var reader = command.ExecuteReader(behavior)) {
                         info.InitReaderColumns(reader);
@@ -512,7 +512,7 @@ namespace Dccelerator.DataAccess.Ado {
 
             var behavior = GetBehaviorFor(mainObjectInfo);
             try {
-                using (var command = CommandFor(ReadCommandText(mainObjectInfo, criteria), connection, parameters)) {
+                using (var command = CommandFor(ReadCommandText(mainObjectInfo, criteria), new DbActionArgs(connection), parameters)) {
                     connection.Open();
                     using (var reader = command.ExecuteReader(behavior)) {
                         mainObjectInfo.InitReaderColumns(reader);

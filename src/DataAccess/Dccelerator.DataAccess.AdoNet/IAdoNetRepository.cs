@@ -32,41 +32,41 @@ namespace Dccelerator.DataAccess.Ado {
         /// Inserts an <paramref name="entity"/> using it's database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        bool Insert<TEntity>(IEntityInfo info, TEntity entity, DbConnection connection) where TEntity : class;
+        bool Insert<TEntity>(IEntityInfo info, TEntity entity, DbActionArgs args) where TEntity : class;
 
 
         /// <summary>
         /// Inserts an <paramref name="entities"/> using they database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        bool InsertMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbConnection connection) where TEntity : class;
+        bool InsertMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbActionArgs args) where TEntity : class;
 
 
         /// <summary>
         /// Updates an <paramref name="entity"/> using it's database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        bool Update<TEntity>(IEntityInfo info, TEntity entity, DbConnection connection) where TEntity : class;
+        bool Update<TEntity>(IEntityInfo info, TEntity entity, DbActionArgs args) where TEntity : class;
 
 
         /// <summary>
         /// Updates an <paramref name="entities"/> using they database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        bool UpdateMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbConnection connection) where TEntity : class;
+        bool UpdateMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbActionArgs args) where TEntity : class;
 
 
         /// <summary>
         /// Removes an <paramref name="entity"/> using it's database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        bool Delete<TEntity>(IEntityInfo info, TEntity entity, DbConnection connection) where TEntity : class;
+        bool Delete<TEntity>(IEntityInfo info, TEntity entity, DbActionArgs args) where TEntity : class;
 
 
         /// <summary>
         /// Removes an <paramref name="entities"/> using they database-specific <paramref name="entityName"/>.
         /// </summary>
         /// <returns>Result of operation</returns>
-        bool DeleteMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbConnection connection) where TEntity : class;
+        bool DeleteMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities, DbActionArgs args) where TEntity : class;
     }
 }
