@@ -235,7 +235,7 @@ namespace Dccelerator.DataAccess.Ado {
                     throw new InvalidOperationException($"Entity of type {entity.GetType()} should contain property '{x.Key}', " +
                                                         "but in some reason value or that property could not be getted.");
 
-                var criterion = new DataCriterion {Name = x.Key, Type = x.Value.PropertyType, Value = x.Value};
+                var criterion = new DataCriterion {Name = x.Key, Type = x.Value.PropertyType, Value = value};
                 return ParameterWith(info, criterion);
             });
         }
