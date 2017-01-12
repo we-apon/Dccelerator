@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 
 namespace Dccelerator.DataAccess {
@@ -64,6 +65,16 @@ namespace Dccelerator.DataAccess {
         /// </summary>
         /// <returns>Result of performed transaction.</returns>
         bool Commit();
+
+
+        /// <summary>
+        /// Immidiatelly executes all prepared actions of this transaction.
+        /// If this method is not called, but transaction are disposed - all prepared actions will be performed later, in some scheduler.
+        /// </summary>
+        /// <param name="error">Output parameter containing error message, if some error occured</param>
+        /// <returns>Result of performed transaction.</returns>
+        [ContractAnnotation("=>true, error:null; =>false, error: notnull")]
+        bool Commit(out string error);
 
 
         /// <summary>

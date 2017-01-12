@@ -1,5 +1,7 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
@@ -110,17 +112,8 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
         /// </summary>
         /// <returns>Result of performed transaction.</returns>
         public bool Commit() {
-            if (_isCommited)
-                return true;
-
-            lock (_lock) {
-                if (_isCommited)
-                    return true;
-
-                _isCommited = true;
-
-                return _factory.Repository().PerformInTransaction(_entityInfos, _elements);
-            }
+            string error;
+            return Commit(out error);
         }
 
 
@@ -131,6 +124,30 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
 
 
         bool _isCommited;
+
+
+        public bool Commit(out string error) {
+            error = null;
+
+            if (_isCommited)
+                return true;
+
+            lock (_lock) {
+                if (_isCommited)
+                    return true;
+
+                _isCommited = true;
+                try {
+
+                    return _factory.Repository().PerformInTransaction(_entityInfos, _elements);
+                }
+                catch (Exception e) {
+                    error = e.ToString();
+                    DataAccess.Infrastructure.Internal.TraceEvent(TraceEventType.Critical, error);
+                    return false;
+                }
+            }
+        }
 
         #endregion
     }

@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+
 
 namespace Dccelerator.DataAccess.Ado.Implementation {
     /// <summary>
@@ -27,16 +29,23 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
         const int DefaultRetryCount = 6;
 
 
-        protected virtual TResult RetryOnDeadlock<TResult>(Func<TResult> func, int retryCount = DefaultRetryCount) {
+        protected virtual bool RetryOnDeadlock(Action action, out string error, int retryCount = DefaultRetryCount) {
             var attemptNumber = 1;
             while (true) {
                 try {
-                    return func();
+                    action();
+                    error = null;
+                    return true;
                 }
                 catch (Exception exception) {
-                    Infrastructure.Internal.TraceEvent(TraceEventType.Warning, $"On attempt count #{attemptNumber} gaived sql exception:\n{exception}");
-                    if (!IsDeadlockException(exception) || (attemptNumber++ > retryCount))
-                        throw;
+                    error = $"On attempt count #{attemptNumber} gaived sql exception:\n{exception}";
+
+                    if (!IsDeadlockException(exception) || (attemptNumber++ > retryCount)) {
+                        Infrastructure.Internal.TraceEvent(TraceEventType.Critical, error);
+                        return false;
+                    }
+
+                    Infrastructure.Internal.TraceEvent(TraceEventType.Warning, error);
                 }
             }
         }
@@ -146,6 +155,20 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
         /// </summary>
         /// <returns>Always returns <see langword="true"/>.</returns>
         public bool Commit() {
+            string unusedError;
+            return Commit(out unusedError);
+        }
+
+
+        /// <summary>
+        /// Immidiatelly executes all prepared actions of this transaction.
+        /// If this method is not called, but transaction are disposed - all prepared actions will be performed later, in some scheduler.
+        /// </summary>
+        /// <param name="error">Output parameter containing error message, if some error occured</param>
+        /// <returns>Result of performed transaction.</returns>
+        public bool Commit(out string error) {
+            error = null;
+
             if (_isCommited)
                 return true;
 
@@ -154,34 +177,25 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
             return RetryOnDeadlock(() => {
                 var queue = _actions.ToArray();
 
-                try {
-                    using (var connection = _factory.AdoNetRepository().GetConnection()) {
-                        connection.Open();
-                        using (var transaction = connection.BeginTransaction(GetDataIsolationLevel(_isolationLevel))) {
-                            var args = new DbActionArgs(connection, transaction);
+                using (var connection = _factory.AdoNetRepository().GetConnection()) {
+                    connection.Open();
+                    using (var transaction = connection.BeginTransaction(GetDataIsolationLevel(_isolationLevel))) {
+                        var args = new DbActionArgs(connection, transaction);
 
-                            foreach (var action in queue) {
-                                if (!action(args)) {
-                                    _isCommited = false;
-                                    transaction.Rollback();
-                                    return false;
-                                }
+                        foreach (var action in queue) {
+                            if (!action(args)) {
+                                _isCommited = false;
+                                transaction.Rollback();
+                                throw new Exception("Unknown error occured. Transaction is rolled back.");
                             }
-
-                            transaction.Commit();
-                            return true;
                         }
 
+                        transaction.Commit();
                     }
                 }
-                catch (Exception e) {
-                    new TraceSource("Dccelerator.DataAccess").TraceEvent(TraceEventType.Critical, 0, e.ToString());
-                    return false;
-                }
-            });
+            }, out error);
         }
 
-        
 
 
 
