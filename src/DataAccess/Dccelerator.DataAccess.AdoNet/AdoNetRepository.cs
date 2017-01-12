@@ -512,16 +512,22 @@ namespace Dccelerator.DataAccess.Ado {
 
             var behavior = GetBehaviorFor(mainObjectInfo);
             try {
+                
                 using (var command = CommandFor(ReadCommandText(mainObjectInfo, criteria), new DbActionArgs(connection), parameters)) {
                     connection.Open();
                     using (var reader = command.ExecuteReader(behavior)) {
                         mainObjectInfo.InitReaderColumns(reader);
 
-                        var mainObjects = new Dictionary<object, object>();
+                        var hasIncludeons = mainObjectInfo.Inclusions.Any();
+
+                        var mainObjects = hasIncludeons ? new Dictionary<object, object>() : null;
 
                         while (reader.Read()) {
                             object keyId;
                             var item = ReadItem(reader, mainObjectInfo, null, out keyId);
+                            if (!hasIncludeons)
+                                yield return item;
+
                             try {
                                 mainObjects.Add(keyId, item);
                             }
@@ -628,7 +634,8 @@ namespace Dccelerator.DataAccess.Ado {
                         }
 
 
-                        return mainObjects.Values;
+                        foreach (var item in mainObjects.Values)
+                            yield return item;
                     }
                 }
             }
