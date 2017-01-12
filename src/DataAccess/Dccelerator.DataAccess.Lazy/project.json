@@ -13,7 +13,12 @@
 
 
   "configurations": {
-    "Debug": { "buildOptions": { "define": [ "DEBUG" ] } },
+    "Debug": {
+      "buildOptions": {
+        "define": [ "DEBUG" ],
+        "xmlDoc": true
+      }
+    },
     "Release": {
       "buildOptions": {
         "optimize": true,

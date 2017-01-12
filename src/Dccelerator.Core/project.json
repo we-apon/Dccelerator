@@ -11,7 +11,12 @@
     "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE"
   },
   "configurations": {
-    "Debug": { "buildOptions": { "define": [ "DEBUG" ] } },
+    "Debug": {
+       "buildOptions": {
+        "define": [ "DEBUG" ],
+        "xmlDoc": true 
+       }
+    },
     "Release": {
       "buildOptions": {
         "optimize": true,
