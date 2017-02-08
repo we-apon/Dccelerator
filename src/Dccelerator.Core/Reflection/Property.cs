@@ -7,18 +7,18 @@ using Dccelerator.Convertion;
 namespace Dccelerator.Reflection {
     class Property<TContext, TType> : MemberBase, IProperty<TContext, TType> {
 
-        MethodDelegate<TContext, TType> _getter;
-        ActionDelegate<TContext, TType> _setter;
+        IFunctionDelegate<TContext, TType> _getter;
+        IActionDelegate<TContext, TType> _setter;
 
 
         public PropertyInfo Info { get; }
 
 
-        public MethodDelegate<TContext, TType> Getter => _getter ?? (_getter = MakeGetter());
+        public IFunctionDelegate<TContext, TType> Getter => _getter ?? (_getter = MakeGetter());
 
 
 
-        public ActionDelegate<TContext, TType> Setter => _setter ?? (_setter = MakeSetter());
+        public IActionDelegate<TContext, TType> Setter => _setter ?? (_setter = MakeSetter());
 
 
         public Property(PropertyInfo property) : base(property.Name, MemberKind.Property) {
@@ -41,16 +41,7 @@ namespace Dccelerator.Reflection {
 
 
         public bool TryGetValue(TContext context, out TType value) {
-            try {
-                if (Getter.TryInvoke(context, out value))
-                    return true;
-            }
-            catch (Exception e) {
-                Internal.TraceEvent(TraceEventType.Error, e.ToString());
-            }
-
-            value = default(TType);
-            return false;
+            return Getter.TryInvoke(context, out value);
         }
 
 
@@ -69,18 +60,39 @@ namespace Dccelerator.Reflection {
         }
 
 
-        ActionDelegate<TContext, TType> MakeSetter() {
+        IActionDelegate<TContext, TType> MakeSetter() {
             var method = Info.GetSetMethod(true);
-            return method == null ? null : new ActionDelegate<TContext, TType>(method);
+            if (method != null)
+                return new ActionDelegate<TContext, TType>(method);
+
+            Internal.TraceEvent(TraceEventType.Warning, $"Property {(Info.ReflectedType() ?? Info.DeclaringType)?.FullName}.{Info.Name} has not setter, but {nameof(TrySetValue)} extension invoked on it!");
+            return new NotExistedDelegate();
         }
 
 
-        MethodDelegate<TContext, TType> MakeGetter() {
+        IFunctionDelegate<TContext, TType> MakeGetter() {
             var method = Info.GetGetMethod(true);
-            return method == null ? null : new MethodDelegate<TContext, TType>(method);
+            if (method != null)
+                return new FunctionDelegate<TContext, TType>(method);
+
+            Internal.TraceEvent(TraceEventType.Warning, $"Property {(Info.ReflectedType() ?? Info.DeclaringType)?.FullName}.{Info.Name} has not getter, but {nameof(TryGetValue)} extension invoked on it!");
+            return new NotExistedDelegate();
         }
         
         
+        /// <summary>
+        /// Used then property doesn't contain getter or setter, to avoid exceptions and getter/setter searching or every get/set call)
+        /// </summary>
+        class NotExistedDelegate : IActionDelegate<TContext, TType>, IFunctionDelegate<TContext, TType> {
+            public bool TryInvoke(TContext context, out TType result) {
+                result = default(TType);
+                return false;
+            }
+            
+            public bool TryInvoke(TContext context, TType p1) {
+                return false;
+            }
+        }
     }
 
     

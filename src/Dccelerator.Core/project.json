@@ -12,15 +12,16 @@
   },
   "configurations": {
     "Debug": {
-       "buildOptions": {
-        "define": [ "DEBUG" ],
-        "xmlDoc": true 
-       }
+      "buildOptions": {
+        "define": [ "DEBUG", "TRACE" ],
+        "xmlDoc": true
+      }
     },
     "Release": {
       "buildOptions": {
+        "define": [ "TRACE" ],
         "optimize": true,
-        "xmlDoc":  true 
+        "xmlDoc": true
       }
     }
   },

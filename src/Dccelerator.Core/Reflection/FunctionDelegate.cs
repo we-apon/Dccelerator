@@ -5,10 +5,8 @@ using System.Reflection;
 
 namespace Dccelerator.Reflection
 {
-    public class MethodDelegate<TContext, TOut> : DelegateContainer<Func<TContext, TOut>>
-    {
-        public MethodDelegate(MethodInfo method) : base(method) {}
-
+    public class FunctionDelegate<TContext, TOut> : DelegateContainer<Func<TContext, TOut>>, IFunctionDelegate<TContext, TOut> {
+        public FunctionDelegate(MethodInfo method) : base(method) {}
 
         public bool TryInvoke(TContext context, out TOut result) {
             try {
@@ -26,10 +24,11 @@ namespace Dccelerator.Reflection
 
 
 
+    public class FunctionDelegate<TContext, TP1, TOut> : DelegateContainer<Func<TContext, TP1, TOut>>, IFunctionDelegate<TContext, TP1, TOut>
 
-    public class MethodDelegate<TContext, TP1, TOut> : DelegateContainer<Func<TContext, TP1, TOut>>//, IMethod<TContext, TP1, TOut>
+//, IMethod<TContext, TP1, TOut>
     {
-        public MethodDelegate(MethodInfo method) : base(method) {}
+        public FunctionDelegate(MethodInfo method) : base(method) {}
 
 
         public bool TryInvoke(TContext context, TP1 p1, out TOut result) {
@@ -47,10 +46,8 @@ namespace Dccelerator.Reflection
 
 
 
-
-    public class MethodDelegate<TContext, TP1, TP2, TOut> : DelegateContainer<Func<TContext, TP1, TP2, TOut>>
-    {
-        public MethodDelegate(MethodInfo method) : base(method) {}
+    public class FunctionDelegate<TContext, TP1, TP2, TOut> : DelegateContainer<Func<TContext, TP1, TP2, TOut>>, IFunctionDelegate<TContext, TP1, TP2, TOut> {
+        public FunctionDelegate(MethodInfo method) : base(method) {}
 
 
         public bool TryInvoke(TContext context, TP1 p1, TP2 p2, out TOut result) {

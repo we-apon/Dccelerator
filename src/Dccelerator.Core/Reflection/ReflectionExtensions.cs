@@ -48,6 +48,24 @@ namespace Dccelerator.Reflection {
 
 
         /// <summary>
+        /// Extension to get reflected type of property.
+        /// On NET40-NET46 platforms returns it, on netstandard - returns null.
+        /// <para>It usable for multiplatform programming, to avoid #if #else statements</para>
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        [CanBeNull]
+        public static Type ReflectedType(this PropertyInfo info) {
+#if NET40 || NET45
+            return info.ReflectedType;
+#else
+            return null;
+#endif
+        }
+
+
+
+        /// <summary>
         /// Returns true if can get <paramref name="value"/> from <paramref name="property"/> in passed <paramref name="context"/>.
         /// </summary>
         /// <param name="property">Property defined in <paramref name="context"/>'s type.</param>

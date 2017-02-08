@@ -5,8 +5,7 @@ using System.Reflection;
 
 namespace Dccelerator.Reflection
 {
-    public class ActionDelegate<TContext> : DelegateContainer<Action<TContext>>
-    {
+    public class ActionDelegate<TContext> : DelegateContainer<Action<TContext>>, IActionDelegate<TContext> {
         public ActionDelegate(MethodInfo method) : base(method) {}
 
 
@@ -23,8 +22,8 @@ namespace Dccelerator.Reflection
     }
 
 
-    public class ActionDelegate<TContext, TP1> : DelegateContainer<Action<TContext, TP1>>
-    {
+
+    public class ActionDelegate<TContext, TP1> : DelegateContainer<Action<TContext, TP1>>, IActionDelegate<TContext, TP1> {
         public ActionDelegate(MethodInfo method) : base(method) {}
 
 
