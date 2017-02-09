@@ -310,7 +310,7 @@ namespace Dccelerator.Reflection
                     return property;
             }
 
-            var prop = type.GetProperty(name); //todo: add BindingFlags
+            var prop = type.GetProperty(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
             if (prop == null)
                 return null;
 
