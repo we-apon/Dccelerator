@@ -67,13 +67,21 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
 
             var targetType = _targetProperty.Info.PropertyType;
 
-            if (targetType.IsArray)
-                return Info.EntityType.MakeArrayType();
-
-            if (targetType.IsAbstract || targetType.IsInterface)
+            if (targetType.IsAbstract || targetType.IsInterface) {
                 return targetType.IsGenericType
-                    ? typeof (List<>).MakeGenericType(Info.EntityType)
-                    : typeof (ArrayList);
+                    ? typeof(List<>).MakeGenericType(Info.EntityType)
+                    : typeof(ArrayList);
+            }
+
+            foreach (var ctor in targetType.GetConstructors()) {
+                var parameters = ctor.GetParameters();
+                if (!parameters.Any() || parameters.All(x => x.IsOptional))
+                    return targetType;
+            }
+
+
+            if (targetType.IsArray) // I think this is not needed anymore..
+                return Info.EntityType.MakeArrayType();
 
             return null;
         }
