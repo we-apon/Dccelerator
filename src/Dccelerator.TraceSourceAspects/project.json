@@ -1,0 +1,40 @@
+﻿{
+  "version": "0.0.12-*",
+  "title": "Dccelerator.TraceSourceAttribute",
+  "description": "Contains TraceSourceAttribute - a PostSharp-based aspect for simple but rich logging with .Net System.Diagnostics framework. It makes completely simple to use activity tracing and locial operations stacks.",
+  "authors": [ "Kirill Dubinkin" ],
+  "copyright": "Copyright © Kirill Dubinkin 2017",
+  "packOptions": {
+    "summary": "Dccelerator.TraceSourceAspects",
+    "tags": [ "TraceSource Diagnostics Logging AOP Aspects ActivityTracing LogicalOperationStack" ],
+    "projectUrl": "https://github.com/we-apon/Dccelerator",
+    "licenseUrl": "https://github.com/we-apon/Dccelerator/blob/master/LICENSE"
+  },
+  "configurations": {
+    "Debug": {
+      "buildOptions": {
+        "define": [ "DEBUG", "TRACE" ],
+        "xmlDoc": true
+      }
+    },
+    "Release": {
+      "buildOptions": {
+        "define": [ "TRACE" ],
+        "optimize": true,
+        "xmlDoc": true
+      }
+    }
+  },
+
+  "frameworks": {
+    "net40": {
+      "buildOptions": { "define": [ "NET35", "JETBRAINS_ANNOTATIONS" ] },
+      "dependencies": {
+        "PostSharp": "4.3.29"
+      }
+    }
+
+  }
+
+
+}

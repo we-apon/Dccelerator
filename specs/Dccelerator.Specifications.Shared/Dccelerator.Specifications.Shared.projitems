@@ -12,5 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)DataAccess\Adapters\MsSql\SqlRepository_Specs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataAccess\Adapters\Oracle\OracleRepository_Specs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataAccess\AdoNet\AdoNetRepository_Specs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TraceSourceAspects\TraceSourceAttribute_Specs.cs" />
   </ItemGroup>
 </Project>

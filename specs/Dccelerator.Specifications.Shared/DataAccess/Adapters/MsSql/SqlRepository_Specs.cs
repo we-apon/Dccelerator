@@ -5,11 +5,11 @@ using System.Reflection;
 using Dccelerator.DataAccess;
 using Dccelerator.DataAccess.Ado;
 using Dccelerator.DataAccess.Ado.SqlClient;
+using Dccelerator.TraceSourceAttributes;
 using FakeItEasy;
 using Machine.Specifications;
 
 namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.MsSql {
-
     [Subject(typeof(SqlClientRepository))]
     class When_getting_select_query {
         Establish context = () => {
@@ -18,7 +18,7 @@ namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.MsSql {
             _info = A.Fake<IAdoEntityInfo>();
             A.CallTo(() => _info.EntityName).Returns(_entityName);
 
-            _criteria = new[] {
+            _criteria = new IDataCriterion[] {
                 new DataCriterion {Name = "Name1"},
                 new DataCriterion {Name = "Name2"},
                 new DataCriterion {Name = "Name3"},
