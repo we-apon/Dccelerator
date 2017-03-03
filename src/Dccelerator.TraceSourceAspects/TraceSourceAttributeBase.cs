@@ -3,7 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using PostSharp.Aspects;
@@ -27,9 +29,11 @@ namespace Dccelerator.TraceSourceAttributes {
         /// Глобальный экземпляр трассировщика. 
         /// Используется, если при объявлении атрибута не было переопределено свойство <see cref="SourceName"/>.
         /// Для имени используется короткое имя сборки приложения (<see cref="Assembly.GetEntryAssembly">Assembly.GetEntryAssembly()</see>),
-        /// либо имя исполняемой сборки (<see cref="Assembly.GetExecutingAssembly">Assembly.GetExecutingAssembly()</see>), что в большинстве случаев будет соответствовать сборке 'Dccelerator.TraceSourceAspects'.
+        /// либо имя исполняемой сборки (<see cref="Assembly.GetExecutingAssembly">Assembly.GetExecutingAssembly()</see>), что будет соответствовать сборке 'Dccelerator.TraceSourceAspects'.
         /// </para>
         /// </summary>
+        /// <see cref="SourceName"/>
+        /// <seealso cref="Tracer"/>
         static readonly TraceSource _globalTrace = new TraceSource((Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly()).GetName().Name);
 
 
@@ -43,11 +47,16 @@ namespace Dccelerator.TraceSourceAttributes {
         /// Есть мнение, что лучше явно указывать <see cref="SourceName"/>, т.к. при выполнении тех же тестов <see cref="Assembly.GetEntryAssembly">Assembly.GetEntryAssembly()</see> ничего не вернёт.
         /// </para>
         /// </summary>
+        /// <see cref="SourceName"/>
         protected virtual TraceSource Tracer => _trace ?? (_trace = string.IsNullOrWhiteSpace(SourceName) ? _globalTrace : new TraceSource(SourceName));
 
         [NonSerialized]
         TraceSource _trace;
 
+
+        protected int? IdentifiedParameterIndex { get; set; }
+
+        protected PropertyInfo IdentifierParameterProperty { get; set; }
 
         /// <summary>
         /// <para xml:lang="en"></para>
@@ -63,23 +72,59 @@ namespace Dccelerator.TraceSourceAttributes {
         /// <summary>
         /// <para xml:lang="en"></para>
         /// <para xml:lang="ru">
-        /// Список параметров текущего метода. Инициализируется при компиляции (<see cref="CompileTimeInitialize"/>).
+        /// Список параметров текущего метода. Инициализируется при <see cref="CompileTimeInitialize">компиляции</see>.
         /// Используется для форматирования аргументов методов.
         /// </para>
         /// </summary>
         protected virtual ParameterInfo[] Parameters { get; set; }
-        
 
+
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Позвляет переопределить имя используемого <see cref="Tracer">трассировщика</see>.
+        /// Если указано - используется оно.
+        /// Если нет - используется короткое имя сборки приложения (<see cref="Assembly.GetEntryAssembly">Assembly.GetEntryAssembly()</see>),
+        /// либо имя исполняемой сборки (<see cref="Assembly.GetExecutingAssembly">Assembly.GetExecutingAssembly()</see>), что будет соответствовать сборке 'Dccelerator.TraceSourceAspects'.
+        /// Есть мнение, что лучше явно указывать <see cref="SourceName"/>, т.к. при выполнении тех же тестов <see cref="Assembly.GetEntryAssembly">Assembly.GetEntryAssembly()</see> ничего не вернёт.
+        /// </para>
+        /// </summary>
+        /// <seealso cref="Tracer"/>
         public virtual string SourceName { get; set; }
 
 
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Имя текущего метода. Инициализируется при <see cref="CompileTimeInitialize">компиляции</see>.
+        /// По умолчанию используется формат "Класс.Метод".
+        /// Формат можно переопределить в методе <see cref="FormatCompileTimeMethodName"/>.
+        /// </para>
+        /// </summary>
         public virtual string MethodName { get; set; }
 
 
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Имя логической операции. Инициализируется при <see cref="CompileTimeInitialize">компиляции</see>.
+        /// По умолчанию используется формат "Класс.Метод".
+        /// Формат можно переопределить в методе <see cref="FormatCompileTimeLogicalOperation"/>.
+        /// </para>
+        /// </summary>
+        public virtual string LogicalOperation { get; set; }
+
+
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Определяет, следует ли логировать каждый элемент аргументов-коллекций.
+        /// По умолчанию - нет, не следует (<see langword="false"/>).
+        /// </para>
+        /// </summary>
         public virtual bool LogCollectionItems { get; set; }
 
 
-        public virtual string LogicalOperation { get; set; }
 
 
         /// <summary>
@@ -137,11 +182,63 @@ namespace Dccelerator.TraceSourceAttributes {
         /// <para xml:lang="ru">Уровень события исключения (эксепшона). По умолчанию <see cref="TraceEventType.Critical"/>.</para>
         /// </summary>
         public virtual TraceEventType ExceptionsLevel { get; set; } = TraceEventType.Critical;
-        
 
 
 
-        protected virtual Guid GetNewActivityGuid(MethodExecutionArgs args) => Guid.NewGuid();
+        protected virtual int? GetIdentifiedParameterIndex(ParameterInfo[] parameters, out PropertyInfo identifierProperty) {
+            identifierProperty = null;
+
+            if (parameters == null || parameters.Length == 0)
+                return null;
+
+            for (int i = 0; i < parameters.Length; i++) {
+                identifierProperty = GetIdentifierPropertyOfType(parameters[i].ParameterType);
+                if (identifierProperty != null)
+                    return i;
+            }
+
+            return null;
+        }
+
+
+        protected virtual PropertyInfo GetIdentifierPropertyOfType(Type type) {
+            return type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .FirstOrDefault(x => x.CanRead && x.Name == "Id" && x.PropertyType == typeof(Guid)); 
+        }
+
+
+        protected virtual Guid GetActivityIdFromIdentifiedArgument(object value) {
+            if (value == null)
+                return Guid.NewGuid();
+
+            try {
+                return (Guid) IdentifierParameterProperty.GetValue(value, null);
+            }
+            catch (Exception e) {
+                Tracer.TraceEvent(TraceEventType.Warning, 4000, $"Exception while getting identifier of object {value.GetType()} from property {IdentifierParameterProperty}\n{e}");
+                return Guid.NewGuid();
+            }
+        }
+
+
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Возвращает идентификатор для новой активности логировщика
+        /// </para>
+        /// </summary>
+        protected virtual Guid GetNewActivityGuid(MethodExecutionArgs args) {
+            if (Parameters.Length == 0 || IdentifiedParameterIndex == null || args.Arguments.Count < IdentifiedParameterIndex.Value)
+                return Guid.NewGuid();
+
+            var argument = args.Arguments[IdentifiedParameterIndex.Value];
+            var id = GetActivityIdFromIdentifiedArgument(argument);
+
+            if (Trace.CorrelationManager.ActivityId == Guid.Empty || Trace.CorrelationManager.ActivityId != id)
+                return id;
+
+            return Guid.Empty;
+        }
 
         protected virtual string FormatTransferTo(MethodExecutionArgs args) =>  $"Transfered to {MethodName}";
         protected virtual string FormatTransferBack(MethodExecutionArgs args) => "Transfered back";
@@ -151,12 +248,30 @@ namespace Dccelerator.TraceSourceAttributes {
 
         protected virtual string FormatException(MethodExecutionArgs args) => args.Exception.ToString();
         protected virtual string FormatLogicalOperation(MethodExecutionArgs args) => LogicalOperation;
-        
 
+
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Возвращает отформатированное имя текущего метода. Вызывается при <see cref="CompileTimeInitialize">компиляции</see>.
+        /// По умолчанию используется формат "Класс.Метод".
+        /// </para>
+        /// </summary>
+        /// <seealso cref="MethodName"/>
+        /// <seealso cref="CompileTimeInitialize"/>
         protected virtual string FormatCompileTimeMethodName(MethodBase method, AspectInfo aspectInfo) {
             return $"{(method.ReflectedType ?? method.DeclaringType)?.Name}.{method.Name}";
         }
 
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Возвращает отформатированное имя логической операции. Вызывается при <see cref="CompileTimeInitialize">компиляции</see>.
+        /// По умолчанию используется формат "Класс.Метод".
+        /// </para>
+        /// </summary>
+        /// <seealso cref="LogicalOperation"/>
+        /// <seealso cref="CompileTimeInitialize"/>
         protected virtual string FormatCompileTimeLogicalOperation(MethodBase method, AspectInfo aspectInfo) {
             return $"{(method.ReflectedType ?? method.DeclaringType)?.Name}.{method.Name}";
         }
@@ -214,8 +329,13 @@ namespace Dccelerator.TraceSourceAttributes {
         public override void CompileTimeInitialize(MethodBase method, AspectInfo aspectInfo) {
             base.CompileTimeInitialize(method, aspectInfo);
             MethodName = FormatCompileTimeMethodName(method, aspectInfo);
-            Parameters = method.GetParameters();
             LogicalOperation = FormatCompileTimeLogicalOperation(method, aspectInfo);
+
+            Parameters = method.GetParameters();
+
+            PropertyInfo identifierProperty;
+            IdentifiedParameterIndex = GetIdentifiedParameterIndex(Parameters, out identifierProperty);
+            IdentifierParameterProperty = identifierProperty;
         }
 
 
@@ -256,9 +376,7 @@ namespace Dccelerator.TraceSourceAttributes {
             Tracer.TraceEvent(TraceEventType.Stop, StopId, FormatStop(args));
             Trace.CorrelationManager.StopLogicalOperation();
 
-            if (hasParent)
-                Trace.CorrelationManager.ActivityId = parentActivityId;
-
+            Trace.CorrelationManager.ActivityId = hasParent ? parentActivityId : Guid.Empty;
             Tracer.Flush();
         }
 
