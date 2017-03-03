@@ -10,36 +10,135 @@ using PostSharp.Aspects;
 
 namespace Dccelerator.TraceSourceAttributes {
 
+    /// <summary>
+    /// <para xml:lang="en"></para>
+    /// <para xml:lang="ru">
+    /// Базовый класс, реализующий всю логику PostSharp-атрибута для трассировки выполнения методов. 
+    /// Трассировка выполняется фреймворком System.Diagnostics.TraceSource, встронным в .Net Framework.
+    /// Кстати, для знакомства с System.Diagnostics.TraceSource хорошо подходит документация расширяюшего его фрейворка - <see hrev="https://essentialdiagnostics.codeplex.com/">Essential.Diagnostics</see>.
+    /// </para>
+    /// </summary>
     [Serializable]
     public abstract class TraceSourceAttributeBase : OnMethodBoundaryAspect {
 
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Глобальный экземпляр трассировщика. 
+        /// Используется, если при объявлении атрибута не было переопределено свойство <see cref="SourceName"/>.
+        /// Для имени используется короткое имя сборки приложения (<see cref="Assembly.GetEntryAssembly">Assembly.GetEntryAssembly()</see>),
+        /// либо имя исполняемой сборки (<see cref="Assembly.GetExecutingAssembly">Assembly.GetExecutingAssembly()</see>), что в большинстве случаев будет соответствовать сборке 'Dccelerator.TraceSourceAspects'.
+        /// </para>
+        /// </summary>
         static readonly TraceSource _globalTrace = new TraceSource((Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly()).GetName().Name);
-        static readonly ThreadLocal<Stack<Guid>> _parentActicities = new ThreadLocal<Stack<Guid>>(() => new Stack<Guid>());
-        
+
+
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Используемый атрибутом экземпляр трассировщика. 
+        /// Если было проинициализировно свойство <see cref="SourceName"/> - его значение используется в качестве имени <see cref="TraceSource"/>.
+        /// Если нет - используется короткое имя сборки приложения (<see cref="Assembly.GetEntryAssembly">Assembly.GetEntryAssembly()</see>),
+        /// либо имя исполняемой сборки (<see cref="Assembly.GetExecutingAssembly">Assembly.GetExecutingAssembly()</see>), что в большинстве случаев будет соответствовать сборке 'Dccelerator.TraceSourceAspects'.
+        /// Есть мнение, что лучше явно указывать <see cref="SourceName"/>, т.к. при выполнении тех же тестов <see cref="Assembly.GetEntryAssembly">Assembly.GetEntryAssembly()</see> ничего не вернёт.
+        /// </para>
+        /// </summary>
         protected virtual TraceSource Tracer => _trace ?? (_trace = string.IsNullOrWhiteSpace(SourceName) ? _globalTrace : new TraceSource(SourceName));
 
         [NonSerialized]
         TraceSource _trace;
 
+
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Стек вызовов логируемых методов текущего потока. Содержит идентификаторы активностей сообщений трассировки.
+        /// Стек начинает заполняться, когда свойство <see cref="Trace.CorrelationManager.ActivityId">Trace.CorrelationManager.ActivityId</see> не проинициализировано.
+        /// Используется для передачи идентификатора предыдущей активности в метод <see cref="TraceSource.TraceTransfer"/>, при переходе обратно к методу, вызвавшему текущий (вверх по иерархии вызовов).
+        /// </para>
+        /// </summary>
+        static readonly ThreadLocal<Stack<Guid>> _parentActicities = new ThreadLocal<Stack<Guid>>(() => new Stack<Guid>());
+
+
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Список параметров текущего метода. Инициализируется при компиляции (<see cref="CompileTimeInitialize"/>).
+        /// Используется для форматирования аргументов методов.
+        /// </para>
+        /// </summary>
         protected virtual ParameterInfo[] Parameters { get; set; }
         
 
         public virtual string SourceName { get; set; }
 
+
         public virtual string MethodName { get; set; }
+
 
         public virtual bool LogCollectionItems { get; set; }
 
+
         public virtual string LogicalOperation { get; set; }
 
+
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Код события перехода потока выполненя из текущего метода в другой (т.е. код сообщения о событии вызова какого-либо метода, из текущего).
+        /// <see hrev="https://essentialdiagnostics.codeplex.com/wikipage?title=Event%20Ids&referringTitle=Documentation">Статья</see> фреймворка Essential.Diagnostics проясняет, накой оно сдалось.
+        /// </para>
+        /// </summary>
         public virtual int TransferToId { get; set; } = 6000;
+        
+
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Код события возвращения потока выполненя из текущего метода в тот, что его вызвал.
+        /// <see hrev="https://essentialdiagnostics.codeplex.com/wikipage?title=Event%20Ids&referringTitle=Documentation">Статья</see> фреймворка Essential.Diagnostics проясняет, накой оно сдалось.
+        /// </para>
+        /// </summary>
         public virtual int TransferBackId { get; set; } = 6010;
+
+
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Код события начала выполнения текущего метода.
+        /// <see hrev="https://essentialdiagnostics.codeplex.com/wikipage?title=Event%20Ids&referringTitle=Documentation">Статья</see> фреймворка Essential.Diagnostics проясняет, накой оно сдалось.
+        /// </para>
+        /// </summary>
         public virtual int StartId { get; set; } = 1000;
+
+
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Код события окончания выполнения текущего метода.
+        /// <see hrev="https://essentialdiagnostics.codeplex.com/wikipage?title=Event%20Ids&referringTitle=Documentation">Статья</see> фреймворка Essential.Diagnostics проясняет, накой оно сдалось.
+        /// </para>
+        /// </summary>
         public virtual int StopId { get; set; } = 8000;
+
+
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">
+        /// Код события исключения (эксепшона).
+        /// <see hrev="https://essentialdiagnostics.codeplex.com/wikipage?title=Event%20Ids&referringTitle=Documentation">Статья</see> фреймворка Essential.Diagnostics проясняет, накой оно сдалось.
+        /// </para>
+        /// </summary>
         public virtual int ExceptionId { get; set; } = 9900;
 
+
+        /// <summary>
+        /// <para xml:lang="en"></para>
+        /// <para xml:lang="ru">Уровень события исключения (эксепшона). По умолчанию <see cref="TraceEventType.Critical"/>.</para>
+        /// </summary>
         public virtual TraceEventType ExceptionsLevel { get; set; } = TraceEventType.Critical;
         
+
 
 
         protected virtual Guid GetNewActivityGuid(MethodExecutionArgs args) => Guid.NewGuid();
