@@ -23,7 +23,7 @@ namespace Dccelerator.Specifications.Shared.TraceSourceAspects
             SomeProperty = "asd";
             Console.WriteLine(SomeProperty);
         }
-
+        
         /// <summary>
         /// This is integrational test. See resulted logs in file 'TestsLog.svclog' (configured in App.Config) 
         /// </summary>
