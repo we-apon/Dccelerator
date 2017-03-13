@@ -1,5 +1,5 @@
 
-set versionSuffix=--version-suffix rc9
+set versionSuffix=--version-suffix rc10
 set output=publish
 set buildConfiguration=Debug
 

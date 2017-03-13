@@ -13,14 +13,21 @@ namespace Dccelerator.Specifications.Shared.TraceSourceAspects
         public static string SomeProperty { get; set; }
 
 
+        public string PublicProperty { get; set; }
+
         public static string SomeMethod(int asd, string[] lines) {
             return $"{asd}, {string.Join("; ", lines)}";
+        }
+
+        public static string SomeJsonSerizlizerParameter(object value) {
+            return value.ToString();
         }
 
 
         public static void MainMethod(int singleParam) {
             SomeMethod(singleParam, new[] { "one", "two", "three" });
             SomeProperty = "asd";
+            SomeJsonSerizlizerParameter(new When_using_it {PublicProperty = "asdjjaksdkk asdj skdf"});
             Console.WriteLine(SomeProperty);
         }
         

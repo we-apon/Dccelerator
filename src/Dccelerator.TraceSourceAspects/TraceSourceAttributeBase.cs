@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
 using PostSharp.Aspects;
@@ -21,6 +24,8 @@ namespace Dccelerator.TraceSourceAttributes {
     /// </summary>
     [Serializable]
     public abstract class TraceSourceAttributeBase : OnMethodBoundaryAspect {
+
+        protected static readonly ConcurrentDictionary<Guid, string> FormatedGenerics = new ConcurrentDictionary<Guid, string>();
 
         /// <summary>
         /// <para xml:lang="en"></para>
@@ -279,14 +284,14 @@ namespace Dccelerator.TraceSourceAttributes {
         /// <para xml:lang="ru">
         /// Возвращает отформатированную строку для сообщения начала текущей активности (метода).
         /// Реализация по-умолчанию содержит название метода и отформатированный список его аргументов.
-        /// Так же для корневой активности (у которой нет родителей), к сообщению добавляется префикс "RootActivity:".
+        /// Так же для корневой активности (у которой нет родителей), к сообщению добавляется префикс " ---> ".
         /// </para>
         /// </summary>
         protected virtual string FormatStart(MethodExecutionArgs args) {
             if (_parentActivities.Value.Count > 0)
                 return $"{MethodName}{FormatInputArguments(args)}";
 
-            return $"RootActivity: {MethodName}{FormatInputArguments(args)}";
+            return $" ---> {MethodName}{FormatInputArguments(args)}";
         }
 
 
@@ -324,7 +329,7 @@ namespace Dccelerator.TraceSourceAttributes {
         /// <seealso cref="MethodName"/>
         /// <seealso cref="CompileTimeInitialize"/>
         protected virtual string FormatCompileTimeMethodName(MethodBase method, AspectInfo aspectInfo) {
-            return $"{(method.ReflectedType ?? method.DeclaringType)?.Name}.{method.Name}";
+            return $"{FormatType(method.ReflectedType ?? method.DeclaringType)}.{method.Name}";
         }
 
 
@@ -338,7 +343,7 @@ namespace Dccelerator.TraceSourceAttributes {
         /// <seealso cref="LogicalOperation"/>
         /// <seealso cref="CompileTimeInitialize"/>
         protected virtual string FormatCompileTimeLogicalOperation(MethodBase method, AspectInfo aspectInfo) {
-            return $"{(method.ReflectedType ?? method.DeclaringType)?.Name}.{method.Name}";
+            return $"{FormatType(method.ReflectedType ?? method.DeclaringType)}.{method.Name}";
         }
 
 
@@ -347,22 +352,183 @@ namespace Dccelerator.TraceSourceAttributes {
         /// <para xml:lang="ru">Возвращает строковое представление переданного значения (<paramref name="value"/>)</para>
         /// </summary>
         protected virtual string FormatValue(object value, bool logCollectionItems = false, bool inCollection = false, bool printTypeNames = false) {
-            IEnumerable collection;
+            if (value == null)
+                return "null";
 
-            if (!logCollectionItems || (collection = AsAnCollection(value)) == null)
+            var enumerable = AsAnCollection(value);
+            
+            if (enumerable == null) {
+                var result = value.ToString();
+                if (result == value.GetType().FullName)
+                    return FormatToJSON(value, printTypeNames);
+                
                 return printTypeNames
-                    ? $"{value?.GetType().Name}: \"{value?.ToString() ?? "null"}\""
-                    : value?.ToString() ?? "null";
+                    ? $"{FormatType(value.GetType())}: \"{value}\""
+                    : value.ToString();
+            }
 
+            if (!logCollectionItems) {
+                var collection = enumerable as ICollection;
+                var valueText = $"{(collection != null ? $"{collection.Count} items" : $"\"{value}\"")}";
+
+                return printTypeNames
+                    ? $"{FormatType(value.GetType())}: {valueText}"
+                    : valueText;
+            }
 
             var separator = inCollection ? "\n\t\t" : "\n\t";
 
-            var builder = new StringBuilder(printTypeNames ? value.GetType().Name : value.ToString()).Append(" {");
-            foreach (var item in collection) {
+            var builder = new StringBuilder(printTypeNames ? FormatType(value.GetType()) : string.Empty).Append("{");
+            foreach (var item in enumerable) {
                 builder.Append(separator).Append(item).Append(", ");
             }
             return builder.Remove(builder.Length - 2, 2).Append(inCollection ? "\n\t" : "\n").Append("}").ToString();
         }
+
+
+        /// <summary>
+        /// Форматирует название типа.
+        /// Возвращает человеческие названия женериков и нуллабл-типов.
+        /// </summary>
+        protected virtual string FormatType(Type type) {
+            if (!type.IsGenericType)
+                return type.Name;
+
+            string typeName;
+            if (FormatedGenerics.TryGetValue(type.GUID, out typeName))
+                return typeName;
+
+            var definition = type.GetGenericTypeDefinition();
+            var args = type.GetGenericArguments();
+
+            if (definition == typeof(Nullable<>)) {
+                return $"{FormatType(args[0])}?";
+            }
+
+            typeName = $"{definition.Name.Substring(0, definition.Name.IndexOf('`'))}<{string.Join(", ", args.Select(FormatType))}>";
+            FormatedGenerics.TryAdd(type.GUID, typeName);
+            return typeName;
+        }
+
+
+        static Func<object, string> _toJson;
+
+        /// <summary>
+        /// Форматирует значение в JSON.
+        /// </summary>
+        protected virtual string FormatToJSON(object value, bool printTypeNames) {
+            if (_toJson == null) {
+                try {
+                    _toJson = GetNewtonSoftSerializer() ?? GetDataContractSerializer();
+                }
+                catch (Exception e) {
+                    Tracer.TraceEvent(TraceEventType.Warning, WarningId, $"Can't get serialization delegate\n{e}");
+                }
+
+                _toJson = _toJson ?? (val => val.ToString());
+
+                return printTypeNames ? $"{FormatType(value.GetType())} {_toJson(value)}" : _toJson(value);
+            }
+
+            return printTypeNames 
+                ? $"{FormatType(value.GetType())} {_toJson(value)}"
+                : _toJson(value);
+        }
+
+        /// <summary>
+        /// Возвращает делегат для сериализации значения через Newtonsoft.Json.JsonConvert.
+        /// Сборка Newtonsoft.Json должна быть загружена в текущий домен приложения, или хотя бы доступна для загрузки по относительному пути.
+        /// </summary>
+        Func<object, string> GetNewtonSoftSerializer() {
+
+            MethodInfo serializeObject;
+            object indented;
+
+            try {
+                var inBasePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Newtonsoft.Json.dll");
+                var path = File.Exists(inBasePath) ? inBasePath : "Newtonsoft.Json.dll";
+
+                var newton = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "Newtonsoft.Json");
+                newton = newton ?? Assembly.LoadFrom(path);
+
+                if (newton == null)
+                    return null;
+
+                var jsonConvert = newton.GetType("Newtonsoft.Json.JsonConvert");
+                var formating = newton.GetType("Newtonsoft.Json.Formatting");
+                if (jsonConvert == null)
+                    return null;
+
+                serializeObject = jsonConvert.GetMethod("SerializeObject", new[] {typeof(object), formating});
+                if (serializeObject == null)
+                    return null;
+
+                indented = Enum.Parse(formating, "Indented");
+
+            }
+            catch (Exception e) {
+                Tracer.TraceEvent(TraceEventType.Warning, WarningId, $"Can't get Newtonsoft.Json serializer\n{e}");
+                return null;
+            }
+
+            return value => {
+                try {
+                    return serializeObject.Invoke(null, new[] {value, indented}) as string;
+                }
+                catch (Exception e) {
+                    Tracer.TraceEvent(TraceEventType.Warning, WarningId, $"Can't serialize with Newtonsoft.Json\n{e}");
+                    return value.ToString();
+                }
+            };
+        }
+
+
+        /// <summary>
+        /// Возвращает делегат для сериализации значения через <see cref="DataContractJsonSerializer"/>
+        /// </summary>
+        Func<object, string> GetDataContractSerializer() {
+
+            MethodInfo writeObject;
+            Type serializerType;
+
+            try {
+
+                var serialization = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "System.Runtime.Serialization");
+                var pf = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+                var path = Path.Combine(pf, @"Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Runtime.Serialization.dll");
+
+                serialization = serialization ?? Assembly.LoadFrom(path);
+
+                if (serialization == null)
+                    return null;
+
+                serializerType = serialization.GetType("System.Runtime.Serialization.Json.DataContractJsonSerializer");
+                if (serializerType == null)
+                    return null;
+
+                writeObject = serializerType.GetMethod("WriteObject", new[] {typeof(Stream), typeof(object)});
+            }
+            catch (Exception e) {
+                Tracer.TraceEvent(TraceEventType.Warning, WarningId, $"Can't get DataContractJsonSerializer\n{e}");
+                throw;
+            }
+
+            return value => {
+                try {
+                    var serializer = Activator.CreateInstance(serializerType, value.GetType());
+                    using (var stream = new MemoryStream()) {
+                        writeObject.Invoke(serializer, new[] {stream, value});
+                        return Encoding.UTF8.GetString(stream.ToArray());
+                    }
+                }
+                catch (Exception e) {
+                    Tracer.TraceEvent(TraceEventType.Warning, WarningId, $"Can't serialize with DataContractJsonSerializer\n{e}");
+                    return value.ToString();
+                }
+            };
+        }
+
+
 
 
         /// <summary>
@@ -378,13 +544,15 @@ namespace Dccelerator.TraceSourceAttributes {
         /// <para xml:lang="en"></para>
         /// <para xml:lang="ru">Возвращает строковое представление значений аргументов, переданных в текущий метод.</para>
         /// </summary>
-        protected string FormatInputArguments(MethodExecutionArgs args) {
+        protected virtual string FormatInputArguments(MethodExecutionArgs args) {
             if (args.Arguments.Count == 0)
                 return null;
 
             if (args.Arguments.Count == 1) {
                 var parameter = Parameters[0];
-                return $"( {parameter.ParameterType.Name} {parameter.Name} = {FormatValue(args.Arguments[0], LogCollectionItems)} )";
+                var argument = args.Arguments[0];
+                var printTypeNames = argument != null && parameter.ParameterType != argument.GetType();
+                return $"( {FormatType(parameter.ParameterType)} {parameter.Name} = {FormatValue(argument, LogCollectionItems, printTypeNames: printTypeNames)} )";
             }
 
             var builder = new StringBuilder("( ");
@@ -393,8 +561,11 @@ namespace Dccelerator.TraceSourceAttributes {
                     break;
 
                 var parameter = Parameters[i];
+                var argument = args.Arguments[i];
+                var printTypeNames = argument != null && parameter.ParameterType != argument.GetType();
+
                 builder.Append("\n\t").Append(parameter.ParameterType.Name).Append(" ").Append(parameter.Name)
-                    .Append(" = ").Append(FormatValue(args.Arguments[i], LogCollectionItems, inCollection: true))
+                    .Append(" = ").Append(FormatValue(argument, LogCollectionItems, inCollection: true, printTypeNames: printTypeNames))
                     .Append(", ");
             }
             return builder.Remove(builder.Length - 2, 2).Append(" \n)").ToString();

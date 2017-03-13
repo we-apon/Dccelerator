@@ -31,6 +31,9 @@
       "buildOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] },
       "dependencies": {
         "PostSharp": "4.3.29"
+      },
+      "frameworkAssemblies": {
+        "System.Runtime.Serialization": "4.0.0.0"
       }
     }
 
