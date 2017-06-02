@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Dccelerator.DataAccess.Infrastructure;
 using Dccelerator.Reflection;
 using JetBrains.Annotations;
@@ -22,7 +23,7 @@ namespace Dccelerator.DataAccess.Lazy {
 
         protected bool IsAccepted(LocationInfo location) {
 
-            if (GetCustomAttribute(location.PropertyInfo, typeof(NotPersistedAttribute)) != null || location.PropertyInfo.GetCustomAttributes(typeof(NotPersistedAttribute), true).Any()) {
+            if (location.PropertyInfo.GetCustomAttributes(typeof(NotPersistedAttribute), true).Any()) {
                 Message.Write(MessageLocation.Of(location), IsAcceptedMessageSeverityType(), "3543", $"'LazyDataAccess' aspect can'n be used on properties marked with {typeof(NotPersistedAttribute).Name}.\nLocation is {location.DeclaringType.FullName}.{location.PropertyInfo.Name}\n");
                 return false;
             }
@@ -48,7 +49,7 @@ namespace Dccelerator.DataAccess.Lazy {
             }
 
 
-            if (type.IsPrimitive || !type.IsClass) {
+            if (type.GetInfo().IsPrimitive || !type.GetInfo().IsClass) {
                 Message.Write(MessageLocation.Of(location), IsAcceptedMessageSeverityType(), "3543", $"'LazyDataAccess' aspect can only be used on classes!\nLocation is {location.DeclaringType.FullName}.{location.PropertyInfo.Name}\n");
                 return false;
             }
@@ -76,7 +77,7 @@ namespace Dccelerator.DataAccess.Lazy {
         public override void CompileTimeInitialize(LocationInfo targetLocation, AspectInfo aspectInfo) {
             base.CompileTimeInitialize(targetLocation, aspectInfo);
 
-            if (targetLocation.LocationType.IsGenericType) {
+            if (targetLocation.LocationType.GetInfo().IsGenericType) {
                 var genericType = targetLocation.LocationType.GetGenericTypeDefinition();
                 IsCollection = genericType == typeof (ICollection<>)
                                || genericType == typeof(IEnumerable<>)
@@ -111,7 +112,11 @@ namespace Dccelerator.DataAccess.Lazy {
             }
 
 
-            var link = GetCustomAttribute(targetLocation.PropertyInfo, typeof (ForeignKeyAttribute)) as ForeignKeyAttribute;
+            //var link = GetCustomAttribute(targetLocation.PropertyInfo, typeof (ForeignKeyAttribute)) as ForeignKeyAttribute;
+
+            var link = targetLocation.PropertyInfo.GetCustomAttributes(typeof(ForeignKeyAttribute), false).Cast<ForeignKeyAttribute>().FirstOrDefault()
+                ?? targetLocation.PropertyInfo.GetCustomAttributes(typeof(ForeignKeyAttribute), true).Cast<ForeignKeyAttribute>().SingleOrDefault();
+
             if (link != null)
                 CriterionName = link.Name;
             else if (targetLocation.DeclaringType == RealLocationType && IsCollection) {

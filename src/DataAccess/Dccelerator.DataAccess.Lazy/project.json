@@ -32,20 +32,27 @@
   "frameworks": {
 
     "net40": {
-      "buildOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] }
+      "buildOptions": { "define": [ "NET40", "JETBRAINS_ANNOTATIONS" ] },
+      "dependencies": { "PostSharp": "4.3.29" }
     },
 
 
     "net45": {
-      "buildOptions": { "define": [ "NET45", "JETBRAINS_ANNOTATIONS" ] }
+      "buildOptions": { "define": [ "NET45", "JETBRAINS_ANNOTATIONS" ] },
+      "dependencies": { "PostSharp": "4.3.29" }
+    },
+
+    "netstandard1.3": {
+      "buildOptions": { "define": [ "NET_STANDARD", "JETBRAINS_ANNOTATIONS" ] },
+      "dependencies": { "PostSharp": "5.0.25-preview" }
+
     }
 
   },
 
 
   "dependencies": {
-    "Dccelerator.DataAccess.Common": "0.0.12-*",
-    "PostSharp": "4.3.24"
+    "Dccelerator.DataAccess.Common": "0.0.12-*"
   }
 
 }
