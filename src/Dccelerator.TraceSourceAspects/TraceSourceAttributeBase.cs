@@ -14,6 +14,7 @@ using PostSharp.Aspects;
 
 namespace Dccelerator.TraceSourceAttributes {
 
+    
     /// <summary>
     /// <para xml:lang="en"></para>
     /// <para xml:lang="ru">
@@ -27,6 +28,7 @@ namespace Dccelerator.TraceSourceAttributes {
 
         protected static readonly ConcurrentDictionary<Guid, string> FormatedGenerics = new ConcurrentDictionary<Guid, string>();
 
+
         /// <summary>
         /// <para xml:lang="en"></para>
         /// <para xml:lang="ru">
@@ -36,6 +38,8 @@ namespace Dccelerator.TraceSourceAttributes {
         /// </summary>
         /// <see cref="SourceName"/>
         protected virtual TraceSource Tracer => _trace ?? (_trace = new TraceSource(SourceName));
+
+
         [NonSerialized] TraceSource _trace;
 
 
@@ -45,11 +49,13 @@ namespace Dccelerator.TraceSourceAttributes {
         /// </summary>
         protected int? IdentifiedParameterIndex { get; set; }
 
+
         /// <summary>
         /// <para xml:lang="en"></para>
         /// <para xml:lang="ru">Свойство идентифицированного параметра текущего метода, содержащее его идентификатор.</para>
         /// </summary>
         protected PropertyInfo IdentifierParameterProperty { get; set; }
+
 
         /// <summary>
         /// <para xml:lang="en"></para>
@@ -59,7 +65,19 @@ namespace Dccelerator.TraceSourceAttributes {
         /// Используется для передачи идентификатора предыдущей активности в метод <see cref="TraceSource.TraceTransfer"/>, при переходе обратно к методу, вызвавшему текущий (вверх по иерархии вызовов).
         /// </para>
         /// </summary>
-        static readonly ThreadLocal<Stack<Guid>> _parentActivities = new ThreadLocal<Stack<Guid>>(() => new Stack<Guid>());
+        static readonly ThreadLocal<LocalStack> _parentActivities = new ThreadLocal<LocalStack>(() => new LocalStack());
+
+
+        protected class LocalStack {
+
+            public bool IsInitialized { get; set; } = false;
+
+            public Guid OutsideActivityId { get; set; }
+
+            public Stack<Guid> Stack { get; set; } = new Stack<Guid>();
+
+        }
+
 
 
         /// <summary>
@@ -258,7 +276,7 @@ namespace Dccelerator.TraceSourceAttributes {
             var argument = args.Arguments[IdentifiedParameterIndex.Value];
             var id = GetActivityIdFromIdentifiedArgument(argument);
 
-            if (Trace.CorrelationManager.ActivityId == id || _parentActivities.Value.Contains(id))
+            if (Trace.CorrelationManager.ActivityId == id || _parentActivities.Value.Stack.Contains(id))
                 return Guid.NewGuid();
 
             return id;
@@ -288,7 +306,7 @@ namespace Dccelerator.TraceSourceAttributes {
         /// </para>
         /// </summary>
         protected virtual string FormatStart(MethodExecutionArgs args) {
-            if (_parentActivities.Value.Count > 0)
+            if (_parentActivities.Value.Stack.Count > 0)
                 return $"{MethodName}{FormatInputArguments(args)}";
 
             return $" ---> {MethodName}{FormatInputArguments(args)}";
@@ -356,12 +374,12 @@ namespace Dccelerator.TraceSourceAttributes {
                 return "null";
 
             var enumerable = AsAnCollection(value);
-            
+
             if (enumerable == null) {
                 var result = value.ToString();
                 if (result == value.GetType().FullName)
                     return FormatToJSON(value, printTypeNames);
-                
+
                 return printTypeNames
                     ? $"{FormatType(value.GetType())}: \"{value}\""
                     : value.ToString();
@@ -413,6 +431,7 @@ namespace Dccelerator.TraceSourceAttributes {
 
         static Func<object, string> _toJson;
 
+
         /// <summary>
         /// Форматирует значение в JSON.
         /// </summary>
@@ -430,10 +449,11 @@ namespace Dccelerator.TraceSourceAttributes {
                 return printTypeNames ? $"{FormatType(value.GetType())} {_toJson(value)}" : _toJson(value);
             }
 
-            return printTypeNames 
+            return printTypeNames
                 ? $"{FormatType(value.GetType())} {_toJson(value)}"
                 : _toJson(value);
         }
+
 
         /// <summary>
         /// Возвращает делегат для сериализации значения через Newtonsoft.Json.JsonConvert.
@@ -473,15 +493,23 @@ namespace Dccelerator.TraceSourceAttributes {
 
             return value => {
                 try {
+                    if (_serializationFailed.Keys.Contains(value.GetType()))
+                        return value.ToString();
+
                     return serializeObject.Invoke(null, new[] {value, indented}) as string;
                 }
                 catch (Exception e) {
                     Tracer.TraceEvent(TraceEventType.Warning, WarningId, $"Can't serialize with Newtonsoft.Json\n{e}");
+                    _serializationFailed.TryAdd(value.GetType(), true);
                     return value.ToString();
                 }
             };
         }
 
+
+        static readonly ConcurrentDictionary<Type, bool> _serializationFailed = new ConcurrentDictionary<Type, bool>();
+
+        
 
         /// <summary>
         /// Возвращает делегат для сериализации значения через <see cref="DataContractJsonSerializer"/>
@@ -515,6 +543,9 @@ namespace Dccelerator.TraceSourceAttributes {
 
             return value => {
                 try {
+                    if (_serializationFailed.Keys.Contains(value.GetType()))
+                        return value.ToString();
+
                     var serializer = Activator.CreateInstance(serializerType, value.GetType());
                     using (var stream = new MemoryStream()) {
                         writeObject.Invoke(serializer, new[] {stream, value});
@@ -523,6 +554,7 @@ namespace Dccelerator.TraceSourceAttributes {
                 }
                 catch (Exception e) {
                     Tracer.TraceEvent(TraceEventType.Warning, WarningId, $"Can't serialize with DataContractJsonSerializer\n{e}");
+                    _serializationFailed.TryAdd(value.GetType(), true);
                     return value.ToString();
                 }
             };
@@ -564,8 +596,12 @@ namespace Dccelerator.TraceSourceAttributes {
                 var argument = args.Arguments[i];
                 var printTypeNames = argument != null && parameter.ParameterType != argument.GetType();
 
-                builder.Append("\n\t").Append(parameter.ParameterType.Name).Append(" ").Append(parameter.Name)
-                    .Append(" = ").Append(FormatValue(argument, LogCollectionItems, inCollection: true, printTypeNames: printTypeNames))
+                builder.Append("\n\t")
+                    .Append(parameter.ParameterType.Name)
+                    .Append(" ")
+                    .Append(parameter.Name)
+                    .Append(" = ")
+                    .Append(FormatValue(argument, LogCollectionItems, inCollection: true, printTypeNames: printTypeNames))
                     .Append(", ");
             }
             return builder.Remove(builder.Length - 2, 2).Append(" \n)").ToString();
@@ -609,11 +645,16 @@ namespace Dccelerator.TraceSourceAttributes {
         /// after the execution of <see cref="M:PostSharp.Aspects.IOnMethodBoundaryAspect.OnEntry(PostSharp.Aspects.MethodExecutionArgs)" />.</param>
         public override void OnEntry(MethodExecutionArgs args) {
             base.OnEntry(args);
-            
-            if (Trace.CorrelationManager.ActivityId == Guid.Empty)
+
+            var parentActivities = _parentActivities.Value;
+
+            if (Trace.CorrelationManager.ActivityId == Guid.Empty || !parentActivities.IsInitialized) {
+                parentActivities.OutsideActivityId = Trace.CorrelationManager.ActivityId;
                 Trace.CorrelationManager.ActivityId = GetNewActivityGuid(args);
+                parentActivities.IsInitialized = true;
+            }
             else {
-                _parentActivities.Value.Push(Trace.CorrelationManager.ActivityId);
+                parentActivities.Stack.Push(Trace.CorrelationManager.ActivityId);
 
                 var newActivityId = GetNewActivityGuid(args);
                 Tracer.TraceTransfer(TransferToId, FormatTransferTo(args), newActivityId);
@@ -623,6 +664,8 @@ namespace Dccelerator.TraceSourceAttributes {
             Trace.CorrelationManager.StartLogicalOperation(FormatLogicalOperation(args));
             Tracer.TraceEvent(TraceEventType.Start, StartId, FormatStart(args));
         }
+
+
 
 
         /// <summary>
@@ -647,9 +690,9 @@ namespace Dccelerator.TraceSourceAttributes {
         public override void OnExit(MethodExecutionArgs args) {
             base.OnExit(args);
 
-            var parentActivityStack = _parentActivities.Value;
-            var hasParent = parentActivityStack.Count > 0;
-            var parentActivityId = hasParent ? parentActivityStack.Pop() : Guid.Empty;
+            var parentActivities = _parentActivities.Value;
+            var hasParent = parentActivities.Stack.Count > 0;
+            var parentActivityId = hasParent ? parentActivities.Stack.Pop() : Guid.Empty;
 
             if (hasParent)
                 Tracer.TraceTransfer(TransferBackId, FormatTransferBack(args), parentActivityId);
@@ -657,7 +700,13 @@ namespace Dccelerator.TraceSourceAttributes {
             Tracer.TraceEvent(TraceEventType.Stop, StopId, FormatStop(args));
             Trace.CorrelationManager.StopLogicalOperation();
 
-            Trace.CorrelationManager.ActivityId = hasParent ? parentActivityId : Guid.Empty;
+            if (hasParent)
+                Trace.CorrelationManager.ActivityId = parentActivityId;
+            else {
+                Trace.CorrelationManager.ActivityId = parentActivities.OutsideActivityId;
+                parentActivities.IsInitialized = false;
+            }
+
             Tracer.Flush();
         }
 
@@ -676,5 +725,9 @@ namespace Dccelerator.TraceSourceAttributes {
                 ? (IEnumerable) value
                 : null;
         }
+
+
+
     }
+    
 }
