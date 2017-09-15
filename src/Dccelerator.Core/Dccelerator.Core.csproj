@@ -23,13 +23,11 @@ It contains some nice stuff like RUtils, SmartConvert and many usefull reflectio
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <PackageReference Include="JetBrains.Annotations" Version="10.2.1" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="JetBrains.Annotations" Version="10.2.1" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
@@ -39,21 +37,24 @@ It contains some nice stuff like RUtils, SmartConvert and many usefull reflectio
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+    <DefineConstants>$(DefineConstants);NET45;JETBRAINS_ANNOTATIONS</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <DefineConstants>$(DefineConstants);NET_STANDARD</DefineConstants>
+    <DefineConstants>$(DefineConstants);NET_STANDARD;JETBRAINS_ANNOTATIONS</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+  <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="JetBrains.Annotations" Version="10.2.1" />
     <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
   </ItemGroup>
 
 </Project>

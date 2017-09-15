@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.props" Condition="Exists('D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -11,7 +12,8 @@
     <AssemblyName>Dccelerator.Specifications.Net40</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <DontImportPostSharp>True</DontImportPostSharp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,62 +33,34 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dccelerator.Core">
-      <HintPath>..\..\output\net40\Dccelerator.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Dccelerator.DataAccess.Adapters.MsSql">
-      <HintPath>..\..\output\net40\Dccelerator.DataAccess.Adapters.MsSql.dll</HintPath>
-    </Reference>
-    <Reference Include="Dccelerator.DataAccess.Adapters.Oracle">
-      <HintPath>..\..\output\net40\Dccelerator.DataAccess.Adapters.Oracle.dll</HintPath>
-    </Reference>
-    <Reference Include="Dccelerator.DataAccess.AdoNet">
-      <HintPath>..\..\output\net40\Dccelerator.DataAccess.AdoNet.dll</HintPath>
-    </Reference>
-    <Reference Include="Dccelerator.DataAccess.Common">
-      <HintPath>..\..\output\net40\Dccelerator.DataAccess.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Dccelerator.DataAccess.Lazy">
-      <HintPath>..\..\output\net40\Dccelerator.DataAccess.Lazy.dll</HintPath>
-    </Reference>
-    <Reference Include="Dccelerator.TraceSourceAspects">
-      <HintPath>..\..\output\net40\Dccelerator.TraceSourceAspects.dll</HintPath>
-    </Reference>
     <Reference Include="Essential.Diagnostics.ColoredConsoleTraceListener, Version=2.0.0.0, Culture=neutral, PublicKeyToken=9d041bca93991466, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Essential.Diagnostics.ColoredConsoleTraceListener.2.0.206\lib\Essential.Diagnostics.ColoredConsoleTraceListener.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Essential.Diagnostics.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=9d041bca93991466, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Essential.Diagnostics.Core.2.0.206\lib\Essential.Diagnostics.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Essential.Diagnostics.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=9d041bca93991466, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Essential.Diagnostics.Core.2.1.728\lib\Essential.Diagnostics.Core.dll</HintPath>
     </Reference>
-    <Reference Include="FakeItEasy, Version=2.3.1.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\FakeItEasy.2.3.1\lib\net40\FakeItEasy.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FakeItEasy, Version=4.0.0.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\FakeItEasy.4.0.0\lib\net40\FakeItEasy.dll</HintPath>
     </Reference>
-    <Reference Include="JetBrains.Annotations, Version=10.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="JetBrains.Annotations, Version=11.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\JetBrains.Annotations.11.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
-    <Reference Include="Machine.Specifications, Version=0.11.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Machine.Specifications.0.11.0\lib\net40\Machine.Specifications.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Machine.Specifications, Version=0.11.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Machine.Specifications.0.11.1\lib\net40\Machine.Specifications.dll</HintPath>
     </Reference>
     <Reference Include="Machine.Specifications.Should, Version=0.11.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Machine.Specifications.Should.0.11.0\lib\net40\Machine.Specifications.Should.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.2.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Oracle.ManagedDataAccess.12.1.24160719\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.122.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Oracle.ManagedDataAccess.12.2.1100\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
     </Reference>
-    <Reference Include="PostSharp, Version=4.3.29.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PostSharp.4.3.29\lib\net35-client\PostSharp.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="PostSharp, Version=5.0.32.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\PostSharp.Redist.5.0.32\lib\net35-client\PostSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -105,25 +79,56 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\..\packages\FakeItEasy.Analyzer.2.3.1\analyzers\dotnet\cs\FakeItEasy.Analyzer.dll" />
+    <Analyzer Include="..\..\packages\FakeItEasy.Analyzer.CSharp.4.0.0\analyzers\dotnet\cs\FakeItEasy.Analyzer.CSharp.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.Adapters.MsSql\Dccelerator.DataAccess.Adapters.MsSql.csproj">
+      <Project>{802e612e-433f-4974-8c7a-38398a982275}</Project>
+      <Name>Dccelerator.DataAccess.Adapters.MsSql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.Adapters.Oracle\Dccelerator.DataAccess.Adapters.Oracle.csproj">
+      <Project>{5a19f9b4-4a6b-4893-afae-567a0b00b6f9}</Project>
+      <Name>Dccelerator.DataAccess.Adapters.Oracle</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.AdoNet\Dccelerator.DataAccess.AdoNet.csproj">
+      <Project>{55fe0a1e-b49a-490b-b4b1-4aa732f00a66}</Project>
+      <Name>Dccelerator.DataAccess.AdoNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.BerkeleyDb\Dccelerator.DataAccess.BerkeleyDb.csproj">
+      <Project>{edf7ce71-93e7-4f81-9bff-66d732b89674}</Project>
+      <Name>Dccelerator.DataAccess.BerkeleyDb</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.csproj">
+      <Project>{54f9cc41-92d0-4019-a3a1-7b861ea7b707}</Project>
+      <Name>Dccelerator.DataAccess.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.Lazy\Dccelerator.DataAccess.Lazy.csproj">
+      <Project>{5c576a43-3ee7-48cb-8a8c-9b58becff0ae}</Project>
+      <Name>Dccelerator.DataAccess.Lazy</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Dccelerator.Core\Dccelerator.Core.csproj">
+      <Project>{ed664bd5-35fd-40e6-9156-1514c14155d6}</Project>
+      <Name>Dccelerator.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Dccelerator.TraceSourceAspects\Dccelerator.TraceSourceAspects.csproj">
+      <Project>{bdb0faea-2ff9-4697-a20b-5e5e99cf304a}</Project>
+      <Name>Dccelerator.TraceSourceAspects</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>dotnet build $(SolutionDir)src\Dccelerator.Core --no-dependencies --build-profile -f net40 -o $(SolutionDir)output\net40
-dotnet build $(SolutionDir)src\Dccelerator.TraceSourceAspects --no-dependencies --build-profile -f net40 -o $(SolutionDir)output\net40
-dotnet build $(SolutionDir)src\DataAccess\Dccelerator.DataAccess.Common --no-dependencies --build-profile -f net40 -o $(SolutionDir)output\net40
-dotnet build $(SolutionDir)src\DataAccess\Dccelerator.DataAccess.AdoNet --no-dependencies --build-profile -f net40 -o $(SolutionDir)output\net40
-dotnet build $(SolutionDir)src\DataAccess\Dccelerator.DataAccess.Lazy --no-dependencies --build-profile -f net40 -o $(SolutionDir)output\net40
-dotnet build $(SolutionDir)src\DataAccess\Dccelerator.DataAccess.Adapters.MsSql --no-dependencies --build-profile -f net40 -o $(SolutionDir)output\net40
-dotnet build $(SolutionDir)src\DataAccess\Dccelerator.DataAccess.Adapters.Oracle --no-dependencies --build-profile -f net40 -o $(SolutionDir)output\net40
-</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
-  <Import Project="..\..\packages\PostSharp.4.3.29\tools\PostSharp.targets" Condition="Exists('..\..\packages\PostSharp.4.3.29\tools\PostSharp.targets')" />
-  <Target Name="EnsurePostSharpImported" BeforeTargets="BeforeBuild" Condition="'$(PostSharp30Imported)' == ''">
-    <Error Condition="!Exists('..\..\packages\PostSharp.4.3.29\tools\PostSharp.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://www.postsharp.net/links/nuget-restore." />
-    <Error Condition="Exists('..\..\packages\PostSharp.4.3.29\tools\PostSharp.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://www.postsharp.net/links/nuget-restore." />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.props')" Text="$([System.String]::Format('$(ErrorText)', 'D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.props'))" />
+    <Error Condition="!Exists('D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', 'D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.targets'))" />
   </Target>
+  <Import Project="D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.targets" Condition="Exists('D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

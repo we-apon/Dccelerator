@@ -31,7 +31,7 @@
     <DefineConstants>$(DefineConstants);NET40;JETBRAINS_ANNOTATIONS</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+  <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 

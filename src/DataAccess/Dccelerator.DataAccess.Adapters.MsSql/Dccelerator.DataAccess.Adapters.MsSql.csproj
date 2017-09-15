@@ -35,10 +35,10 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+    <DefineConstants>$(DefineConstants);NET45;JETBRAINS_ANNOTATIONS</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+  <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 

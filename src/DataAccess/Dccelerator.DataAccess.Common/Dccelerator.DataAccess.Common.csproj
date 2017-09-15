@@ -38,14 +38,14 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+    <DefineConstants>$(DefineConstants);NET45;JETBRAINS_ANNOTATIONS</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <DefineConstants>$(DefineConstants);NET_STANDARD</DefineConstants>
+    <DefineConstants>$(DefineConstants);NET_STANDARD;JETBRAINS_ANNOTATIONS</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+  <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 

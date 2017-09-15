@@ -3,7 +3,9 @@
 	<s:Boolean x:Key="/Default/CodeEditing/GenerateMemberBody/WrapIntoRegions/@EntryValue">False</s:Boolean>
 	
 	<s:String x:Key="/Default/CodeEditing/Intellisense/EnhancedTooltipSettingsRoot/IdentifierTooltip/ShowIdentifierAnnotations/@EntryValue">All</s:String>
+	<s:String x:Key="/Default/CodeEditing/Intellisense/EnhancedTooltipSettingsRoot/IdentifierTooltip/ShowIdentifierAttributes/@EntryValue">AllAnnotations</s:String>
 	<s:String x:Key="/Default/CodeEditing/Intellisense/EnhancedTooltipSettingsRoot/IdentifierTooltip/ShowParametersAnnotations/@EntryValue">All</s:String>
+	<s:String x:Key="/Default/CodeEditing/Intellisense/EnhancedTooltipSettingsRoot/IdentifierTooltip/ShowParametersAttributes/@EntryValue">AllAnnotations</s:String>
 	<s:Boolean x:Key="/Default/CodeInspection/CodeAnnotations/NamespacesWithAnnotations/=Dccelerator_002ECore_002EJetBrains_002EAnnotations/@EntryIndexedValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/CodeAnnotations/NamespacesWithAnnotations/=Dccelerator_002ECore_002EJetBrains_002EAnnotations/@EntryIndexRemoved">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/CodeAnnotations/NamespacesWithAnnotations/=Dccelerator_002EJetBrains_002EAnnotations/@EntryIndexedValue">True</s:Boolean>
@@ -122,6 +124,7 @@
 	
 	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileB4514FD50B1DC1438409D0316F18340E/RelativePriority/@EntryValue">1</s:Double>
 	<s:Boolean x:Key="/Default/Environment/SearchAndNavigation/NavigateByControlClick/@EntryValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=GammaJul_002EReSharper_002EEnhancedTooltip_002ESettings_002EAnnotationsDisplayKindMigration/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EAddAccessorOwnerDeclarationBracesMigration/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EMigrateBlankLinesAroundFieldToBlankLinesAroundProperty/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EMigrateThisQualifierSettings/@EntryIndexedValue">True</s:Boolean>
