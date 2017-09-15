@@ -35,10 +35,6 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <Target Name="PostcompileScript" AfterTargets="Build">
-    <Exec Command="../../../NugetPack.bat $(Configuration) Release ../../../publish" />
-  </Target>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
