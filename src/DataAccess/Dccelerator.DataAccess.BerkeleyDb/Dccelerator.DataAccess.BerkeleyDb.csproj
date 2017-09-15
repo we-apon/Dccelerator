@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Berkeley Db adapter for Dccelerator.DataAccess ORM</Description>
+    <AssemblyTitle>Berkeley Db adapter for Dccelerator.DataAccess ORM</AssemblyTitle>
+    <VersionPrefix>0.0.12</VersionPrefix>
+    <Authors>Kirill Dubinkin</Authors>
+    <TargetFramework>net40</TargetFramework>
+    <AssemblyName>Dccelerator.DataAccess.BerkeleyDb</AssemblyName>
+    <PackageId>Dccelerator.DataAccess.BerkeleyDb</PackageId>
+    <PackageTags>ORM BerkeleyDb</PackageTags>
+    <PackageProjectUrl>https://github.com/we-apon/Dccelerator</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/we-apon/Dccelerator/blob/master/LICENSE</PackageLicenseUrl>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Berkeley.DB" Version="6.1.26" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <DefineConstants>$(DefineConstants);NET40;JETBRAINS_ANNOTATIONS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <Target Name="PostcompileScript" AfterTargets="Build">
+    <Exec Command="../../../NugetPack.bat $(Configuration) Release ../../../publish" />
+  </Target>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>

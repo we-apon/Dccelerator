@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Contains TraceSourceAttribute - a PostSharp-based aspect for simple but rich logging with .Net System.Diagnostics framework. It makes completely simple to use activity tracing and locial operations stacks.</Description>
+    <Copyright>Copyright © Kirill Dubinkin 2017</Copyright>
+    <AssemblyTitle>Dccelerator.TraceSourceAspects</AssemblyTitle>
+    <VersionPrefix>0.0.12</VersionPrefix>
+    <Authors>Kirill Dubinkin</Authors>
+    <TargetFramework>net40</TargetFramework>
+    <AssemblyName>Dccelerator.TraceSourceAspects</AssemblyName>
+    <PackageId>Dccelerator.TraceSourceAspects</PackageId>
+    <PackageTags>TraceSource Diagnostics Logging AOP Aspects ActivityTracing LogicalOperationStack</PackageTags>
+    <PackageProjectUrl>https://github.com/we-apon/Dccelerator</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/we-apon/Dccelerator/blob/master/LICENSE</PackageLicenseUrl>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <DefineConstants>$(DefineConstants);NET40;JETBRAINS_ANNOTATIONS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <PackageReference Include="PostSharp" Version="4.3.29" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>

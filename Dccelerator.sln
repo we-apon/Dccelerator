@@ -1,40 +1,39 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F2D904CE-9E9D-43F1-8BE5-72DBB17FFDB7}"
 	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
 		NugetPack.bat = NugetPack.bat
 		NugetPublish.bat = NugetPublish.bat
 	EndProjectSection
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Dccelerator.Core", "src\Dccelerator.Core\Dccelerator.Core.xproj", "{ED664BD5-35FD-40E6-9156-1514C14155D6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "specs", "specs", "{8FCF91C8-AB08-4481-BBEE-94F54CF7F170}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataAccess", "DataAccess", "{2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Dccelerator.DataAccess.Common", "src\DataAccess\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.xproj", "{54F9CC41-92D0-4019-A3A1-7B861EA7B707}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.Core", "src\Dccelerator.Core\Dccelerator.Core.csproj", "{ED664BD5-35FD-40E6-9156-1514C14155D6}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Dccelerator.DataAccess.Adapters.MsSql", "src\DataAccess\Dccelerator.DataAccess.Adapters.MsSql\Dccelerator.DataAccess.Adapters.MsSql.xproj", "{802E612E-433F-4974-8C7A-38398A982275}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.DataAccess.Common", "src\DataAccess\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.csproj", "{54F9CC41-92D0-4019-A3A1-7B861EA7B707}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Dccelerator.DataAccess.AdoNet", "src\DataAccess\Dccelerator.DataAccess.AdoNet\Dccelerator.DataAccess.AdoNet.xproj", "{55FE0A1E-B49A-490B-B4B1-4AA732F00A66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.DataAccess.Adapters.MsSql", "src\DataAccess\Dccelerator.DataAccess.Adapters.MsSql\Dccelerator.DataAccess.Adapters.MsSql.csproj", "{802E612E-433F-4974-8C7A-38398A982275}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Dccelerator.DataAccess.BerkeleyDb", "src\DataAccess\Dccelerator.DataAccess.BerkeleyDb\Dccelerator.DataAccess.BerkeleyDb.xproj", "{EDF7CE71-93E7-4F81-9BFF-66D732B89674}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.DataAccess.AdoNet", "src\DataAccess\Dccelerator.DataAccess.AdoNet\Dccelerator.DataAccess.AdoNet.csproj", "{55FE0A1E-B49A-490B-B4B1-4AA732F00A66}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Dccelerator.DataAccess.Lazy", "src\DataAccess\Dccelerator.DataAccess.Lazy\Dccelerator.DataAccess.Lazy.xproj", "{5C576A43-3EE7-48CB-8A8C-9B58BECFF0AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.DataAccess.BerkeleyDb", "src\DataAccess\Dccelerator.DataAccess.BerkeleyDb\Dccelerator.DataAccess.BerkeleyDb.csproj", "{EDF7CE71-93E7-4F81-9BFF-66D732B89674}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Dccelerator.DataAccess.Adapters.Oracle", "src\DataAccess\Dccelerator.DataAccess.Adapters.Oracle\Dccelerator.DataAccess.Adapters.Oracle.xproj", "{5A19F9B4-4A6B-4893-AFAE-567A0B00B6F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.DataAccess.Lazy", "src\DataAccess\Dccelerator.DataAccess.Lazy\Dccelerator.DataAccess.Lazy.csproj", "{5C576A43-3EE7-48CB-8A8C-9B58BECFF0AE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.DataAccess.Adapters.Oracle", "src\DataAccess\Dccelerator.DataAccess.Adapters.Oracle\Dccelerator.DataAccess.Adapters.Oracle.csproj", "{5A19F9B4-4A6B-4893-AFAE-567A0B00B6F9}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Dccelerator.Specifications.Shared", "specs\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.shproj", "{33695D1E-6EFD-4C81-A607-AE5D541C41BE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dccelerator.Specifications.Net40", "specs\Dccelerator.Specifications.Net40\Dccelerator.Specifications.Net40.csproj", "{CC4E0CEE-8CD4-40AE-B76B-C2F3CF82DBE6}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Dccelerator.TraceSourceAspects", "src\Dccelerator.TraceSourceAspects\Dccelerator.TraceSourceAspects.xproj", "{BDB0FAEA-2FF9-4697-A20B-5E5E99CF304A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.TraceSourceAspects", "src\Dccelerator.TraceSourceAspects\Dccelerator.TraceSourceAspects.csproj", "{BDB0FAEA-2FF9-4697-A20B-5E5E99CF304A}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -87,8 +86,8 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{ED664BD5-35FD-40E6-9156-1514C14155D6} = {94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}
 		{2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7} = {94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}
+		{ED664BD5-35FD-40E6-9156-1514C14155D6} = {94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}
 		{54F9CC41-92D0-4019-A3A1-7B861EA7B707} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
 		{802E612E-433F-4974-8C7A-38398A982275} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
 		{55FE0A1E-B49A-490B-B4B1-4AA732F00A66} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
@@ -98,6 +97,9 @@ Global
 		{33695D1E-6EFD-4C81-A607-AE5D541C41BE} = {8FCF91C8-AB08-4481-BBEE-94F54CF7F170}
 		{CC4E0CEE-8CD4-40AE-B76B-C2F3CF82DBE6} = {8FCF91C8-AB08-4481-BBEE-94F54CF7F170}
 		{BDB0FAEA-2FF9-4697-A20B-5E5E99CF304A} = {94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {86E545B5-25AD-4F90-A8B1-D3FD862AECCD}
 	EndGlobalSection
 	GlobalSection(CodealikeProperties) = postSolution
 		SolutionGuid = d277d950-8cb6-443a-bb7f-3da78e68f24d
