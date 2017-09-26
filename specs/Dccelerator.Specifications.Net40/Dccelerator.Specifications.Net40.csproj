@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\PostSharp.5.0.34\build\PostSharp.props" Condition="Exists('..\..\packages\PostSharp.5.0.34\build\PostSharp.props')" />
   <Import Project="D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.props" Condition="Exists('D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -37,8 +38,9 @@
       <HintPath>..\..\packages\Essential.Diagnostics.ColoredConsoleTraceListener.2.0.206\lib\Essential.Diagnostics.ColoredConsoleTraceListener.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Essential.Diagnostics.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=9d041bca93991466, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Essential.Diagnostics.Core.2.1.728\lib\Essential.Diagnostics.Core.dll</HintPath>
+    <Reference Include="Essential.Diagnostics.Core">
+      <HintPath>..\..\packages\Essential.Diagnostics.Core.2.2.0\lib\net20\Essential.Diagnostics.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="FakeItEasy, Version=4.0.0.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\FakeItEasy.4.0.0\lib\net40\FakeItEasy.dll</HintPath>
@@ -59,8 +61,9 @@
     <Reference Include="Oracle.ManagedDataAccess, Version=4.122.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Oracle.ManagedDataAccess.12.2.1100\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
     </Reference>
-    <Reference Include="PostSharp, Version=5.0.32.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PostSharp.Redist.5.0.32\lib\net35-client\PostSharp.dll</HintPath>
+    <Reference Include="PostSharp">
+      <HintPath>..\..\packages\PostSharp.Redist.5.0.34\lib\net35-client\PostSharp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -76,7 +79,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\FakeItEasy.Analyzer.CSharp.4.0.0\analyzers\dotnet\cs\FakeItEasy.Analyzer.CSharp.dll" />
@@ -93,10 +98,6 @@
     <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.AdoNet\Dccelerator.DataAccess.AdoNet.csproj">
       <Project>{55fe0a1e-b49a-490b-b4b1-4aa732f00a66}</Project>
       <Name>Dccelerator.DataAccess.AdoNet</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.BerkeleyDb\Dccelerator.DataAccess.BerkeleyDb.csproj">
-      <Project>{edf7ce71-93e7-4f81-9bff-66d732b89674}</Project>
-      <Name>Dccelerator.DataAccess.BerkeleyDb</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.csproj">
       <Project>{54f9cc41-92d0-4019-a3a1-7b861ea7b707}</Project>
@@ -125,10 +126,10 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.props')" Text="$([System.String]::Format('$(ErrorText)', 'D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.props'))" />
-    <Error Condition="!Exists('D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', 'D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.targets'))" />
+    <Error Condition="!Exists('..\..\packages\PostSharp.5.0.34\build\PostSharp.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\PostSharp.5.0.34\build\PostSharp.props'))" />
+    <Error Condition="!Exists('..\..\packages\PostSharp.5.0.34\build\PostSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\PostSharp.5.0.34\build\PostSharp.targets'))" />
   </Target>
-  <Import Project="D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.targets" Condition="Exists('D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.targets')" />
+  <Import Project="..\..\packages\PostSharp.5.0.34\build\PostSharp.targets" Condition="Exists('..\..\packages\PostSharp.5.0.34\build\PostSharp.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

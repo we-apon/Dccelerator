@@ -53,7 +53,7 @@
 -->
 
   <ItemGroup>
-    <PackageReference Include="PostSharp" Version="5.0.32" />
+    <PackageReference Include="PostSharp" Version="5.0.34" />
   </ItemGroup>
 
 </Project>
