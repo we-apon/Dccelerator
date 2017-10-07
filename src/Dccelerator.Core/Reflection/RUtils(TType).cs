@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 
 namespace Dccelerator.Reflection
@@ -303,6 +305,11 @@ namespace Dccelerator.Reflection
         }
 
 
+        public static PropertyInfo MostClosedPropertyNamed(string name) {
+            return Type.MostClosedPropertyNamed(name);
+        }
+        
+        
         static IProperty get_property_from(Type type, Dictionary<string, IProperty> cache, string name) {
             IProperty property;
             lock (cache) {
@@ -310,7 +317,14 @@ namespace Dccelerator.Reflection
                     return property;
             }
 
-            var prop = type.GetProperty(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+            var props = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
+                .Where(x => x.Name == name)
+                .ToList();
+            
+            if (props.Count > 1)
+                Internal.TraceEvent(TraceEventType.Warning, $"Type {type.FullName} contains {props.Count} properties named {name}. Most closely declared property will be selected for reflection access through Dccelerator API, so make sure that here will not be any collisions");
+
+            var prop = props.MostClosedPropertyTo(type);
             if (prop == null)
                 return null;
 
