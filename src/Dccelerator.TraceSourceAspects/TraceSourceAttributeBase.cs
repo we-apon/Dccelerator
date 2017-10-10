@@ -526,9 +526,6 @@ namespace Dccelerator.TraceSourceAttributes {
 
                 serialization = serialization ?? Assembly.LoadFrom(path);
 
-                if (serialization == null)
-                    return null;
-
                 serializerType = serialization.GetType("System.Runtime.Serialization.Json.DataContractJsonSerializer");
                 if (serializerType == null)
                     return null;
