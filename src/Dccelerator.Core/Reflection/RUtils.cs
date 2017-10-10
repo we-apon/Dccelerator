@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 
 
 namespace Dccelerator.Reflection
@@ -19,6 +22,92 @@ namespace Dccelerator.Reflection
     /// <seealso cref="RUtils{TType}"/>
     public static class RUtils //todo: generate and use delegate accessing full requested property path at one call.
     {
+        
+        /// <summary>
+        /// Returns number of inheritance generator from <paramref name="parent"/> to <paramref name="child"/> type.
+        /// </summary>
+        /// <returns>
+        /// Returns 0, if <paramref name="parent"/> is interface, and it can be assigranble from <paramref name="child"/>.
+        /// Othrewise returns number of ingeritrance iterations fro <paramref name="parent"/> to <paramref name="child"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">When <paramref name="parent"/> or <paramref name="child"/> is null</exception>
+        /// <exception cref="InvalidOperationException">When <paramref name="parent"/> and <paramref name="child"/> arguments are not siblings.</exception>
+        public static int GetGenerationNumberTo(this Type parent, [NotNull] Type child) {
+            if (parent == null)
+                throw new ArgumentNullException(nameof(parent));
+
+            if (child == null)
+                throw new ArgumentNullException(nameof(child));
+
+            if (!parent.IsAssignableFrom(child))
+                throw new InvalidOperationException($"Type '{parent}' is not parent of type '{child}'");
+
+            if (parent.GetInfo().IsInterface)
+                return 0;
+
+            var sum = 0;
+
+            do {
+                if (parent == child)
+                    return sum;
+                
+                child = child.GetInfo().BaseType;
+                sum++;
+            } while (child != null);
+
+            return sum;
+        }
+
+        
+        public static PropertyInfo MostClosedPropertyNamed(string name, Type type) {
+            return type.MostClosedPropertyNamed(name);
+        }
+        
+        
+        public static PropertyInfo MostClosedPropertyNamed(this Type type, string name) {
+            return type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
+                .Where(x => x.Name == name)
+                .MostClosedPropertyTo(type);
+        }
+        
+        
+        
+        public static PropertyInfo MostClosedPropertyTo(Type type, IEnumerable<PropertyInfo> props) {
+            return props.MostClosedPropertyTo(type);
+        }
+        
+        
+        
+        public static PropertyInfo MostClosedPropertyTo(this IEnumerable<PropertyInfo> props, Type type) {
+            Dictionary<Type, PropertyInfo> declarationMapping;
+            try {
+                declarationMapping = props.ToDictionary(x => x.DeclaringType, x => x);
+            }
+            catch (Exception e) {
+                Internal.TraceEvent(TraceEventType.Error, e.ToString());
+                throw;
+            }
+
+            if (!declarationMapping.Any())
+                return null;
+            
+            var curType = type;
+            do {
+                if (declarationMapping.TryGetValue(curType, out PropertyInfo closestProperty))
+                    return closestProperty;
+            } while ((curType = curType.GetInfo().BaseType) != null);
+
+            var error = $"Seems that passed properties doesn't belong to type '{type.FullName}'. "
+                        + $"\nPassed props {{"
+                        + $"\n\t{string.Join("\n,", declarationMapping.Select(x => $"\"{x.Key.FullName}\": \"{x.Value.Name}\""))}}}";
+            Internal.TraceEvent(TraceEventType.Critical, error);
+            throw new Exception(error);
+        }
+        
+        
+        
+        
+        
 
         /// <summary>
         /// Returns an structure for manipulating property what placed on <paramref name="path"/>, if we start looking from specified <paramref name="contextType"/>.

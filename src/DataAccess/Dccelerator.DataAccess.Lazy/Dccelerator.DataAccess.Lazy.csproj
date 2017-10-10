@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Lazy Loading and navigation properties support for Dccelerator.DataAccess ORM.</Description>
+    <AssemblyTitle>Dccelerator.DataAccess.Lazy</AssemblyTitle>
+    <VersionPrefix>0.0.12</VersionPrefix>
+    <Authors>Kirill Dubinkin</Authors>
+    <TargetFrameworks>net40;net45</TargetFrameworks> <!-- netstandard1.3 -->
+    <AssemblyName>Dccelerator.DataAccess.Lazy</AssemblyName>
+    <PackageId>Dccelerator.DataAccess.Lazy</PackageId>
+    <PackageTags>ORM Lazy Loading</PackageTags>
+    <PackageProjectUrl>https://github.com/we-apon/Dccelerator</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/we-apon/Dccelerator/blob/master/LICENSE</PackageLicenseUrl>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;NET40</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;NET45</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\Debug\net45\Dccelerator.DataAccess.Lazy.xml</DocumentationFile>
+  </PropertyGroup>
+
+<!-- Postsharp still don't work with netstandard (any version of it)
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;NET_STANDARD</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\Debug\netstandard1.3\Dccelerator.DataAccess.Lazy.xml</DocumentationFile>
+  </PropertyGroup>
+-->
+
+  <ItemGroup>
+    <PackageReference Include="PostSharp" Version="5.0.34" />
+  </ItemGroup>
+
+</Project>

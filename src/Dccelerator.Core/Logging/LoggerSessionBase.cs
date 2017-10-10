@@ -18,15 +18,13 @@ namespace Dccelerator.Logging {
         
 
         public Task Log(TraceEventType eventType, Func<string> message, params object[] relatedObjects) {
-            throw new NotImplementedException();
-
             return Task.Factory.StartNew(() => {
                 var traceEvent = new TraceEvent {
                     Id = Guid.NewGuid().ToByteArray(),
                     EventId = _eventId,
                     Type = eventType,
                     Message = message(),
-                    /*RelatedObjects = relatedObjects,*/
+                    //RelatedObjects = relatedObjects,
                     TimeCreated = DateTime.UtcNow,
                     Source = _sourceName
                 };

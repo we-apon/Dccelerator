@@ -209,20 +209,18 @@ namespace Dccelerator.Convertion
             },
 
             new ConvertionRule { 
-                CanConvert = (source, target, value, thisRule) => value.AsAnCollection(source) == null || !target.IsAnCollection(),
+                CanConvert = (source, target, value, thisRule) => value.AsAnCollection() == null || !target.IsAnCollection(),
                 Convert = (source, target, value, thisRule) => SmartConvert.Object(value).To(target)
             },
 
 
             new ConvertionRule { 
                 PrepareConvertion = (source, target, thisRule) => thisRule.TargetItemType = target.IsArray ? target.ElementType() : null,
-                CanConvert = (source, target, value, thisRule) => target.IsArray && value.AsAnCollection(source) != null,
+                CanConvert = (source, target, value, thisRule) => target.IsArray && value.AsAnCollection() != null,
                 Convert = (source, target, value, thisRule) => {
 
-                    var collection = value.AsAnCollection();
-                    var count = collection.Count(); //bug: need to check it for multipple enumerations
-
-                    IList targetArray = Array.CreateInstance(thisRule.TargetItemType, count);
+                    var collection = value as ICollection ?? value.AsAnCollection().Cast<object>().ToList();
+                    IList targetArray = Array.CreateInstance(thisRule.TargetItemType, collection.Count);
 
                     var i = 0;
                     foreach (var item in collection)
@@ -234,7 +232,7 @@ namespace Dccelerator.Convertion
 
             new ConvertionRule {
                 PrepareConvertion = (source, target, thisRule) => thisRule.TargetItemType = target.IsAnCollection() ? target.ElementType() : null,
-                CanConvert = (source, target, value, thisRule) => !target.IsArray && target.IsAnCollection() && value.AsAnCollection(source) != null,
+                CanConvert = (source, target, value, thisRule) => !target.IsArray && target.IsAnCollection() && value.AsAnCollection() != null,
                 Convert = (source, target, value, thisRule) => {
 
                     var collection = value.AsAnCollection();

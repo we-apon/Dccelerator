@@ -14,7 +14,7 @@ using PostSharp.Aspects;
 
 namespace Dccelerator.TraceSourceAttributes {
 
-    
+
     /// <summary>
     /// <para xml:lang="en"></para>
     /// <para xml:lang="ru">
@@ -412,8 +412,7 @@ namespace Dccelerator.TraceSourceAttributes {
             if (!type.IsGenericType)
                 return type.Name;
 
-            string typeName;
-            if (FormatedGenerics.TryGetValue(type.GUID, out typeName))
+            if (FormatedGenerics.TryGetValue(type.GUID, out string typeName))
                 return typeName;
 
             var definition = type.GetGenericTypeDefinition();
@@ -509,7 +508,7 @@ namespace Dccelerator.TraceSourceAttributes {
 
         static readonly ConcurrentDictionary<Type, bool> _serializationFailed = new ConcurrentDictionary<Type, bool>();
 
-        
+
 
         /// <summary>
         /// Возвращает делегат для сериализации значения через <see cref="DataContractJsonSerializer"/>
@@ -526,9 +525,6 @@ namespace Dccelerator.TraceSourceAttributes {
                 var path = Path.Combine(pf, @"Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Runtime.Serialization.dll");
 
                 serialization = serialization ?? Assembly.LoadFrom(path);
-
-                if (serialization == null)
-                    return null;
 
                 serializerType = serialization.GetType("System.Runtime.Serialization.Json.DataContractJsonSerializer");
                 if (serializerType == null)
@@ -631,8 +627,7 @@ namespace Dccelerator.TraceSourceAttributes {
 
             Parameters = method.GetParameters();
 
-            PropertyInfo identifierProperty;
-            IdentifiedParameterIndex = GetIdentifiedParameterIndex(Parameters, out identifierProperty);
+            IdentifiedParameterIndex = GetIdentifiedParameterIndex(Parameters, out PropertyInfo identifierProperty);
             IdentifierParameterProperty = identifierProperty;
         }
 
@@ -729,5 +724,5 @@ namespace Dccelerator.TraceSourceAttributes {
 
 
     }
-    
+
 }
