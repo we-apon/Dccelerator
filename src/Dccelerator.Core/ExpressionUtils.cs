@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 
@@ -48,85 +49,7 @@ namespace Dccelerator
         public static string PathTo<T, TOut>(this T entity,  Expression<Func<T, TOut>> expression) {
             return Path(expression);
         }
-
-/*
-        /// <summary>
-        /// Returns path listed in <paramref name="expression"/>
-        /// </summary>
-        /// <typeparam name="T">Any type</typeparam>
-        /// <typeparam name="TOut">Any type</typeparam>
-        /// <param name="expression">Any expression</param>
-        /// <seealso cref="PathTo{T,TOut}"/>
-        /// <seealso cref="NameOf{TIn, TOut}"/>
         
-        public static string Path<T, TOut>( this Expression<Func<T, TOut>> expression) {
-            MemberExpression memberExpression;
-            switch (expression.Body.NodeType) {
-                case ExpressionType.Convert:
-                case ExpressionType.ConvertChecked:
-                    var unaryExpression = expression.Body as UnaryExpression;
-                    memberExpression = unaryExpression?.Operand as MemberExpression;
-                    break;
-                default:
-                    memberExpression = expression.Body as MemberExpression;
-                    break;
-            }
-
-            var builder = new StringBuilder();
-            while (memberExpression != null) {
-                builder.Insert(0, ".");
-                builder.Insert(0, memberExpression.Member.Name);
-                memberExpression = memberExpression.Expression as MemberExpression;
-            }
-
-            return builder.ToString().Trim('.');
-        }
-
-
-        /// <summary>
-        /// Returns path listed in <paramref name="expression"/>
-        /// </summary>
-        /// <typeparam name="T">Any type</typeparam>
-        /// <typeparam name="TOut">Any type</typeparam>
-        /// <param name="expression">Any expression</param>
-        /// <seealso cref="PathTo{T,TOut}"/>
-        /// <seealso cref="NameOf{TIn, TOut}"/>
-        
-        public static string Path<T>( this Expression<Func<T>> exp) {
-            var builder = new StringBuilder();
-
-            var expression = exp.Body;
-
-            while (expression != null) {
-                if (expression.NodeType == ExpressionType.Convert || expression.NodeType == ExpressionType.ConvertChecked) {
-                    var unaryExpression = expression as UnaryExpression;
-                    expression = unaryExpression?.Operand as MemberExpression;
-                    continue;
-                }
-
-                if (expression.NodeType == ExpressionType.ArrayIndex) {
-                    var binExpression = (BinaryExpression) expression;
-                    builder.Insert(0, ']').Insert(0, binExpression.Right).Insert(0, "[");
-                    expression = binExpression.Left;
-                    continue;
-                }
-
-                if (expression.NodeType == ExpressionType.MemberAccess) {
-                    var memberExpression = (MemberExpression) expression;
-                    if (memberExpression.Expression == null)
-                        break;
-
-                    builder.Insert(0, memberExpression.Member.Name).Insert(0, '.');
-                    expression = memberExpression.Expression;
-                    continue;
-                }
-
-                break;
-            }
-
-            return builder.ToString().Trim('.', ' ');
-        }*/
-
 
         /// <summary>
         /// Returns path listed in <paramref name="expression"/>
@@ -192,7 +115,23 @@ namespace Dccelerator
         /// <seealso cref="NameOf{TIn, TOut}"/>
         
         public static string NameOf<T, TOut>(this T item,  Expression<Func<T, TOut>> expression) {
-            return NameOf<T>.Member(expression);
+            return LastMemberNameOf(expression);
+        }
+
+
+        /// <summary>
+        /// Returns name of last <paramref name="expression"/> argument.
+        /// </summary>
+        static string LastMemberNameOf<TIn>(Expression<TIn> expression) {
+            if (!((expression.Body as UnaryExpression)?.Operand is MethodCallExpression methodCall))
+                return null;
+
+            var stack = new Stack<MemberInfo>();
+            foreach (var info in methodCall.Arguments.OfType<ConstantExpression>().Select(x => x.Value).OfType<MemberInfo>()) {
+                stack.Push(info);
+            }
+
+            return stack.Pop().Name;
         }
     }
 }
