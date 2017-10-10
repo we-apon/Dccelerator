@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Dccelerator.Reflection;
@@ -13,7 +15,6 @@ namespace Dccelerator
     /// </summary>
     public static class EnumerableUtils
     {
-        static readonly Random _random = new Random();
 
 
         public static TValue AggregateBranch<TContext, TValue>(this TContext context, Func<TContext, TContext> getChild, Func<TContext, TValue, TValue> aggregate) {
@@ -46,7 +47,7 @@ namespace Dccelerator
         /// <param name="collection">Any generic collection.</param>
         
         public static  IOrderedEnumerable<T> Shuffle<T>( this IEnumerable<T> collection) {
-            return collection.OrderBy(x => _random.Next());
+            return collection.OrderBy(x => StaticRandom.Next());
         }
 
 
@@ -64,7 +65,7 @@ namespace Dccelerator
         /// </summary>
         /// <param name="collection">Any collection, even not generic.</param>
         public static bool IsArray<T>(this T collection) where T : IEnumerable {
-            return typeof(T).IsArray;
+            return typeof(T).IsArray || collection.GetType().IsArray;
         }
 
 
@@ -72,24 +73,27 @@ namespace Dccelerator
         /// <summary>
         /// Adds all <paramref name="items"/> to <see cref="IList{T}"/> and then returns it.
         /// </summary>
-        
-        public static IList<T> Add<T>( this IList<T> list,  params T[] items) {
-            foreach (var item in items) {
-                list.Add(item);
+        public static IList<T> AddRange<T>( this IList<T> collection, IEnumerable<T> items) {
+            if (collection is List<T> list) {
+                list.AddRange(items);
+                return list;
             }
-            return list;
+
+            bool isArray;
+            if ((isArray = collection.IsArray()) || collection is ReadOnlyCollection<T>) {
+                var error = $"{collection} is an {(isArray ? "array" : "read only collection")} so it can't be modified!";
+                Internal.TraceEvent(TraceEventType.Warning, error);
+                throw new InvalidOperationException(error);
+            }
+
+            foreach (var item in items) {
+                collection.Add(item);
+            }
+
+            return collection;
         }
 
-
-        /// <summary>
-        /// Checks, is <paramref name="enumerable"/> <see cref="ICollection"/>.
-        /// It's actually returns <code>enumerable is ICollection</code>.
-        /// </summary>
-        /// <param name="enumerable">An enumerable</param>
-        public static bool IsCollection( this IEnumerable enumerable) {
-            return enumerable is ICollection;
-        }
-
+        
 
         /// <summary>
         /// Counts elements in <paramref name="enumerable"/>.
@@ -98,8 +102,7 @@ namespace Dccelerator
         /// </summary>
         /// <param name="enumerable">Any collection</param>
         public static int Count( this IEnumerable enumerable) {
-            var collection = enumerable as ICollection;
-            if (collection != null)
+            if (enumerable is ICollection collection)
                 return collection.Count;
 
             var count = 0;
@@ -121,15 +124,15 @@ namespace Dccelerator
         /// </summary>
         /// <param name="enumerable">An collection</param>
         public static bool HasAny(this IEnumerable enumerable) {
-            var collection = enumerable as ICollection;
-            if (collection != null)
+            if (enumerable is ICollection collection)
                 return collection.Count != 0;
-
+            
             var enumerator = enumerable.GetEnumerator();
             try {
                 return enumerator.MoveNext();
             }
-            catch {
+            catch (Exception e) {
+                Internal.TraceEvent(TraceEventType.Warning, e.ToString());
                 return false;
             }
         }
@@ -141,20 +144,13 @@ namespace Dccelerator
         /// </summary>
         /// <param name="enumerable">An collection.</param>
         public static bool IsDistinct( this IEnumerable enumerable) {
-            var collection = enumerable as ICollection;
-            if (collection != null) {
-                var hash = new HashSet<object>(collection.Cast<object>());
-                return hash.Count == collection.Count;
-            }
-
             var enumerator = enumerable.GetEnumerator();
-            var count = 0;
             var hashSet = new HashSet<object>();
             while (enumerator.MoveNext()) {
-                hashSet.Add(enumerator.Current);
-                count++;
+                if (!hashSet.Add(enumerator.Current))
+                    return false;
             }
-            return hashSet.Count == count;
+            return true;
         }
 
 
@@ -163,39 +159,24 @@ namespace Dccelerator
         /// Otherwise return <see langword="null"/>.
         /// </summary>
         /// <seealso cref="TypeCache.IsAnCollection"/>
-        public static IEnumerable AsAnCollection( this object value,  Type valueType = null) {
-            if (value == null)
+        public static IEnumerable AsAnCollection(this object value) {
+            if (value is string)
                 return null;
 
-            return (valueType ?? value.GetType()).IsAnCollection()
-                ? (IEnumerable) value
-                : null;
+            return value is IEnumerable enumerable ? enumerable : null;
         }
 
 
         /// <summary>
         /// Applies specified <paramref name="action"/> on every item from <paramref name="collection"/> in yielded loop.
         /// </summary>
-        /// <seealso cref="Map{T}"/>
         public static IEnumerable<T> Perform<T>( this IEnumerable<T> collection,  Action<T> action) {
             foreach (var item in collection) {
                 action(item);
                 yield return item;
             }
         }
-
-        /// <summary>
-        /// Same as <see cref="Perform{T}"/> method, applies specified <paramref name="action"/> on every item from <paramref name="collection"/> in yielded loop.
-        /// In most languages such method called 'map', so.
-        /// </summary>
-        /// <seealso cref="Perform{T}"/>
-        public static IEnumerable<T> Map<T>( this IEnumerable<T> collection,  Action<T> action) {
-            foreach (var item in collection) {
-                action(item);
-                yield return item;
-            }
-        }
-
+        
 
         /// <summary>
         /// Enumerates <paramref name="collection"/> to it's end.
@@ -218,7 +199,7 @@ namespace Dccelerator
         /// This method uses yield return.
         /// </summary>
         
-        public static IEnumerable<TItem> DistinctBy<TItem, TKey>( this IEnumerable<TItem> collection,  Func<TItem, TKey> criterion) {
+        public static IEnumerable<TItem> DistinctBy<TItem, TKey>(this IEnumerable<TItem> collection, Func<TItem, TKey> criterion) {
             var set = new HashSet<TKey>();
 
             foreach (var item in collection) {
@@ -234,10 +215,20 @@ namespace Dccelerator
 
 
         /// <summary>
-        /// Returns <see langword="true"/> if <paramref name="collection"/> is null, or has not items.
+        /// Returns <see langword="true"/> if <paramref name="enumerable"/> is null, or has not items.
         /// </summary>
-        public static bool IsNullOrEmpty<T>( this IEnumerable<T> collection) {
-            return collection == null || !collection.Any();
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> enumerable) {
+            if (enumerable == null)
+                return true;
+
+            var str = enumerable as string;
+            if (str != null)
+                return string.IsNullOrEmpty(str);
+
+            if (enumerable is ICollection collection)
+                return collection.Count == 0;
+            
+            return !enumerable.Any();
         }
 
     }
