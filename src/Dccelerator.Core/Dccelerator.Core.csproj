@@ -46,6 +46,7 @@ It contains some nice stuff like RUtils, SmartConvert and many usefull reflectio
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RootNamespace>Dccelerator</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
