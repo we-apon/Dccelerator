@@ -58,4 +58,10 @@ It contains some nice stuff like RUtils, SmartConvert and many usefull reflectio
     <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
+    <PackageReference Include="System.Runtime.Serialization.Formatters">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
 </Project>
