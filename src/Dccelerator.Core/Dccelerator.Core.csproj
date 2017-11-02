@@ -5,7 +5,7 @@
 It contains some nice stuff like RUtils, SmartConvert and many usefull reflection extensions, some of that works through runtime delegate generation.</Description>
     <Copyright>Copyright © Kirill Dubinkin 2015-2016</Copyright>
     <AssemblyTitle>Dccelerator's core utilities</AssemblyTitle>
-    <VersionPrefix>0.0.12</VersionPrefix>
+    <Version>0.0.14</Version>
     <Authors>Kirill Dubinkin</Authors>
     <TargetFrameworks>net40;net45;netstandard1.3</TargetFrameworks>
     <AssemblyName>Dccelerator.Core</AssemblyName>

@@ -1,5 +1,5 @@
 
-set versionSuffix=--version-suffix rc10
+set versionSuffix=--include-symbols --include-source
 set output=publish
 set buildConfiguration=Debug
 

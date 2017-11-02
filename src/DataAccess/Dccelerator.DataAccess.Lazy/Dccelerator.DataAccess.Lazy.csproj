@@ -17,6 +17,7 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <Version>0.0.14</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,13 +37,21 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net40' ">
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;NET40</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\Debug\net40\Dccelerator.DataAccess.Lazy.xml</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <LangVersion>default</LangVersion>
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;NET45</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DocumentationFile>bin\Debug\net45\Dccelerator.DataAccess.Lazy.xml</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <LangVersion>default</LangVersion>
+    <DebugType>full</DebugType>
   </PropertyGroup>
+
 
 <!-- Postsharp still don't work with netstandard (any version of it)
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
