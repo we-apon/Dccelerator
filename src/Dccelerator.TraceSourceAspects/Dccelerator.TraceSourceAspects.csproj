@@ -32,7 +32,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <PackageReference Include="PostSharp" Version="5.0.34" />
+    <PackageReference Include="PostSharp" Version="4.3.29" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
