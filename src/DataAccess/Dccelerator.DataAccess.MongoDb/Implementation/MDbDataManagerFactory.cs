@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Dccelerator.DataAccess.MongoDb.Infrastructure;
 
 
 namespace Dccelerator.DataAccess.MongoDb.Implementation
@@ -49,12 +50,25 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation
 
 
         public IEntityInfo InfoAbout<TEntity>() {
-            throw new NotImplementedException();
+            return MDbInfoAbout<TEntity>();
+        }
+
+
+        IEntityInfo MDbInfoAbout<TEntity>() {
+            var info = MdbInfoAbout<TEntity>.Info;
+            if (info.Repository == null)
+                info.Repository = Repository();
+
+            return info;
         }
 
 
         public IEntityInfo InfoAbout(Type entityType) {
-            throw new NotImplementedException();
+            var info = new MdbInfoAboutEntity(entityType).Info;
+            if (info.Repository == null)
+                info.Repository = Repository();
+
+            return info;
         }
 
 
