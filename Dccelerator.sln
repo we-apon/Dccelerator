@@ -35,7 +35,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dccelerator.Specifications.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.TraceSourceAspects", "src\Dccelerator.TraceSourceAspects\Dccelerator.TraceSourceAspects.csproj", "{BDB0FAEA-2FF9-4697-A20B-5E5E99CF304A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dccelerator.DataAccess.MongoDb", "Dccelerator.DataAccess.MongoDb\Dccelerator.DataAccess.MongoDb.csproj", "{DE639EEE-5CCD-470B-B357-DCEF60773402}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.DataAccess.MongoDb", "src\DataAccess\Dccelerator.DataAccess.MongoDb\Dccelerator.DataAccess.MongoDb.csproj", "{0EACD7E7-7238-4900-8CCB-E53E924DB447}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -83,10 +83,10 @@ Global
 		{BDB0FAEA-2FF9-4697-A20B-5E5E99CF304A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDB0FAEA-2FF9-4697-A20B-5E5E99CF304A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDB0FAEA-2FF9-4697-A20B-5E5E99CF304A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DE639EEE-5CCD-470B-B357-DCEF60773402}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DE639EEE-5CCD-470B-B357-DCEF60773402}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DE639EEE-5CCD-470B-B357-DCEF60773402}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE639EEE-5CCD-470B-B357-DCEF60773402}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EACD7E7-7238-4900-8CCB-E53E924DB447}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EACD7E7-7238-4900-8CCB-E53E924DB447}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EACD7E7-7238-4900-8CCB-E53E924DB447}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EACD7E7-7238-4900-8CCB-E53E924DB447}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,7 +103,7 @@ Global
 		{33695D1E-6EFD-4C81-A607-AE5D541C41BE} = {8FCF91C8-AB08-4481-BBEE-94F54CF7F170}
 		{CC4E0CEE-8CD4-40AE-B76B-C2F3CF82DBE6} = {8FCF91C8-AB08-4481-BBEE-94F54CF7F170}
 		{BDB0FAEA-2FF9-4697-A20B-5E5E99CF304A} = {94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}
-		{DE639EEE-5CCD-470B-B357-DCEF60773402} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
+		{0EACD7E7-7238-4900-8CCB-E53E924DB447} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {86E545B5-25AD-4F90-A8B1-D3FD862AECCD}

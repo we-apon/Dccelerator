@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\DataAccess\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.csproj" />
+    <ProjectReference Include="..\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
