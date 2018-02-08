@@ -23,8 +23,7 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
         }
 
 
-        protected virtual KeyValuePair<string,string> KeyValuePairOf(object entity, IEntityInfo info)
-        {
+        protected virtual KeyValuePair<string, string> KeyValuePairOf(object entity, IEntityInfo info) {
             if (entity is IIdentified<byte[]> bytesIdentified)
                 return new KeyValuePair<string, string>(nameof(bytesIdentified.Id), bytesIdentified.Id.ToString());
 
@@ -89,11 +88,11 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
 
         public bool Update<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class {
-            try {                
+            try {
                 var collection = MongoDatabase().GetCollection<object>(info.EntityName);
                 var keyValuePair = KeyValuePairOf(entity, info);
                 collection.UpdateOne(Builders<object>.Filter.Eq(keyValuePair.Key, keyValuePair.Value), new ObjectUpdateDefinition<object>(entity));
-               
+
                 return true;
             }
             catch (Exception e) {
@@ -104,14 +103,22 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
 
         public bool UpdateMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class {
-            var collection = MongoDatabase().GetCollection<object>(info.EntityName);
-            
             throw new NotImplementedException();
         }
 
 
         public bool Delete<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class {
-            throw new NotImplementedException();
+            try {
+                var collection = MongoDatabase().GetCollection<object>(info.EntityName);
+                var keyValuePair = KeyValuePairOf(entity, info);
+                collection.DeleteOne(Builders<object>.Filter.Eq(keyValuePair.Key, keyValuePair.Value));
+
+                return true;
+            }
+            catch (Exception e) {
+                _trace.TraceEvent(TraceEventType.Critical, 0, $"Error on delete {info.EntityName} \n\n{e}");
+                return false;
+            }
         }
 
 

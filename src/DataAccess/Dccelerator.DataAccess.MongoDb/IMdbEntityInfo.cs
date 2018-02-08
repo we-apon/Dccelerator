@@ -6,5 +6,7 @@ using System.Threading.Tasks;
 
 
 namespace Dccelerator.DataAccess.MongoDb {
-    interface IMdbEntityInfo : IEntityInfo { }
+    interface IMdbEntityInfo : IEntityInfo {
+        IMDbRepository Repository { get; }
+    }
 }
