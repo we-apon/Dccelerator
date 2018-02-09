@@ -23,7 +23,7 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
         }
 
 
-        protected virtual KeyValuePair<string, string> KeyValuePairOf(object entity, IEntityInfo info) {
+        public KeyValuePair<string, string> KeyValuePairOf(object entity, IEntityInfo info) {
             if (entity is IIdentified<byte[]> bytesIdentified)
                 return new KeyValuePair<string, string>(nameof(bytesIdentified.Id), bytesIdentified.Id.ToString());
 
@@ -51,7 +51,7 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
         }
 
 
-        public bool Insert<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class {
+        public bool Insert<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction) where TEntity : class {
             try {
                 var collection = MongoDatabase().GetCollection<object>(info.EntityName);
                 collection.InsertOne(entity);
@@ -63,6 +63,7 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
                 return false;
             }
             catch (Exception e) {
+                transaction.Abort();
                 _trace.TraceEvent(TraceEventType.Critical, 0, $"Error on insert {info.EntityName} \n\n{e}");
                 return false;
             }
@@ -87,7 +88,7 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
         }
 
 
-        public bool Update<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class {
+        public bool Update<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction) where TEntity : class {
             try {
                 var collection = MongoDatabase().GetCollection<object>(info.EntityName);
                 var keyValuePair = KeyValuePairOf(entity, info);
@@ -96,6 +97,7 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
                 return true;
             }
             catch (Exception e) {
+                transaction.Abort();
                 _trace.TraceEvent(TraceEventType.Critical, 0, $"Error on update {info.EntityName} \n\n{e}");
                 return false;
             }
@@ -107,7 +109,7 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
         }
 
 
-        public bool Delete<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class {
+        public bool Delete<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction) where TEntity : class {
             try {
                 var collection = MongoDatabase().GetCollection<object>(info.EntityName);
                 var keyValuePair = KeyValuePairOf(entity, info);
@@ -116,6 +118,7 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
                 return true;
             }
             catch (Exception e) {
+                transaction.Abort();
                 _trace.TraceEvent(TraceEventType.Critical, 0, $"Error on delete {info.EntityName} \n\n{e}");
                 return false;
             }
@@ -127,8 +130,36 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
         }
 
 
-        public bool PerformInTransaction(ICollection<IMdbEntityInfo> entityInfos, IEnumerable<TransactionElement> elements) {
-            throw new NotImplementedException();
+        public bool PerformInTransaction(IEnumerable<TransactionElement> elements) {
+            using (var transaction = new MDbTransaction()) {
+                transaction.Begin();
+
+                foreach (var element in elements) {
+                    transaction.StoreOrigin(element);
+
+                    if (transaction.IsAborted)
+                        return false;
+
+                    switch (element.ActionType) {
+                        case ActionType.Insert:
+                            Insert(element.Info, element, transaction);
+                            break;
+                        case ActionType.Update:
+                            Update(element.Info, element, transaction);
+                            break;
+                        case ActionType.Delete:
+                            Delete(element.Info, element, transaction);
+                            break;
+                        default: throw new NotImplementedException();
+                    }
+
+                    transaction.CompleteAction(element);
+                }
+
+                transaction.Commit();
+            }
+
+            return true;
         }
     }
 }

@@ -11,10 +11,16 @@ namespace Dccelerator.DataAccess.MongoDb
     public interface IMDbRepository {
         IMongoDatabase MongoDatabase();
 
+
+
+        KeyValuePair<string, string> KeyValuePairOf(object entity, IEntityInfo info);
+
+
+
         IEnumerable<object> Read(IEntityInfo info, ICollection<IDataCriterion> criteria);
 
         
-        bool Insert<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class;
+        bool Insert<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction = null) where TEntity : class;
 
 
        
@@ -22,7 +28,7 @@ namespace Dccelerator.DataAccess.MongoDb
 
 
         
-        bool Update<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class;
+        bool Update<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction = null) where TEntity : class;
 
 
         
@@ -30,13 +36,13 @@ namespace Dccelerator.DataAccess.MongoDb
 
 
         
-        bool Delete<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class;
+        bool Delete<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction = null) where TEntity : class;
 
 
         
         bool DeleteMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class;
 
 
-        bool PerformInTransaction(ICollection<IMdbEntityInfo> entityInfos, IEnumerable<TransactionElement> elements);
+        bool PerformInTransaction(IEnumerable<TransactionElement> elements);
     }
 }
