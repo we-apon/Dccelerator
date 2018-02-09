@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Dccelerator.DataAccess.MongoDb.Implementation;
 using MongoDB.Driver;
 
 
@@ -34,5 +35,8 @@ namespace Dccelerator.DataAccess.MongoDb
 
         
         bool DeleteMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class;
+
+
+        bool PerformInTransaction(ICollection<IMdbEntityInfo> entityInfos, IEnumerable<TransactionElement> elements);
     }
 }

@@ -6,6 +6,9 @@ using System.Text;
 namespace Dccelerator.DataAccess.MongoDb
 {
     public interface IDataManagerMDbFactory : IDataManagerFactory {
+
+        IMdbEntityInfo MDbInfoAbout<TEntity>();
+
         IMDbRepository Repository();
     }
 }

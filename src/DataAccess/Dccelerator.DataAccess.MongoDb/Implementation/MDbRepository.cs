@@ -125,5 +125,10 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
         public bool DeleteMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class {
             throw new NotImplementedException();
         }
+
+
+        public bool PerformInTransaction(ICollection<IMdbEntityInfo> entityInfos, IEnumerable<TransactionElement> elements) {
+            throw new NotImplementedException();
+        }
     }
 }

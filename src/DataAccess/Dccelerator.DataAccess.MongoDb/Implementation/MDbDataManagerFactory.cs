@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Dccelerator.DataAccess.Implementation;
 using Dccelerator.DataAccess.MongoDb.Infrastructure;
 
 
@@ -40,12 +41,12 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation
 
 
         public IDataTransaction DataTransaction(ITransactionScheduler scheduler, IsolationLevel isolationLevel) {
-            throw new NotImplementedException();
+            return new NotScheduledMDbTransaction(this);
         }
 
 
         public ITransactionScheduler Scheduler() {
-            throw new NotImplementedException();
+            return new DummyScheduler();
         }
 
 
@@ -54,7 +55,7 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation
         }
 
 
-        IEntityInfo MDbInfoAbout<TEntity>() {
+        public IMdbEntityInfo MDbInfoAbout<TEntity>() {
             var info = MdbInfoAbout<TEntity>.Info;
             if (info.Repository == null)
                 info.Repository = Repository();
