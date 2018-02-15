@@ -8,7 +8,7 @@ using Dccelerator.DataAccess.MongoDb.Infrastructure;
 
 namespace Dccelerator.DataAccess.MongoDb.Implementation
 {
-    class MDbDataManagerFactory : IDataManagerMDbFactory
+    public class MDbDataManagerFactory : IDataManagerMDbFactory
     {
         public IDataGetter<TEntity> GetterFor<TEntity>() where TEntity : class, new() {
             return NotCachedGetterFor<TEntity>();
