@@ -25,18 +25,18 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
         }
 
 
-        public KeyValuePair<string, string> KeyValuePairOf(object entity, IEntityInfo info) {
+        public KeyValuePair<string, object> KeyValuePairOf(object entity, IEntityInfo info) {
             if (entity is IIdentified<byte[]> bytesIdentified)
-                return new KeyValuePair<string, string>(nameof(bytesIdentified.Id), bytesIdentified.Id.ToString());
+                return new KeyValuePair<string, object>(nameof(bytesIdentified.Id), bytesIdentified.Id);
 
             if (entity is IIdentified<Guid> guidIdentified)
-                return new KeyValuePair<string, string>(nameof(bytesIdentified.Id), guidIdentified.Id.ToString());
+                return new KeyValuePair<string, object>(nameof(bytesIdentified.Id), guidIdentified.Id);
 
             if (entity is IIdentified<long> longIdentified)
-                return new KeyValuePair<string, string>(nameof(bytesIdentified.Id), longIdentified.Id.ToString());
+                return new KeyValuePair<string, object>(nameof(bytesIdentified.Id), longIdentified.Id);
 
             if (entity is IIdentified<int> intIdentified)
-                return new KeyValuePair<string, string>(nameof(bytesIdentified.Id), intIdentified.ToString());
+                return new KeyValuePair<string, object>(nameof(bytesIdentified.Id), intIdentified);
 
             throw new NotSupportedException("By default, supported only identifying of entities that implements at least one of the following interfaces:\n" +
                                             $"{nameof(IIdentified<byte[]>)},\n" +
@@ -49,15 +49,11 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
         public IEnumerable<object> Read(IEntityInfo info, ICollection<IDataCriterion> criteria) {
             var collection = MongoDatabase().GetCollection<BsonDocument>(info.EntityName);
-            IEnumerable<BsonDocument> results;
-            if (!criteria.HasAny()) {
-                results = collection.Find(new BsonDocument()).ToList();
-                return results.Select(x => BsonSerializer.Deserialize<object>(x));
-            }
-
+            if (!criteria.HasAny())
+                return collection.Find(new BsonDocument()).ToList().Select(x => BsonSerializer.Deserialize<object>(x));
+            
             var filter = Builders<BsonDocument>.Filter.And(criteria.Select(x => x.Name == "Id" ? Builders<BsonDocument>.Filter.Eq("_id", x.Value) : Builders<BsonDocument>.Filter.Eq(x.Name, x.Value)));
-            results = collection.Find(filter).ToList();
-            return results.Select(x => BsonSerializer.Deserialize<object>(x));
+            return collection.Find(filter).ToList().Select(x => BsonSerializer.Deserialize<object>(x));
         }
 
 
@@ -100,11 +96,14 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
         public bool Update<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction) where TEntity : class {
             try {
-                var collection = MongoDatabase().GetCollection<TEntity>(info.EntityName);
+                var collection = MongoDatabase().GetCollection<BsonDocument>(info.EntityName);
                 var keyValuePair = KeyValuePairOf(entity, info);
-                collection.UpdateOne(Builders<TEntity>.Filter.Eq(keyValuePair.Key, keyValuePair.Value), new ObjectUpdateDefinition<TEntity>(entity));
+                var result = collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", keyValuePair.Value), new ObjectUpdateDefinition<BsonDocument>(entity));
 
-                return true;
+                if(result.MatchedCount==1)
+                    return true;
+
+                return false;
             }
             catch (Exception e) {
                 transaction.Abort();
@@ -121,11 +120,14 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
         public bool Delete<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction) where TEntity : class {
             try {
-                var collection = MongoDatabase().GetCollection<TEntity>(info.EntityName);
+                var collection = MongoDatabase().GetCollection<BsonDocument>(info.EntityName);
                 var keyValuePair = KeyValuePairOf(entity, info);
-                collection.DeleteOne(Builders<TEntity>.Filter.Eq(keyValuePair.Key, keyValuePair.Value));
+                var result = collection.DeleteOne(Builders<BsonDocument>.Filter.Eq("_id", keyValuePair.Value));
 
-                return true;
+                if (result.DeletedCount == 1)
+                    return true;
+                
+                return false;
             }
             catch (Exception e) {
                 transaction.Abort();

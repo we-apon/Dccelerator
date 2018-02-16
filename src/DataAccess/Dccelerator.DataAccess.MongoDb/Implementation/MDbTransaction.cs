@@ -7,12 +7,11 @@ using MongoDB.Driver;
 
 namespace Dccelerator.DataAccess.MongoDb.Implementation {
     public class MDbTransaction: IMDbTransaction, IDisposable {
-        readonly IMongoDatabase _mongoDatabase;
         bool _isAborted;
         bool _isCommited;
 
         readonly ConcurrentQueue<TransactionElement> _completedElements = new ConcurrentQueue<TransactionElement>();
-        readonly ConcurrentDictionary<string, object> _originEntities = new ConcurrentDictionary<string, object>();
+        readonly ConcurrentDictionary<object, object> _originEntities = new ConcurrentDictionary<object, object>();
 
 
         public bool IsAborted {
@@ -35,6 +34,9 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
         public bool Abort() {
             foreach (var element in _completedElements) {
+                if (element.ActionType == ActionType.Insert)
+                    element.Info.Repository.Delete(element.Info, element.Entity);
+
                 var keyValuePair = element.Info.Repository.KeyValuePairOf(element.Entity, element.Info);
                 if(!_originEntities.TryGetValue(keyValuePair.Value, out var origin))
                     continue;
@@ -58,6 +60,9 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
 
         public void StoreOrigin(TransactionElement element) {
+            if(element.ActionType == ActionType.Insert)
+                return;
+
             var keyValuePair = element.Info.Repository.KeyValuePairOf(element.Entity, element.Info);
             var origin = element.Info.Repository.Read(
                     element.Info,
@@ -69,6 +74,9 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
                         }
                     })
                 .SingleOrDefault();
+
+            if(origin==null)
+                throw new InvalidOperationException("Can`t get origin entity for update and delete operation in transaction");
 
             if (!_originEntities.TryAdd(keyValuePair.Value, origin))
                 Abort();

@@ -13,7 +13,7 @@ namespace Dccelerator.DataAccess.MongoDb
 
 
 
-        KeyValuePair<string, string> KeyValuePairOf(object entity, IEntityInfo info);
+        KeyValuePair<string, object> KeyValuePairOf(object entity, IEntityInfo info);
 
 
 

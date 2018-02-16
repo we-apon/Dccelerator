@@ -106,7 +106,6 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
                 _isCommited = true;
                 try {
-
                     return _dataManagerMDbFactory.Repository().PerformInTransaction(_elements);
                 }
                 catch (Exception e) {
