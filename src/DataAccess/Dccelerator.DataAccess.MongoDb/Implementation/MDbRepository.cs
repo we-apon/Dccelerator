@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Dccelerator.DataAccess.Lazy;
 using Dccelerator.Reflection;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 
@@ -46,60 +48,68 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
 
         public IEnumerable<object> Read(IEntityInfo info, ICollection<IDataCriterion> criteria) {
-            var collection = MongoDatabase().GetCollection<object>(info.EntityName);
-            return collection.Find(Builders<object>.Filter.And(criteria.Select(x => Builders<object>.Filter.Eq(x.Name, x.Value)))).ToList();
+            var collection = MongoDatabase().GetCollection<BsonDocument>(info.EntityName);
+            IEnumerable<BsonDocument> results;
+            if (!criteria.HasAny()) {
+                results = collection.Find(new BsonDocument()).ToList();
+                return results.Select(x => BsonSerializer.Deserialize<object>(x));
+            }
+
+            var filter = Builders<BsonDocument>.Filter.And(criteria.Select(x => x.Name == "Id" ? Builders<BsonDocument>.Filter.Eq("_id", x.Value) : Builders<BsonDocument>.Filter.Eq(x.Name, x.Value)));
+            results = collection.Find(filter).ToList();
+            return results.Select(x => BsonSerializer.Deserialize<object>(x));
         }
 
 
         public bool Insert<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction) where TEntity : class {
             try {
-                var collection = MongoDatabase().GetCollection<object>(info.EntityName);
+                var collection = MongoDatabase().GetCollection<TEntity>(info.EntityName);
                 collection.InsertOne(entity);
 
                 return true;
             }
             catch (MongoDuplicateKeyException e) {
                 _trace.TraceEvent(TraceEventType.Critical, 0, $"Duplicate key founded. Error on insert {info.EntityName} \n\n{e}");
-                return false;
+                throw;
             }
             catch (Exception e) {
                 transaction.Abort();
                 _trace.TraceEvent(TraceEventType.Critical, 0, $"Error on insert {info.EntityName} \n\n{e}");
-                return false;
+                throw;
             }
         }
 
 
         public bool InsertMany<TEntity>(IEntityInfo info, IEnumerable<TEntity> entities) where TEntity : class {
             try {
-                var collection = MongoDatabase().GetCollection<object>(info.EntityName);
+                var collection = MongoDatabase().GetCollection<TEntity>(info.EntityName);
                 collection.InsertMany(entities);
 
                 return true;
             }
             catch (MongoDuplicateKeyException e) {
                 _trace.TraceEvent(TraceEventType.Critical, 0, $"Duplicate key founded. Error on insert many {info.EntityName} \n\n{e}");
-                return false;
+                throw;
             }
             catch (Exception e) {
                 _trace.TraceEvent(TraceEventType.Critical, 0, $"Error on insert many {info.EntityName} \n\n{e}");
-                return false;
+                throw;
             }
         }
 
 
         public bool Update<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction) where TEntity : class {
             try {
-                var collection = MongoDatabase().GetCollection<object>(info.EntityName);
+                var collection = MongoDatabase().GetCollection<TEntity>(info.EntityName);
                 var keyValuePair = KeyValuePairOf(entity, info);
-                collection.UpdateOne(Builders<object>.Filter.Eq(keyValuePair.Key, keyValuePair.Value), new ObjectUpdateDefinition<object>(entity));
+                collection.UpdateOne(Builders<TEntity>.Filter.Eq(keyValuePair.Key, keyValuePair.Value), new ObjectUpdateDefinition<TEntity>(entity));
 
                 return true;
             }
             catch (Exception e) {
                 transaction.Abort();
                 _trace.TraceEvent(TraceEventType.Critical, 0, $"Error on update {info.EntityName} \n\n{e}");
-                return false;
+                throw;
             }
         }
 
@@ -111,16 +121,16 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
         public bool Delete<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction) where TEntity : class {
             try {
-                var collection = MongoDatabase().GetCollection<object>(info.EntityName);
+                var collection = MongoDatabase().GetCollection<TEntity>(info.EntityName);
                 var keyValuePair = KeyValuePairOf(entity, info);
-                collection.DeleteOne(Builders<object>.Filter.Eq(keyValuePair.Key, keyValuePair.Value));
+                collection.DeleteOne(Builders<TEntity>.Filter.Eq(keyValuePair.Key, keyValuePair.Value));
 
                 return true;
             }
             catch (Exception e) {
                 transaction.Abort();
                 _trace.TraceEvent(TraceEventType.Critical, 0, $"Error on delete {info.EntityName} \n\n{e}");
-                return false;
+                throw;
             }
         }
 
@@ -142,13 +152,13 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
                     switch (element.ActionType) {
                         case ActionType.Insert:
-                            Insert(element.Info, element, transaction);
+                            Insert(element.Info, element.Entity, transaction);
                             break;
                         case ActionType.Update:
-                            Update(element.Info, element, transaction);
+                            Update(element.Info, element.Entity, transaction);
                             break;
                         case ActionType.Delete:
-                            Delete(element.Info, element, transaction);
+                            Delete(element.Info, element.Entity, transaction);
                             break;
                         default: throw new NotImplementedException();
                     }

@@ -21,12 +21,12 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation
 
 
         public IDataExistenceChecker<TEntity> DataExistenceChecker<TEntity>() where TEntity : class {
-            throw new NotImplementedException();
+            return NoCachedExistenceChecker<TEntity>();
         }
 
 
         public IDataExistenceChecker<TEntity> NoCachedExistenceChecker<TEntity>() where TEntity : class {
-            throw new NotImplementedException();
+            return new MDbDataExistenceChecker<TEntity>(ReadingRepository(), InfoAbout<TEntity>());
         }
 
 

@@ -19,7 +19,7 @@ namespace Dccelerator.DataAccess.MongoDb
 
         IEnumerable<object> Read(IEntityInfo info, ICollection<IDataCriterion> criteria);
 
-        
+
         bool Insert<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction = null) where TEntity : class;
 
 
