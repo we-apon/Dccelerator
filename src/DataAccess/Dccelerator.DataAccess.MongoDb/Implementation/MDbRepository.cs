@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Dccelerator.DataAccess.Lazy;
 using Dccelerator.Reflection;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
@@ -96,14 +97,15 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
         public bool Update<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction) where TEntity : class {
             try {
-                var collection = MongoDatabase().GetCollection<BsonDocument>(info.EntityName);
+                var collection = MongoDatabase().GetCollection<TEntity>(info.EntityName);
                 var keyValuePair = KeyValuePairOf(entity, info);
-                var result = collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", keyValuePair.Value), new ObjectUpdateDefinition<BsonDocument>(entity));
+                
+                var result = collection.DeleteOne(Builders<TEntity>.Filter.Eq("_id", keyValuePair.Value));
+                if (result.DeletedCount != 1)
+                    return false;
 
-                if(result.MatchedCount==1)
-                    return true;
-
-                return false;
+                collection.InsertOne(entity);
+                return true;
             }
             catch (Exception e) {
                 transaction.Abort();
@@ -120,9 +122,9 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
         public bool Delete<TEntity>(IEntityInfo info, TEntity entity, IMDbTransaction transaction) where TEntity : class {
             try {
-                var collection = MongoDatabase().GetCollection<BsonDocument>(info.EntityName);
+                var collection = MongoDatabase().GetCollection<TEntity>(info.EntityName);
                 var keyValuePair = KeyValuePairOf(entity, info);
-                var result = collection.DeleteOne(Builders<BsonDocument>.Filter.Eq("_id", keyValuePair.Value));
+                var result = collection.DeleteOne(Builders<TEntity>.Filter.Eq("_id", keyValuePair.Value));
 
                 if (result.DeletedCount == 1)
                     return true;
