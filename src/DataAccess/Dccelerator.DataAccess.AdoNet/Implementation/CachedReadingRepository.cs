@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Dccelerator.DataAccess.Common.Implementation;
 using Dccelerator.Reflection;
 
 namespace Dccelerator.DataAccess.Ado.Implementation {
@@ -9,13 +10,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
     {
         readonly ConcurrentDictionary<string, EntitiesCache> _entities = new ConcurrentDictionary<string, EntitiesCache>();
         static readonly ConcurrentDictionary<string, EntitiesCache> _globallyCachedEntities = new ConcurrentDictionary<string, EntitiesCache>();
-
-
-        class EntitiesCache {
-            public object[] Entities;
-            public DateTime QueriedTime;
-        }
-
+        
 
         protected virtual TimeSpan CacheTimeoutOf(IAdoEntityInfo info) {
             return info.CacheTimeout;

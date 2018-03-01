@@ -11,7 +11,7 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation
     public class MDbDataManagerFactory : IDataManagerMDbFactory
     {
         public IDataGetter<TEntity> GetterFor<TEntity>() where TEntity : class, new() {
-            return NotCachedGetterFor<TEntity>();
+            return new MDbDataGetter<TEntity>(CachedReadingRepository(), InfoAbout<TEntity>());
         }
 
 
@@ -21,7 +21,7 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation
 
 
         public IDataExistenceChecker<TEntity> DataExistenceChecker<TEntity>() where TEntity : class {
-            return NoCachedExistenceChecker<TEntity>();
+            return new MDbDataExistenceChecker<TEntity>(CachedReadingRepository(), InfoAbout<TEntity>());
         }
 
 
@@ -72,11 +72,15 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation
             return info;
         }
 
-
+        
         public IReadingRepository ReadingRepository() {
            return new MDbReadingRepository();
         }
 
+
+        public IReadingRepository CachedReadingRepository() {
+            return new MDbCachedReadingRepository();
+        }
 
         public IMDbRepository Repository() {
             return new MDbRepository();

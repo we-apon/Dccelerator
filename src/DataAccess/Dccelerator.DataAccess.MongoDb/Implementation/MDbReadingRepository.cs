@@ -14,7 +14,7 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation
         static IReadingRepository _readingRepository;
 
 
-        public IEnumerable<object> Read(IEntityInfo info, ICollection<IDataCriterion> criteria) {
+        public virtual IEnumerable<object> Read(IEntityInfo info, ICollection<IDataCriterion> criteria) {
             var dbdInfo = (IMdbEntityInfo) info;
             return dbdInfo.Repository.Read(info, criteria);
         }
