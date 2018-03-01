@@ -20,18 +20,18 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation
         }
 
 
-        public bool Any(IEntityInfo info, ICollection<IDataCriterion> criteria) {
+        public virtual bool Any(IEntityInfo info, ICollection<IDataCriterion> criteria) {
             var dbdInfo = (IMdbEntityInfo)info;
             return dbdInfo.Repository.Read(info, criteria).Any();
         }
 
 
-        public IEnumerable<object> ReadColumn(string columnName, IEntityInfo info, ICollection<IDataCriterion> criteria) {
+        public virtual IEnumerable<object> ReadColumn(string columnName, IEntityInfo info, ICollection<IDataCriterion> criteria) {
             throw new NotImplementedException();
         }
 
 
-        public int CountOf(IEntityInfo info, ICollection<IDataCriterion> criteria) {
+        public virtual int CountOf(IEntityInfo info, ICollection<IDataCriterion> criteria) {
             var dbdInfo = (IMdbEntityInfo)info;
             return dbdInfo.Repository.Read(info, criteria).Count();
         }
