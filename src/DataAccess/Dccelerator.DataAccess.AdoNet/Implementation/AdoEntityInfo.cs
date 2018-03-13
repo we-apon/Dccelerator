@@ -129,12 +129,9 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
         public void InitReaderColumns(DbDataReader reader) {
             if (ReaderColumns != null)
                 return;
-
-#if NET40 || NET45
+            
             var columns = reader.GetSchemaTable()?.Rows.Cast<DataRow>().Select(x => (string) x[0]).ToArray();
-#else
-            throw new NotImplementedException() and don't build until it's implemented!
-#endif
+
             lock (_lock) {
                 if (ReaderColumns == null)
                     ReaderColumns = columns;

@@ -5,7 +5,7 @@
     <AssemblyTitle>Dccelerator.DataAccess.Adapters.MsSql</AssemblyTitle>
     <VersionPrefix>0.0.12</VersionPrefix>
     <Authors>Kirill Dubinkin</Authors>
-    <TargetFrameworks>net40;net45</TargetFrameworks>
+    <TargetFrameworks>net40;net45;netstandard2.0;netcoreapp2.0</TargetFrameworks>
     <AssemblyName>Dccelerator.DataAccess.Adapters.MsSql</AssemblyName>
     <PackageId>Dccelerator.DataAccess.Adapters.MsSql</PackageId>
     <PackageTags>ORM ADO.NET SQLClient MSSQL SQL</PackageTags>
@@ -20,15 +20,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dccelerator.DataAccess.AdoNet\Dccelerator.DataAccess.AdoNet.csproj" />
+    
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net40' ">
     <DefineConstants>$(DefineConstants);NET40;JETBRAINS_ANNOTATIONS</DefineConstants>
@@ -48,6 +42,27 @@
     <Reference Include="System.Transactions" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+    <ProjectReference Include="..\Dccelerator.DataAccess.AdoNet\Dccelerator.DataAccess.AdoNet.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+    <ProjectReference Include="..\Dccelerator.DataAccess.AdoNet\Dccelerator.DataAccess.AdoNet.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
+    <ProjectReference Include="..\Dccelerator.DataAccess.AdoNet\Dccelerator.DataAccess.AdoNet.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
+    <ProjectReference Include="..\Dccelerator.DataAccess.AdoNet\Dccelerator.DataAccess.AdoNet.csproj" />
   </ItemGroup>
 
 </Project>
+ 
