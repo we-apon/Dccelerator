@@ -5,7 +5,7 @@
     <AssemblyTitle>Dccelerator.DataAccess.Lazy</AssemblyTitle>
     <VersionPrefix>0.0.12</VersionPrefix>
     <Authors>Kirill Dubinkin</Authors>
-    <TargetFrameworks>net40;net45</TargetFrameworks> <!-- netstandard1.3 -->
+    <TargetFrameworks>net40;net45;netstandard2.0;netcoreapp2.0</TargetFrameworks> <!-- netstandard1.3 -->
     <AssemblyName>Dccelerator.DataAccess.Lazy</AssemblyName>
     <PackageId>Dccelerator.DataAccess.Lazy</PackageId>
     <PackageTags>ORM Lazy Loading</PackageTags>
@@ -17,7 +17,7 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <Version>0.0.16</Version>
+    <Version>0.0.17</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -52,18 +52,42 @@
     <DebugType>full</DebugType>
   </PropertyGroup>
 
-
-<!-- Postsharp still don't work with netstandard (any version of it)
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;NET_STANDARD</DefineConstants>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>bin\Debug\netstandard1.3\Dccelerator.DataAccess.Lazy.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netstandard2.0\Dccelerator.DataAccess.Lazy.xml</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <LangVersion>default</LangVersion>
+    <DebugType>full</DebugType>
   </PropertyGroup>
--->
 
-  <ItemGroup>
-    <PackageReference Include="PostSharp" Version="5.0.34" />
-    <PackageReference Include="PostSharp.Redist" Version="5.0.34" />
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.0\Dccelerator.DataAccess.Lazy.xml</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <LangVersion>default</LangVersion>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+    <PackageReference Include="PostSharp" Version="5.0.48" />
+    <PackageReference Include="PostSharp.Redist" Version="5.0.48" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="PostSharp" Version="5.0.48" />
+    <PackageReference Include="PostSharp.Redist" Version="5.0.48" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
+    <PackageReference Include="PostSharp" Version="5.0.48" />
+    <PackageReference Include="PostSharp.Redist" Version="5.0.48" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
+    <PackageReference Include="PostSharp" Version="4.3.29" />
   </ItemGroup>
 
 </Project>

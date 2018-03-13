@@ -4,7 +4,7 @@
     <Description>Contains TraceSourceAttribute - a PostSharp-based aspect for simple but rich logging with .Net System.Diagnostics framework. It makes completely simple to use activity tracing and locial operations stacks.</Description>
     <Copyright>Copyright © Kirill Dubinkin 2017</Copyright>
     <AssemblyTitle>Dccelerator.TraceSourceAspects</AssemblyTitle>
-    <VersionPrefix>0.0.12</VersionPrefix>
+    <VersionPrefix>0.0.17</VersionPrefix>
     <Authors>Kirill Dubinkin</Authors>
     <TargetFramework>net40</TargetFramework>
     <AssemblyName>Dccelerator.TraceSourceAspects</AssemblyName>
@@ -23,7 +23,7 @@
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>0.0.16</Version>
+    <Version>0.0.17</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -31,15 +31,20 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <PackageReference Include="PostSharp" Version="5.0.34" />
+    <PackageReference Include="PostSharp" Version="5.0.48" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="PostSharp.Redist" Version="5.0.34" />
+    <PackageReference Include="PostSharp.Redist" Version="5.0.48" />
   </ItemGroup>
 
 </Project>
