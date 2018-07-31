@@ -26,6 +26,8 @@ namespace Dccelerator.Reflection {
         }
 
 
+        public object GetValue(object context) => Getter.Delegate((TContext)context);
+
 
         public bool TryGetValue(object context, out object value) {
             TType val;
@@ -33,7 +35,11 @@ namespace Dccelerator.Reflection {
             value = val;
             return result;
         }
-        
+
+
+        public void SetValue(object context, object value) => Setter.Delegate((TContext)context, (TType)value);
+
+
 
         public bool TryGetValue(object context, out TType value) {
             return TryGetValue((TContext) context, out value);
@@ -47,8 +53,8 @@ namespace Dccelerator.Reflection {
 
         public bool TrySetValue(object context, object value) {
             try {
-                var val = value is TType
-                    ? (TType) value
+                var val = value is TType type
+                    ? type
                     : (TType)(value.ConvertTo(typeof (TType)));
 
                 return Setter.TryInvoke((TContext)context, val);
@@ -57,6 +63,11 @@ namespace Dccelerator.Reflection {
                 Internal.TraceEvent(TraceEventType.Error, e.ToString());
                 return false;
             }
+        }
+
+
+        public bool TrySetValue(TContext context, TType value) {
+            return Setter.TryInvoke(context, value);
         }
 
 
@@ -84,11 +95,19 @@ namespace Dccelerator.Reflection {
         /// Used then property doesn't contain getter or setter, to avoid exceptions and getter/setter searching or every get/set call)
         /// </summary>
         class NotExistedDelegate : IActionDelegate<TContext, TType>, IFunctionDelegate<TContext, TType> {
+
+            Func<TContext, TType> IFunctionDelegate<TContext, TType>.Delegate => null;
+
+
             public bool TryInvoke(TContext context, out TType result) {
                 result = default(TType);
                 return false;
             }
-            
+
+
+            Action<TContext, TType> IActionDelegate<TContext, TType>.Delegate => null;
+
+
             public bool TryInvoke(TContext context, TType p1) {
                 return false;
             }

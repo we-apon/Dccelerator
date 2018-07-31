@@ -4,9 +4,11 @@ namespace Dccelerator.Reflection {
     public interface IProperty {
         PropertyInfo Info { get; }
 
-
+        object GetValue(object context);
         bool TryGetValue(object context, out object value);
 
+
+        void SetValue(object context, object value);
         bool TrySetValue(object context, object value);
     }
 
@@ -15,6 +17,13 @@ namespace Dccelerator.Reflection {
     }
 
     public interface IProperty<in TContext, TValue> : IProperty<TValue> {
+
+        IFunctionDelegate<TContext, TValue> Getter { get; }
+
+        IActionDelegate<TContext, TValue> Setter { get; }
+
         bool TryGetValue(TContext context, out TValue value);
+
+        bool TrySetValue(TContext context, TValue value);
     }
 }

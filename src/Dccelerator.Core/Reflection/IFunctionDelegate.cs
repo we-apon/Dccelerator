@@ -1,6 +1,12 @@
+using System;
+
+
 namespace Dccelerator.Reflection {
 
     public interface IFunctionDelegate<in TContext, TOut> {
+
+        Func<TContext, TOut> Delegate { get; }
+
         bool TryInvoke(TContext context, out TOut result);
     }
 
