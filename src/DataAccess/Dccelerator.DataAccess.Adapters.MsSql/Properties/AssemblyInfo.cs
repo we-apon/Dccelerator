@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kirill Dubinkin")]
 [assembly: AssemblyProduct("Dccelerator.DataAccess ORM")]
-[assembly: AssemblyCopyright("Copyright © Kirill Dubinkin 2016")]
+[assembly: AssemblyCopyright("Copyright © Kirill Dubinkin 2016-2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -23,5 +23,5 @@ using System.Runtime.InteropServices;
 [assembly: Guid("802e612e-433f-4974-8c7a-38398a982275")]
 
 #if DEBUG
-[assembly: InternalsVisibleTo("Dccelerator.Specifications.Net40")]
+[assembly: InternalsVisibleTo("Dccelerator.Specifications")]
 #endif

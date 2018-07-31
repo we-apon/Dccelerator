@@ -300,7 +300,7 @@ namespace Dccelerator.DataAccess.Lazy {
 
                 if (identifiedEntity != null)
                     id = identifiedEntity.Id;
-                else if (!args.Instance.TryGetValueOnPath("Id", out id)) {
+                else if (!args.Instance.TryGet("Id", out id)) {
                     Internal.TraceEvent(TraceEventType.Warning, $"Can't get value of property of not identified entity '{args.Instance.GetType().FullName}.Id'");
                     return null;
                 }
@@ -315,7 +315,7 @@ namespace Dccelerator.DataAccess.Lazy {
                 };
             }
 
-            if (!args.Instance.TryGetValueOnPath(args.Location.PropertyInfo.Name + "Id", out id)) {
+            if (!args.Instance.TryGet(args.Location.PropertyInfo.Name + "Id", out id)) {
                 Internal.TraceEvent(TraceEventType.Warning, $"Can't get value of property '{args.Location.PropertyInfo.Name}Id'");
                 return null;
             }

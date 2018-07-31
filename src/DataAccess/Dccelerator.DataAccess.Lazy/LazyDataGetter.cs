@@ -60,7 +60,7 @@ namespace Dccelerator.DataAccess.Lazy {
 
             foreach (var inclusion in info.Inclusions) {
                 object child;
-                if (!entity.TryGetValueOnPath(inclusion.TargetPath, out child)) {
+                if (!entity.TryGet(inclusion.TargetPath, out child)) {
                     Infrastructure.Internal.TraceEvent(TraceEventType.Warning, $"Can't get property {inclusion.TargetPath} on {_mainEntityInfo.EntityType} to setup it's loading context.");
                     continue;
                 }

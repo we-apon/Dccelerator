@@ -276,7 +276,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
                 var entity = pData.Data.FromBytes();
 
                 object foreingKey;
-                if (!entity.TryGetValueOnPath(secondaryKey.Name, out foreingKey))
+                if (!entity.TryGet(secondaryKey.Name, out foreingKey))
                     throw new InvalidOperationException();
 
                 return new DatabaseEntry(foreingKey.ToBinnary());

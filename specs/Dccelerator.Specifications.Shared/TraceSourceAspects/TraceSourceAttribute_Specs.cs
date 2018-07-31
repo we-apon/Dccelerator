@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if DEBUG
+
+using System;
 using Dccelerator.TraceSourceAttributes;
 using Machine.Specifications;
 
@@ -41,3 +43,5 @@ namespace Dccelerator.Specifications.Shared.TraceSourceAspects
     }
 
 }
+
+#endif

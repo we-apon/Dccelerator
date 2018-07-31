@@ -9,6 +9,7 @@
     <Import_RootNamespace>Dccelerator.Specifications.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Reflection\RUtils_Benchmarks.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataAccess\Adapters\MsSql\SqlRepository_Specs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataAccess\Adapters\Oracle\OracleRepository_Specs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataAccess\AdoNet\AdoNetRepository_Specs.cs" />

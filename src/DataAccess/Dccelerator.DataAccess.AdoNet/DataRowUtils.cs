@@ -1,5 +1,4 @@
-#if (NET40 || NET45)
- 
+
 using System;
 using System.Data;
 using System.Diagnostics;
@@ -48,7 +47,7 @@ namespace Dccelerator.DataAccess.Ado {
                 if (value == DBNull.Value || value == null)
                     continue;
 
-                if (!RUtils<T>.TrySetValueOnPath(item, column.ColumnName, value))
+                if (!RUtils<T>.TrySet(item, column.ColumnName, value))
                     Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {column.ColumnName} from '{typeof (T).FullName}' context.");
             }
 
@@ -67,7 +66,7 @@ namespace Dccelerator.DataAccess.Ado {
                 if (value == DBNull.Value || value == null)
                     continue;
 
-                if (!item.TrySetValueOnPath(column.ColumnName, value))
+                if (!item.TrySet(column.ColumnName, value))
                     Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {column.ColumnName} from '{item.GetType().FullName}' context.");
             }
 
@@ -255,4 +254,3 @@ namespace Dccelerator.DataAccess.Ado {
 }
 
 
-#endif

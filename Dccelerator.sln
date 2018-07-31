@@ -37,10 +37,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.TraceSourceAspe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.DataAccess.MongoDb", "src\DataAccess\Dccelerator.DataAccess.MongoDb\Dccelerator.DataAccess.MongoDb.csproj", "{0EACD7E7-7238-4900-8CCB-E53E924DB447}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dccelerator.Specifications.Net46", "specs\Dccelerator.Specifications.Net46\Dccelerator.Specifications.Net46.csproj", "{EC791B19-57FD-443E-86DB-56D2BBD6F87A}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		specs\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.projitems*{33695d1e-6efd-4c81-a607-ae5d541c41be}*SharedItemsImports = 13
 		specs\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.projitems*{cc4e0cee-8cd4-40ae-b76b-c2f3cf82dbe6}*SharedItemsImports = 4
+		specs\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.projitems*{ec791b19-57fd-443e-86db-56d2bbd6f87a}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +90,10 @@ Global
 		{0EACD7E7-7238-4900-8CCB-E53E924DB447}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EACD7E7-7238-4900-8CCB-E53E924DB447}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0EACD7E7-7238-4900-8CCB-E53E924DB447}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC791B19-57FD-443E-86DB-56D2BBD6F87A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC791B19-57FD-443E-86DB-56D2BBD6F87A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC791B19-57FD-443E-86DB-56D2BBD6F87A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC791B19-57FD-443E-86DB-56D2BBD6F87A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,6 +111,7 @@ Global
 		{CC4E0CEE-8CD4-40AE-B76B-C2F3CF82DBE6} = {8FCF91C8-AB08-4481-BBEE-94F54CF7F170}
 		{BDB0FAEA-2FF9-4697-A20B-5E5E99CF304A} = {94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}
 		{0EACD7E7-7238-4900-8CCB-E53E924DB447} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
+		{EC791B19-57FD-443E-86DB-56D2BBD6F87A} = {8FCF91C8-AB08-4481-BBEE-94F54CF7F170}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {86E545B5-25AD-4F90-A8B1-D3FD862AECCD}

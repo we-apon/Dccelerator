@@ -210,7 +210,7 @@ namespace Dccelerator
             else if (includeGuids && _guidType.IsAssignableFrom(type))
                 value = Guid.NewGuid();
 
-            return value != null && entity.TrySetValueOnPath(prop.Name, value);
+            return value != null && entity.TrySet(prop.Name, value);
         }
 
         #endregion

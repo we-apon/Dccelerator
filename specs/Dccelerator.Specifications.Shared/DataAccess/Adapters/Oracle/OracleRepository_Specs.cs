@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if DEBUG
+
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Dccelerator.DataAccess;
@@ -170,3 +172,5 @@ namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.Oracle {
 
     
 }
+
+#endif

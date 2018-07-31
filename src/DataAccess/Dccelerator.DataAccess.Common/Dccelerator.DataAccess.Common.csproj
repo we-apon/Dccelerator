@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Contains interfaces and base implementation of Dccelerator.DataAccess ORM.</Description>
     <AssemblyTitle>Dccelerator.DataAccess.Common</AssemblyTitle>
-    <VersionPrefix>0.0.12</VersionPrefix>
+    <VersionPrefix>0.0.21</VersionPrefix>
     <Authors>Kirill Dubinkin</Authors>
     <TargetFrameworks>net40;net45;netstandard1.3</TargetFrameworks>
     <AssemblyName>Dccelerator.DataAccess.Common</AssemblyName>
@@ -47,7 +47,7 @@
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>0.0.17</Version>
+    <RootNamespace>Dccelerator.DataAccess</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net40|AnyCPU'">

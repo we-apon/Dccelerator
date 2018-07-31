@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Contains TraceSourceAttribute - a PostSharp-based aspect for simple but rich logging with .Net System.Diagnostics framework. It makes completely simple to use activity tracing and locial operations stacks.</Description>
-    <Copyright>Copyright © Kirill Dubinkin 2017</Copyright>
+    <Copyright>Copyright © Kirill Dubinkin 2017-2018</Copyright>
     <AssemblyTitle>Dccelerator.TraceSourceAspects</AssemblyTitle>
     <VersionPrefix>0.0.17</VersionPrefix>
     <Authors>Kirill Dubinkin</Authors>

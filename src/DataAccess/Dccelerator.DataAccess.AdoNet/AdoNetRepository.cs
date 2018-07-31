@@ -231,7 +231,7 @@ namespace Dccelerator.DataAccess.Ado {
         protected virtual IEnumerable<TParameter> ParametersFrom<TEntity>(IEntityInfo info, TEntity entity) where TEntity : class {
             return info.PersistedProperties.Select(x => {
                 object value;
-                if (!RUtils<TEntity>.TryGetValueOnPath(entity, x.Key, out value))
+                if (!RUtils<TEntity>.TryGet(entity, x.Key, out value))
                     throw new InvalidOperationException($"Entity of type {entity.GetType()} should contain property '{x.Key}', " +
                                                         "but in some reason value or that property could not be getted.");
 
@@ -575,10 +575,10 @@ namespace Dccelerator.DataAccess.Ado {
                                     Parallel.ForEach(mainObjects.Values,
                                         mainObject => {
                                             object value;
-                                            if (!mainObject.TryGetValueOnPath(includeon.ForeignKeyFromMainEntityToCurrent, out value) || !keyId.Equals(value)) // target path should be ServiceWorkplaceId, but it ServiceWorkPlace
+                                            if (!mainObject.TryGet(includeon.ForeignKeyFromMainEntityToCurrent, out value) || !keyId.Equals(value)) // target path should be ServiceWorkplaceId, but it ServiceWorkPlace
                                                 return; //keyId should be just primary key of ServiceWorkPlace
 
-                                            if (!mainObject.TrySetValueOnPath(includeon.Attribute.TargetPath, item))
+                                            if (!mainObject.TrySet(includeon.Attribute.TargetPath, item))
                                                 Internal.TraceEvent(TraceEventType.Warning,
                                                     $"Can't set property {includeon.Attribute.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.EntityType} in result set #{index}.");
                                         });
@@ -617,7 +617,7 @@ namespace Dccelerator.DataAccess.Ado {
                                             return;
                                         }
 
-                                        if (!mainObject.TrySetValueOnPath(includeon.Attribute.TargetPath, child.Value))
+                                        if (!mainObject.TrySet(includeon.Attribute.TargetPath, child.Value))
                                             Internal.TraceEvent(TraceEventType.Warning,
                                                 $"Can't set property {includeon.Attribute.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.EntityType} in result set #{index}.");
 
@@ -625,7 +625,7 @@ namespace Dccelerator.DataAccess.Ado {
                                             return;
 
                                         foreach (var item in child.Value) {
-                                            if (!item.TrySetValueOnPath(includeon.OwnerNavigationReferenceName, mainObject))
+                                            if (!item.TrySet(includeon.OwnerNavigationReferenceName, mainObject))
                                                 Internal.TraceEvent(TraceEventType.Warning,
                                                     $"Can't set property {includeon.OwnerNavigationReferenceName} from '{info.EntityType}' context. This should be reference to owner object ({mainObject})");
                                         }
@@ -685,7 +685,7 @@ namespace Dccelerator.DataAccess.Ado {
                 if (isKey(name, mainEntityInfo, includeon))
                     keyId = value;
 
-                if (!item.TrySetValueOnPath(name, value))
+                if (!item.TrySet(name, value))
                     Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {name} from '{entityType.FullName}' context.");
             }
             return item;

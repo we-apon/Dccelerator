@@ -394,7 +394,7 @@ namespace Dccelerator.Convertion
             foreach (var destinationProperty in destinationProps) {
                 object value;
 
-                if (!other.TryGetValueOnPath(destinationProperty.Key, out value) || !entity.TrySetValueOnPath(destinationProperty.Key, value)) {
+                if (!other.TryGet(destinationProperty.Key, out value) || !entity.TrySet(destinationProperty.Key, value)) {
                     unconvertedProps.Add(destinationProperty.Key, destinationProperty.Value);
                 }
             }

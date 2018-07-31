@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kirill Dubinkin")]
 [assembly: AssemblyProduct("Dccelerator.DataAccess ORM")]
-[assembly: AssemblyCopyright("Copyright © Kirill Dubinkin 2016")]
+[assembly: AssemblyCopyright("Copyright © Kirill Dubinkin 2016-2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

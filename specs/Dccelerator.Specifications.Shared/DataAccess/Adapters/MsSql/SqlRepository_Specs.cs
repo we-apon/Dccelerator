@@ -1,11 +1,12 @@
-﻿using System;
+﻿#if DEBUG
+
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Reflection;
 using Dccelerator.DataAccess;
 using Dccelerator.DataAccess.Ado;
 using Dccelerator.DataAccess.Ado.SqlClient;
-using Dccelerator.TraceSourceAttributes;
 using FakeItEasy;
 using Machine.Specifications;
 
@@ -172,3 +173,5 @@ namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.MsSql {
 
 
 }
+
+#endif

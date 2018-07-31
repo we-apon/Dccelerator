@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using FastMember;
 using JetBrains.Annotations;
 
 
@@ -22,7 +23,8 @@ namespace Dccelerator.Reflection
     /// <seealso cref="RUtils{TType}"/>
     public static class RUtils //todo: generate and use delegate accessing full requested property path at one call.
     {
-        
+
+
         /// <summary>
         /// Returns number of inheritance generator from <paramref name="parent"/> to <paramref name="child"/> type.
         /// </summary>
@@ -117,79 +119,122 @@ namespace Dccelerator.Reflection
         /// <param name="path"></param>
         /// <returns></returns>
         public static PropertyPath GetPropertyPath(this Type contextType, string path) {
-
             var identity = new PropIdentity(contextType, path);
 
-            PropertyPath propertyPath;
-            if (_propertyPaths.TryGetValue(identity, out propertyPath))
+            if (_propertyPaths.TryGetValue(identity, out var propertyPath))
                 return propertyPath;
 
             propertyPath = make_property_path(identity);
             if (!_propertyPaths.TryAdd(identity, propertyPath))
                 propertyPath = _propertyPaths[identity];
-
+                
             return propertyPath;
         }
 
+        
 
-        /// <summary>
-        /// Returns value of static property placed on <paramref name="path"/> with started point at <paramref name="type"/>.
-        /// </summary>
-        /// <param name="type">Type that has static property on passed <paramref name="path"/></param>
-        /// <param name="path">Path to requested property</param>
-        /// <param name="value">Value</param>
-        public static bool TryGetValueOnPath(this Type type, string path, out object value) {
-            if (type == null || string.IsNullOrWhiteSpace(path)) {
-                value = null;
-                return false;
-            }
-
-            return try_get_value_on_path(type, null, path, out value);
-        }
-
-
-
+        
         /// <summary>
         /// Returns value of property placed on <paramref name="path"/> with started point at <paramref name="context"/>.
         /// </summary>
         /// <param name="context">Object that has property on passed <paramref name="path"/></param>
         /// <param name="path">Path to requested property</param>
         /// <param name="value">Value</param>
-        public static bool TryGetValueOnPath(this object context, string path, out object value) {
-            if (context == null || string.IsNullOrWhiteSpace(path)) {
+        public static bool TryGet<T>(this T context, string path, out object value) {
+            return RUtils<T>.TryGet(context, path, out value);
+        }
+
+        
+        /// <summary>
+        /// Returns value of property placed on <paramref name="path"/> with started point at <paramref name="context"/>.
+        /// </summary>
+        /// <param name="context">Object that has property on passed <paramref name="path"/></param>
+        /// <param name="path">Path to requested property</param>
+        /// <param name="value">Value</param>
+        public static bool TryGet(this object context, string path, out object value) {
+            if (context == null || path == null) {
                 value = null;
                 return false;
             }
 
-            return try_get_value_on_path(context.GetType(), context, path, out value);
+            var type = context.GetType();
+            try {
+                var accessor = TypeAccessor.Create(type, true);
+                value = accessor[context, path];
+                return true;
+            }
+            catch (Exception e) {
+                Internal.TraceEvent(TraceEventType.Error, $"Can't get value from path {type.FullName}.{path}\n\n{e}");
+                value = null;
+                return false;
+            }
         }
 
-        
 
-        public static bool TrySetValueOnPath(this object context, string path, object value) {
+
+        public static object Get<T>(this T context, string path) {
+            return RUtils<T>.Get(context, path);
+        }
+
+        public static object Get(this object context, string path) {
+            if (context == null || path == null)
+                return null;
+            
+            var type = context.GetType();
+            var propertyPath = GetPropertyPath(type, path);
+            if (propertyPath != null)
+                return propertyPath.Get(context);
+            
+            Internal.TraceEvent(TraceEventType.Warning, $"There is no property or field {type.FullName}.{path}");
+            return null;
+        }
+
+
+
+        public static bool TrySet<T>(this T context, string path, object value) {
+            if (context == null || string.IsNullOrWhiteSpace(path))
+                return false;
+
+            return RUtils<T>.TrySet(context, path, value);
+        }
+
+
+        public static bool TrySet(this object context, string path, object value) {
+            if (context == null || path == null)
+                return false;
+
+            var type = context.GetType();
+
+            try {
+                var accessor = TypeAccessor.Create(type, true);
+                accessor[context, path] = value;
+                return true;
+            }
+            catch (Exception e) {
+                Internal.TraceEvent(TraceEventType.Error, $"Can't set value '{value}' on path {type.FullName}.{path}\n\n{e}");
+                return false;
+            }
+        }
+
+
+        public static void Set<T>(this T context, string path, object value) {
+            RUtils<T>.Set(context, path, value);
+        }
+
+        public static void Set(this object context, string path, object value) {
+            if (context == null || path == null)
+                return;
 
             PropertyPath propertyPath;
-
-            return context != null 
-                && !string.IsNullOrWhiteSpace(path) 
-                && (propertyPath = GetPropertyPath(context.GetType(), path)) != null
-                && propertyPath.TrySetTargetProperty(context, value);
+            if ((propertyPath = GetPropertyPath(context.GetType(), path)) != null) {
+                propertyPath.Set(context, value);
+            }
         }
-        
+
 
 
 
         #region private
-
-        static bool try_get_value_on_path(Type type, object context, string path, out object value) {
-            var propertyPath = GetPropertyPath(type, path);
-            if (propertyPath == null) {
-                value = null;
-                return false;
-            }
-
-            return propertyPath.TryGetValueOfTargetProperty(context, out value);
-        }
 
 
         class PropIdentity

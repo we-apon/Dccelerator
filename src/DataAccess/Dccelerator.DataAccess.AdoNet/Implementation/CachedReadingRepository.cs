@@ -70,7 +70,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
         public override IEnumerable<object> ReadColumn(string columnName, IEntityInfo info, ICollection<IDataCriterion> criteria) {
             return Read(info, criteria).Select(x => {
                 object value;
-                x.TryGetValueOnPath(columnName, out value);
+                x.TryGet(columnName, out value);
                 return value;
             });
         }

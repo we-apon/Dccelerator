@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if DEBUG
+
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -422,3 +424,5 @@ namespace Dccelerator.Specifications.Shared.DataAccess.AdoNet {
 
 
 }
+
+#endif
