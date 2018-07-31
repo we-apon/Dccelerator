@@ -9,6 +9,8 @@ namespace Dccelerator.DataAccess {
     public interface IEntityInfo {
         string EntityName { get; }
 
+        string TableName { get; }
+
         Type EntityType { get; }
 
         TimeSpan CacheTimeout { get; }

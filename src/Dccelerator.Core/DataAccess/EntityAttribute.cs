@@ -17,6 +17,13 @@ namespace Dccelerator.DataAccess
         [CanBeNull]
         public string Name { get; private set; }
 
+        /// <summary>
+        /// Name of table what mapped by this entity.
+        /// <para>Used for Bulk Inserts.</para>
+        /// </summary>
+        [CanBeNull]
+        public string TableName { get; set; }
+
 
         /// <summary>
         /// If null - attribute <see cref="Name"/> overides <see cref="Name"/> in all repositories.

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -15,18 +14,24 @@ namespace Dccelerator.DataAccess.Implementation {
             EntityName = entityType.Name;
             CacheTimeout = TimeSpan.Zero;
 
+            var table = entityType.Name;
+            var lastChar = table.Last();
+            table += char.ToLowerInvariant(lastChar).Equals('s') ? "es" : "s";
+            TableName = table;
+
             var entityAttribute = entityType.GetConfigurationForRepository(typeof(TRepository));
             if (entityAttribute != null) {
-                EntityName = entityAttribute.Name ?? EntityType.Name;
+                EntityName = entityAttribute.Name ?? entityType.Name;
                 Repository = entityAttribute.Repository?.CreateInstance() as TRepository;
                 UsingQueries = entityAttribute.UseQueries;
+                TableName = entityAttribute.TableName ?? table;
 
-                var cachedEntityAttribute = entityAttribute as GloballyCachedEntityAttribute;
-                if (cachedEntityAttribute != null) {
+                if (entityAttribute is GloballyCachedEntityAttribute cachedEntityAttribute) {
                     CacheTimeout = cachedEntityAttribute.Timeout;
                     IsGloballyCached = true;
                 }
             }
+
         }
 
 
@@ -49,6 +54,7 @@ namespace Dccelerator.DataAccess.Implementation {
 
 #region Implementation of IEntityInfo
 
+        public virtual string TableName { get; }
         public virtual string EntityName { get; }
         public virtual Type EntityType { get; }
         public TimeSpan CacheTimeout { get; }
@@ -106,75 +112,5 @@ namespace Dccelerator.DataAccess.Implementation {
 
         readonly object _lock = new object();
 
-    }
-
-
-
-    class EntityInfoBaseBackend {
-        
-#if NET40
-        internal static Dictionary<string, TAttribute> Get<TAttribute>(Type typeInfo) where TAttribute : SecondaryKeyAttribute {
-#else
-        internal static Dictionary<string, TAttribute> Get<TAttribute>(TypeInfo typeInfo) where TAttribute : SecondaryKeyAttribute {
-#endif
-
-            var dict = new Dictionary<string, TAttribute>();
-
-#if (NET_STANDARD || NET_CORE_APP)
-            var properties = typeInfo.AsType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-#else
-            var properties = typeInfo.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-#endif
-            var attributeType = RUtils<TAttribute>.Type;
-
-            foreach (var property in properties) {
-                var keyAttributes = property.GetCustomAttributes(attributeType, inherit: true).Cast<TAttribute>().ToList();
-                if (keyAttributes.Count < 1)
-                    continue;
-
-                if (keyAttributes.Count > 1)
-                    throw new InvalidOperationException($"Property {typeInfo.FullName}.{property.Name} contains more that one {attributeType.Name}.");
-
-                var attribute = keyAttributes.Single();
-                if (string.IsNullOrWhiteSpace(attribute.Name))
-                    attribute.Name = property.Name;
-
-                dict.Add(property.Name, attribute);
-            }
-
-            return dict;
-        }
-
-
-
-
-
-        static readonly Type _notPersistedAttributeType = typeof(NotPersistedAttribute);
-        static readonly Type _stringType = typeof(string);
-        static readonly Type _byteArrayType = typeof(byte[]);
-        static readonly Type _enumerableType = typeof(IEnumerable);
-
-
-
-
-        internal static readonly Func<PropertyInfo, bool> IsPersistedProperty = property => {
-
-            //? if marked with NotPersistedAttribute
-            if (property.GetCustomAttributesData().Any(x => x.AttributeType() == _notPersistedAttributeType))
-                return false;
-
-            if (!property.CanRead)
-                return false;
-
-            var type = property.PropertyType;
-
-            if (type == _stringType || type.IsAssignableFrom(_byteArrayType))
-                return true;
-
-            if (_enumerableType.IsAssignableFrom(type) || type.GetInfo().IsClass)
-                return false;
-
-            return true;
-        };
     }
 }
