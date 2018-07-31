@@ -165,12 +165,12 @@ namespace Dccelerator.Convertion
                     if (DateTime.TryParse(stringValue, CultureInfo.CurrentUICulture, DateTimeStyles.None, out date))
                         return date;
 
-#if !(NET_CORE_APP || NET_STANDARD)
+#if !(NETSTANDARD1_3)
                     if (DateTime.TryParse(stringValue, CultureInfo.InstalledUICulture, DateTimeStyles.None, out date))
                         return date;
 #endif
                     if (stringValue.Count(x => x == '/') == 2) {
-#if !(NET_CORE_APP || NET_STANDARD)
+#if !(NETSTANDARD1_3)
                         if (DateTime.TryParse(stringValue, CultureInfo.GetCultureInfo("ru-RU"), DateTimeStyles.None, out date))
                             return date;
 #endif

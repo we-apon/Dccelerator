@@ -35,7 +35,7 @@ namespace Dccelerator
         }
 
 
-#if (NET_CORE_APP || NET_STANDARD)
+#if (NETSTANDARD1_3)
         public static IEnumerable<CustomAttributeData> GetCustomAttributesData(this MemberInfo member) => member.CustomAttributes;
 #endif
 

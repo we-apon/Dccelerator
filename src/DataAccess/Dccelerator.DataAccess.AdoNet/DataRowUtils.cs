@@ -1,3 +1,4 @@
+#if !NETSTANDARD1_3
 
 using System;
 using System.Data;
@@ -254,3 +255,4 @@ namespace Dccelerator.DataAccess.Ado {
 }
 
 
+#endif

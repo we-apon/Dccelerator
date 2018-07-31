@@ -67,8 +67,9 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
 
             var targetType = _targetProperty.Info.PropertyType;
 
-            if (targetType.IsAbstract || targetType.IsInterface) {
-                return targetType.IsGenericType
+            var info = targetType.GetInfo();
+            if (info.IsAbstract || info.IsInterface) {
+                return info.IsGenericType
                     ? typeof(List<>).MakeGenericType(Info.EntityType)
                     : typeof(ArrayList);
             }
@@ -101,7 +102,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 if (!string.IsNullOrWhiteSpace(Attribute.KeyIdName))
                     return Attribute.KeyIdName;
 
-                var navigationPropName = (_targetProperty.Info.DeclaringType ?? _targetProperty.Info.ReflectedType ?? _ownerInfo.EntityType).Name;
+                var navigationPropName = (_targetProperty.Info.DeclaringType ?? _ownerInfo.EntityType).Name;
                 var name = GetForeignKeyName(Info, _ownerInfo, prop => prop.Name == navigationPropName, navigationPropName);
                 if (name != null)
                     return name;
@@ -180,7 +181,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                     return _ownerNavigationReferenceName;
 
                 var ownerReference = Info.EntityType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                    .FirstOrDefault(x => x.PropertyType.IsAssignableFrom(_ownerInfo.EntityType) && x.Name == (_targetProperty.Info.DeclaringType ?? _targetProperty.Info.ReflectedType ?? _ownerInfo.EntityType).Name);
+                    .FirstOrDefault(x => x.PropertyType.IsAssignableFrom(_ownerInfo.EntityType) && x.Name == (_targetProperty.Info.DeclaringType ?? _ownerInfo.EntityType).Name);
 
                 _isOwnerReferenceGetted = true;
                 return ownerReference?.Name;

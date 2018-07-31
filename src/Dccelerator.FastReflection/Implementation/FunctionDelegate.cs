@@ -14,7 +14,7 @@ namespace Dccelerator.Reflection
                 return true;
             }
             catch (Exception e) { //todo: add logging
-                Internal.TraceEvent(TraceEventType.Error, e.ToString());
+                Log.TraceEvent(TraceEventType.Error, e.ToString());
                 result = default(TOut);
                 return false;
             }
@@ -25,8 +25,6 @@ namespace Dccelerator.Reflection
 
 
     public class FunctionDelegate<TContext, TP1, TOut> : DelegateContainer<Func<TContext, TP1, TOut>>, IFunctionDelegate<TContext, TP1, TOut>
-
-//, IMethod<TContext, TP1, TOut>
     {
         public FunctionDelegate(MethodInfo method) : base(method) {}
 
@@ -37,7 +35,7 @@ namespace Dccelerator.Reflection
                 return true;
             }
             catch (Exception e) { //todo: add logging
-                Internal.TraceEvent(TraceEventType.Error, e.ToString());
+                Log.TraceEvent(TraceEventType.Error, e.ToString());
                 result = default(TOut);
                 return false;
             }
@@ -56,7 +54,7 @@ namespace Dccelerator.Reflection
                 return true;
             }
             catch (Exception e) { //todo: add logging
-                Internal.TraceEvent(TraceEventType.Error, e.ToString());
+                Log.TraceEvent(TraceEventType.Error, e.ToString());
                 result = default(TOut);
                 return false;
             }

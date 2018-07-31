@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Lazy Loading and navigation properties support for Dccelerator.DataAccess ORM.</Description>
     <AssemblyTitle>Dccelerator.DataAccess.Lazy</AssemblyTitle>
     <VersionPrefix>0.0.12</VersionPrefix>
     <Authors>Kirill Dubinkin</Authors>
-    <TargetFrameworks>net40;net45;netstandard2.0;netcoreapp2.0</TargetFrameworks> <!-- netstandard1.3 -->
+    <TargetFrameworks>net40;netstandard1.3;netstandard2.0</TargetFrameworks> <!-- netstandard1.3 -->
     <AssemblyName>Dccelerator.DataAccess.Lazy</AssemblyName>
     <PackageId>Dccelerator.DataAccess.Lazy</PackageId>
     <PackageTags>ORM Lazy Loading</PackageTags>
@@ -29,65 +29,36 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
+    <PackageReference Include="PostSharp" Version="4.3.43" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;NET40</DefineConstants>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>bin\Debug\net40\Dccelerator.DataAccess.Lazy.xml</DocumentationFile>
-    <DebugSymbols>true</DebugSymbols>
-    <LangVersion>default</LangVersion>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;NET45</DefineConstants>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>bin\Debug\net45\Dccelerator.DataAccess.Lazy.xml</DocumentationFile>
-    <DebugSymbols>true</DebugSymbols>
-    <LangVersion>default</LangVersion>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>bin\Debug\netstandard2.0\Dccelerator.DataAccess.Lazy.xml</DocumentationFile>
-    <DebugSymbols>true</DebugSymbols>
-    <LangVersion>default</LangVersion>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
-    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>bin\Debug\netcoreapp2.0\Dccelerator.DataAccess.Lazy.xml</DocumentationFile>
-    <DebugSymbols>true</DebugSymbols>
-    <LangVersion>default</LangVersion>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <PackageReference Include="PostSharp" Version="5.0.48" />
-    <PackageReference Include="PostSharp.Redist" Version="5.0.48" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
+    <PackageReference Include="PostSharp" Version="5.0.53" />
+    <PackageReference Include="PostSharp.Redist" Version="5.0.53" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="PostSharp" Version="5.0.48" />
-    <PackageReference Include="PostSharp.Redist" Version="5.0.48" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
-    <PackageReference Include="PostSharp" Version="5.0.48" />
-    <PackageReference Include="PostSharp.Redist" Version="5.0.48" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
-    <PackageReference Include="PostSharp" Version="4.3.29" />
+    <PackageReference Include="PostSharp" Version="5.0.53" />
+    <PackageReference Include="PostSharp.Redist" Version="5.0.53" />
   </ItemGroup>
 
 </Project>

@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.DataAccess.Mong
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dccelerator.Specifications.Net46", "specs\Dccelerator.Specifications.Net46\Dccelerator.Specifications.Net46.csproj", "{EC791B19-57FD-443E-86DB-56D2BBD6F87A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.FastReflection", "src\Dccelerator.FastReflection\Dccelerator.FastReflection.csproj", "{18DDAEE0-47B6-4814-8A4B-C0FA6E787B01}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		specs\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.projitems*{33695d1e-6efd-4c81-a607-ae5d541c41be}*SharedItemsImports = 13
@@ -94,6 +96,10 @@ Global
 		{EC791B19-57FD-443E-86DB-56D2BBD6F87A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC791B19-57FD-443E-86DB-56D2BBD6F87A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC791B19-57FD-443E-86DB-56D2BBD6F87A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18DDAEE0-47B6-4814-8A4B-C0FA6E787B01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18DDAEE0-47B6-4814-8A4B-C0FA6E787B01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18DDAEE0-47B6-4814-8A4B-C0FA6E787B01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18DDAEE0-47B6-4814-8A4B-C0FA6E787B01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,6 +118,7 @@ Global
 		{BDB0FAEA-2FF9-4697-A20B-5E5E99CF304A} = {94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}
 		{0EACD7E7-7238-4900-8CCB-E53E924DB447} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
 		{EC791B19-57FD-443E-86DB-56D2BBD6F87A} = {8FCF91C8-AB08-4481-BBEE-94F54CF7F170}
+		{18DDAEE0-47B6-4814-8A4B-C0FA6E787B01} = {94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {86E545B5-25AD-4F90-A8B1-D3FD862AECCD}

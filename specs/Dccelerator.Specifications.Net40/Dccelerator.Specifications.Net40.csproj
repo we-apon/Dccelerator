@@ -122,6 +122,10 @@
       <Project>{ed664bd5-35fd-40e6-9156-1514c14155d6}</Project>
       <Name>Dccelerator.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Dccelerator.FastReflection\Dccelerator.FastReflection.csproj">
+      <Project>{18ddaee0-47b6-4814-8a4b-c0fa6e787b01}</Project>
+      <Name>Dccelerator.FastReflection</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Dccelerator.TraceSourceAspects\Dccelerator.TraceSourceAspects.csproj">
       <Project>{bdb0faea-2ff9-4697-a20b-5e5e99cf304a}</Project>
       <Name>Dccelerator.TraceSourceAspects</Name>

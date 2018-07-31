@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Contains Microsoft SQL Server adapter for Dccelerator.DataAccess ORM.</Description>
     <AssemblyTitle>Dccelerator.DataAccess.Adapters.MsSql</AssemblyTitle>
-    <VersionPrefix>0.0.12</VersionPrefix>
+    <Version>0.0.17</Version>
     <Authors>Kirill Dubinkin</Authors>
-    <TargetFrameworks>net40;net45;netstandard2.0;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>net40;netstandard1.3;netstandard2.0</TargetFrameworks>
     <AssemblyName>Dccelerator.DataAccess.Adapters.MsSql</AssemblyName>
     <PackageId>Dccelerator.DataAccess.Adapters.MsSql</PackageId>
     <PackageTags>ORM ADO.NET SQLClient MSSQL SQL</PackageTags>
@@ -20,40 +20,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    
-  </ItemGroup>
-
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <DefineConstants>$(DefineConstants);NET40;JETBRAINS_ANNOTATIONS</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <DefineConstants>$(DefineConstants);NET45;JETBRAINS_ANNOTATIONS</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>0.0.17</Version>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net40|AnyCPU'">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net40|AnyCPU'">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
     <ProjectReference Include="..\Dccelerator.DataAccess.AdoNet\Dccelerator.DataAccess.AdoNet.csproj" />
   </ItemGroup>
+
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
 
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
@@ -61,17 +45,14 @@
     <Reference Include="System.Transactions" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-    <ProjectReference Include="..\Dccelerator.DataAccess.AdoNet\Dccelerator.DataAccess.AdoNet.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
-    <ProjectReference Include="..\Dccelerator.DataAccess.AdoNet\Dccelerator.DataAccess.AdoNet.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
-    <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
-    <ProjectReference Include="..\Dccelerator.DataAccess.AdoNet\Dccelerator.DataAccess.AdoNet.csproj" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
 
 </Project>

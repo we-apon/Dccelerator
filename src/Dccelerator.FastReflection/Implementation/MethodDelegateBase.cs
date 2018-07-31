@@ -61,7 +61,7 @@ namespace Dccelerator.Reflection
             var delegateParametersCount = delegateArgs.Length - (IsAction ? 0 : 1);
 
             if (delegateParametersCount != Parameters.Length + 1) {
-                Internal.TraceEvent(TraceEventType.Warning, $"Delegate {typeof(TFunc)} has {delegateParametersCount} parameters, but should has {Parameters.Length + 1} for calling method {DeclaringType.FullName}.{Method.Name}()");
+                Log.TraceEvent(TraceEventType.Warning, $"Delegate {typeof(TFunc)} has {delegateParametersCount} parameters, but should has {Parameters.Length + 1} for calling method {DeclaringType.FullName}.{Method.Name}()");
             }
 
 
@@ -101,7 +101,7 @@ namespace Dccelerator.Reflection
                 return Expression.Lambda<TFunc>(methodCall, delegateParameters).Compile();
             }
             catch (Exception e) {
-                Internal.TraceEvent(TraceEventType.Critical, $"Failed generating delegate to method {DeclaringType.FullName}.{Method.Name}()\n\n{e}");
+                Log.TraceEvent(TraceEventType.Critical, $"Failed generating delegate to method {DeclaringType.FullName}.{Method.Name}()\n\n{e}");
                 return default(TFunc);
             }
         }

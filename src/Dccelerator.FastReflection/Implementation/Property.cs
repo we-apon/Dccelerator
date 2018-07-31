@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Reflection;
-using Dccelerator.Convertion;
 
 
 namespace Dccelerator.Reflection {
@@ -53,14 +52,14 @@ namespace Dccelerator.Reflection {
 
         public bool TrySetValue(object context, object value) {
             try {
-                var val = value is TType type
-                    ? type
-                    : (TType)(value.ConvertTo(typeof (TType)));
-
-                return Setter.TryInvoke((TContext)context, val);
+                if (value is TType casted)
+                    return Setter.TryInvoke((TContext) context, casted);
+                
+                Log.TraceEvent(TraceEventType.Warning, $"Can't set property '{Info.PropertyType} {Info.DeclaringType.FullName}.{Info.Name}' with value of type '{value?.GetType()}'");
+                return false;
             }
             catch (Exception e) {
-                Internal.TraceEvent(TraceEventType.Error, e.ToString());
+                Log.TraceEvent(TraceEventType.Error, e.ToString());
                 return false;
             }
         }
@@ -76,7 +75,7 @@ namespace Dccelerator.Reflection {
             if (method != null)
                 return new ActionDelegate<TContext, TType>(method);
 
-            Internal.TraceEvent(TraceEventType.Warning, $"Property {(Info.ReflectedType() ?? Info.DeclaringType)?.FullName}.{Info.Name} has not setter, but {nameof(TrySetValue)} extension invoked on it!");
+            Log.TraceEvent(TraceEventType.Warning, $"Property {Info.DeclaringType?.FullName}.{Info.Name} has not setter, but {nameof(TrySetValue)} extension invoked on it!");
             return new NotExistedDelegate();
         }
 
@@ -86,7 +85,7 @@ namespace Dccelerator.Reflection {
             if (method != null)
                 return new FunctionDelegate<TContext, TType>(method);
 
-            Internal.TraceEvent(TraceEventType.Warning, $"Property {(Info.ReflectedType() ?? Info.DeclaringType)?.FullName}.{Info.Name} has not getter, but {nameof(TryGetValue)} extension invoked on it!");
+            Log.TraceEvent(TraceEventType.Warning, $"Property {Info.DeclaringType?.FullName}.{Info.Name} has not getter, but {nameof(TryGetValue)} extension invoked on it!");
             return new NotExistedDelegate();
         }
         

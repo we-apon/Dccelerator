@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Dccelerator.Reflection;
 using JetBrains.Annotations;
 
 
@@ -33,8 +34,13 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
                 sqlType = SqlDbType.UniqueIdentifier;
             else if (type.IsAssignableFrom(_stringType))
                 sqlType = SqlDbType.NVarChar;
+#if NETSTANDARD1_3
+            else if (type.GetInfo().IsEnum)
+                sqlType = SqlDbType.Int;
+#else
             else if (type.IsEnum)
                 sqlType = SqlDbType.Int;
+#endif
             else if (type.IsAssignableFrom(_dateTimeType))
                 sqlType = SqlDbType.DateTime;
             else if (type.IsAssignableFrom(_booleanType))
@@ -101,14 +107,14 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
                          && !excludedPropNames.Contains(x.Name)
                          && !x.IsDefined<NotPersistedAttribute>()
                          && (x.PropertyType.IsAssignableFrom(_stringType) || _byteArrayType.IsAssignableFrom(x.PropertyType)
-                             || (!_enumerableType.IsAssignableFrom(x.PropertyType) && !x.PropertyType.IsClass)))
+                             || (!_enumerableType.IsAssignableFrom(x.PropertyType) && !x.PropertyType.GetInfo().IsClass)))
                 .ToArray();
 
             return GetParametersFor(props, entity);
         }
 
 
-        #region private
+#region private
 
         static readonly Type _stringType = typeof (string);
         static readonly Type _booleanType = typeof (bool);
@@ -144,7 +150,7 @@ namespace Dccelerator.DataAccess.Ado.SqlClient {
             return new SqlParameter(Dog + prop.Name, type) {Value = prop.GetValue(entity, null)};
         }
 
-        #endregion
+#endregion
 
     }
 }

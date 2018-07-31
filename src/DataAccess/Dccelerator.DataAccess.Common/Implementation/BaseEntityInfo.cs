@@ -22,9 +22,11 @@ namespace Dccelerator.DataAccess.Implementation {
             var entityAttribute = entityType.GetConfigurationForRepository(typeof(TRepository));
             if (entityAttribute != null) {
                 EntityName = entityAttribute.Name ?? entityType.Name;
-                Repository = entityAttribute.Repository?.CreateInstance() as TRepository;
                 UsingQueries = entityAttribute.UseQueries;
                 TableName = entityAttribute.TableName ?? table;
+
+                if (entityAttribute.Repository != null)
+                    Repository = Activator.CreateInstance(entityAttribute.Repository) as TRepository;
 
                 if (entityAttribute is GloballyCachedEntityAttribute cachedEntityAttribute) {
                     CacheTimeout = cachedEntityAttribute.Timeout;

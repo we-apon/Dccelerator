@@ -1,3 +1,4 @@
+#if !NETSTANDARD1_3
 
 using System;
 using System.Collections.Concurrent;
@@ -140,3 +141,5 @@ namespace Dccelerator.DataAccess.Ado {
         }
     }
 }
+
+#endif

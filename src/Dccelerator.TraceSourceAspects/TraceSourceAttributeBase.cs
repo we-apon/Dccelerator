@@ -3,12 +3,11 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
+using Newtonsoft.Json;
 using PostSharp.Aspects;
 
 
@@ -428,136 +427,39 @@ namespace Dccelerator.TraceSourceAttributes {
         }
 
 
-        static Func<object, string> _toJson;
-
 
         /// <summary>
         /// Форматирует значение в JSON.
         /// </summary>
         protected virtual string FormatToJSON(object value, bool printTypeNames) {
-            if (_toJson == null) {
+
+            string formated;
+
+            if (_serializationFailed.Keys.Contains(value.GetType())) {
+                formated = value.ToString();
+            }
+            else {
                 try {
-                    _toJson = GetNewtonSoftSerializer() ?? GetDataContractSerializer();
-                }
-                catch (Exception e) {
-                    Tracer.TraceEvent(TraceEventType.Warning, WarningId, $"Can't get serialization delegate\n{e}");
-                }
-
-                _toJson = _toJson ?? (val => val.ToString());
-
-                return printTypeNames ? $"{FormatType(value.GetType())} {_toJson(value)}" : _toJson(value);
-            }
-
-            return printTypeNames
-                ? $"{FormatType(value.GetType())} {_toJson(value)}"
-                : _toJson(value);
-        }
-
-
-        /// <summary>
-        /// Возвращает делегат для сериализации значения через Newtonsoft.Json.JsonConvert.
-        /// Сборка Newtonsoft.Json должна быть загружена в текущий домен приложения, или хотя бы доступна для загрузки по относительному пути.
-        /// </summary>
-        Func<object, string> GetNewtonSoftSerializer() {
-
-            MethodInfo serializeObject;
-            object indented;
-
-            try {
-                var inBasePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Newtonsoft.Json.dll");
-                var path = File.Exists(inBasePath) ? inBasePath : "Newtonsoft.Json.dll";
-
-                var newton = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "Newtonsoft.Json");
-                newton = newton ?? Assembly.LoadFrom(path);
-
-                if (newton == null)
-                    return null;
-
-                var jsonConvert = newton.GetType("Newtonsoft.Json.JsonConvert");
-                var formating = newton.GetType("Newtonsoft.Json.Formatting");
-                if (jsonConvert == null)
-                    return null;
-
-                serializeObject = jsonConvert.GetMethod("SerializeObject", new[] {typeof(object), formating});
-                if (serializeObject == null)
-                    return null;
-
-                indented = Enum.Parse(formating, "Indented");
-
-            }
-            catch (Exception e) {
-                Tracer.TraceEvent(TraceEventType.Warning, WarningId, $"Can't get Newtonsoft.Json serializer\n{e}");
-                return null;
-            }
-
-            return value => {
-                try {
-                    if (_serializationFailed.Keys.Contains(value.GetType()))
-                        return value.ToString();
-
-                    return serializeObject.Invoke(null, new[] {value, indented}) as string;
+                    formated = JsonConvert.SerializeObject(value, Formatting.Indented);
                 }
                 catch (Exception e) {
                     Tracer.TraceEvent(TraceEventType.Warning, WarningId, $"Can't serialize with Newtonsoft.Json\n{e}");
                     _serializationFailed.TryAdd(value.GetType(), true);
-                    return value.ToString();
+                    formated = value.ToString();
                 }
-            };
+            }
+
+            return printTypeNames
+                ? $"{FormatType(value.GetType())} {formated}"
+                : formated;
         }
+
 
 
         static readonly ConcurrentDictionary<Type, bool> _serializationFailed = new ConcurrentDictionary<Type, bool>();
 
 
-
-        /// <summary>
-        /// Возвращает делегат для сериализации значения через <see cref="DataContractJsonSerializer"/>
-        /// </summary>
-        Func<object, string> GetDataContractSerializer() {
-
-            MethodInfo writeObject;
-            Type serializerType;
-
-            try {
-
-                var serialization = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "System.Runtime.Serialization");
-                var pf = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-                var path = Path.Combine(pf, @"Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Runtime.Serialization.dll");
-
-                serialization = serialization ?? Assembly.LoadFrom(path);
-
-                serializerType = serialization.GetType("System.Runtime.Serialization.Json.DataContractJsonSerializer");
-                if (serializerType == null)
-                    return null;
-
-                writeObject = serializerType.GetMethod("WriteObject", new[] {typeof(Stream), typeof(object)});
-            }
-            catch (Exception e) {
-                Tracer.TraceEvent(TraceEventType.Warning, WarningId, $"Can't get DataContractJsonSerializer\n{e}");
-                throw;
-            }
-
-            return value => {
-                try {
-                    if (_serializationFailed.Keys.Contains(value.GetType()))
-                        return value.ToString();
-
-                    var serializer = Activator.CreateInstance(serializerType, value.GetType());
-                    using (var stream = new MemoryStream()) {
-                        writeObject.Invoke(serializer, new[] {stream, value});
-                        return Encoding.UTF8.GetString(stream.ToArray());
-                    }
-                }
-                catch (Exception e) {
-                    Tracer.TraceEvent(TraceEventType.Warning, WarningId, $"Can't serialize with DataContractJsonSerializer\n{e}");
-                    _serializationFailed.TryAdd(value.GetType(), true);
-                    return value.ToString();
-                }
-            };
-        }
-
-
-
+        
 
         /// <summary>
         /// <para xml:lang="en"></para>

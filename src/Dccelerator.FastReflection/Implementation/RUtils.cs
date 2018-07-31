@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using FastMember;
-using JetBrains.Annotations;
 
 
 namespace Dccelerator.Reflection
@@ -34,7 +32,7 @@ namespace Dccelerator.Reflection
         /// </returns>
         /// <exception cref="ArgumentNullException">When <paramref name="parent"/> or <paramref name="child"/> is null</exception>
         /// <exception cref="InvalidOperationException">When <paramref name="parent"/> and <paramref name="child"/> arguments are not siblings.</exception>
-        public static int GetGenerationNumberTo(this Type parent, [NotNull] Type child) {
+        public static int GetGenerationNumberTo(this Type parent, Type child) {
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));
 
@@ -86,7 +84,7 @@ namespace Dccelerator.Reflection
                 declarationMapping = props.ToDictionary(x => x.DeclaringType, x => x);
             }
             catch (Exception e) {
-                Internal.TraceEvent(TraceEventType.Error, e.ToString());
+                Log.TraceEvent(TraceEventType.Error, e.ToString());
                 throw;
             }
 
@@ -102,7 +100,7 @@ namespace Dccelerator.Reflection
             var error = $"Seems that passed properties doesn't belong to type '{type.FullName}'. "
                         + $"\nPassed props {{"
                         + $"\n\t{string.Join("\n,", declarationMapping.Select(x => $"\"{x.Key.FullName}\": \"{x.Value.Name}\""))}}}";
-            Internal.TraceEvent(TraceEventType.Critical, error);
+            Log.TraceEvent(TraceEventType.Critical, error);
             throw new Exception(error);
         }
         
@@ -158,16 +156,22 @@ namespace Dccelerator.Reflection
             }
 
             var type = context.GetType();
-            try {
-                var accessor = TypeAccessor.Create(type, true);
-                value = accessor[context, path];
-                return true;
+            var prop = GetPropertyPath(type, path);
+            if (prop != null) {
+                try {
+                    value = prop.Get(context);
+                    return true;
+                }
+                catch (Exception e) {
+                    Log.TraceEvent(TraceEventType.Error, $"Can't get value from path {type.FullName}.{path}\n\n{e}");
+                    value = null;
+                    return false;
+                }
             }
-            catch (Exception e) {
-                Internal.TraceEvent(TraceEventType.Error, $"Can't get value from path {type.FullName}.{path}\n\n{e}");
-                value = null;
-                return false;
-            }
+
+            Log.TraceEvent(TraceEventType.Warning, $"There is no property or field {type.FullName}.{path}");
+            value = null;
+            return false;
         }
 
 
@@ -185,7 +189,7 @@ namespace Dccelerator.Reflection
             if (propertyPath != null)
                 return propertyPath.Get(context);
             
-            Internal.TraceEvent(TraceEventType.Warning, $"There is no property or field {type.FullName}.{path}");
+            Log.TraceEvent(TraceEventType.Warning, $"There is no property or field {type.FullName}.{path}");
             return null;
         }
 
@@ -205,15 +209,20 @@ namespace Dccelerator.Reflection
 
             var type = context.GetType();
 
-            try {
-                var accessor = TypeAccessor.Create(type, true);
-                accessor[context, path] = value;
-                return true;
+            var prop = GetPropertyPath(type, path);
+            if (prop != null) {
+                try {
+                    prop.Set(context, value);
+                    return true;
+                }
+                catch (Exception e) {
+                    Log.TraceEvent(TraceEventType.Error, $"Can't set value '{value}' on path {type.FullName}.{path}\n\n{e}");
+                    return false;
+                }
             }
-            catch (Exception e) {
-                Internal.TraceEvent(TraceEventType.Error, $"Can't set value '{value}' on path {type.FullName}.{path}\n\n{e}");
-                return false;
-            }
+
+            Log.TraceEvent(TraceEventType.Warning, $"There is no property or field {type.FullName}.{path}");
+            return false;
         }
 
 

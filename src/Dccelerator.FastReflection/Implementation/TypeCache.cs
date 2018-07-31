@@ -150,32 +150,6 @@ namespace Dccelerator.Reflection
                 : assignables[valueType];
         }
 
-/*
-
-        public static object DefaultInstanceOf(Type type) {
-            if (GetInfo(type).IsClass)
-                return null;
-
-            object instance;
-
-
-            if (_defaultInstances.TryGetValue(type, out instance))
-                return instance;
-
-            try {
-                instance = Activator.CreateInstance(type);
-            }
-            catch (Exception) {
-                instance = null;
-            }
-
-
-            return _defaultInstances.TryAdd(type, instance)
-                ? instance
-                : _defaultInstances[type];
-        }
-*/
-
 
 
         public static bool IsInherited(this Type childType, Type parentType) {
@@ -356,25 +330,6 @@ namespace Dccelerator.Reflection
 
             return TopInHierarchy(GetInfo(type).BaseType, one, two);
         }
-
-
-
-
-        /// <summary>
-        /// <see cref="Activator"/>.<see cref="Activator.CreateInstance(Type)"/> as extension.
-        /// </summary>
-        public static object CreateInstance(this Type type) {
-            return Activator.CreateInstance(type);
-        }
-
-
-        /// <summary>
-        /// <see cref="Activator"/>.<see cref="Activator.CreateInstance(Type, object[])"/> as extension.
-        /// </summary>
-        public static object CreateInstance(this Type type, params object[] args) {
-            return Activator.CreateInstance(type, args);
-        }
-
 
 
 

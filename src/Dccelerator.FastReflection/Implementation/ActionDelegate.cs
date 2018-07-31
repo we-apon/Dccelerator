@@ -15,7 +15,7 @@ namespace Dccelerator.Reflection
                 return true;
             }
             catch (Exception e) {
-                Internal.TraceEvent(TraceEventType.Error, e.ToString());
+                Log.TraceEvent(TraceEventType.Error, e.ToString());
                 return false;
             }
         }
@@ -33,7 +33,7 @@ namespace Dccelerator.Reflection
                 return true;
             }
             catch (Exception e) {
-                Internal.TraceEvent(TraceEventType.Error, e.ToString());
+                Log.TraceEvent(TraceEventType.Error, e.ToString());
                 return false;
             }
         }

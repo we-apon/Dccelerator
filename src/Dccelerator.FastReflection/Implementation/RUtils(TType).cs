@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using FastMember;
-using JetBrains.Annotations;
 
 
 namespace Dccelerator.Reflection {
@@ -33,7 +31,7 @@ namespace Dccelerator.Reflection {
         public static readonly TypeInfo Info = Type.GetTypeInfo();
 #endif
 
-        static readonly TypeAccessor _accessor = TypeAccessor.Create(Type);
+        //static readonly TypeAccessor _accessor = TypeAccessor.Create(Type);
 
 
         #region Attributes
@@ -168,13 +166,13 @@ namespace Dccelerator.Reflection {
                     return true;
                 }
                 catch (Exception e) {
-                    Internal.TraceEvent(TraceEventType.Error, $"Can't get value from path {Type.FullName}.{path}\n\n{e}");
+                    Log.TraceEvent(TraceEventType.Error, $"Can't get value from path {Type.FullName}.{path}\n\n{e}");
                     value = null;
                     return false;
                 }
             }
 
-            Internal.TraceEvent(TraceEventType.Warning, $"There is no property or field {Type.FullName}.{path}");
+            Log.TraceEvent(TraceEventType.Warning, $"There is no property or field {Type.FullName}.{path}");
 
             value = null;
             return false;
@@ -219,12 +217,12 @@ namespace Dccelerator.Reflection {
                     return true;
                 }
                 catch (Exception e) {
-                    Internal.TraceEvent(TraceEventType.Error, $"Can't set value '{value}' on path {Type.FullName}.{path}\n\n{e}");
+                    Log.TraceEvent(TraceEventType.Error, $"Can't set value '{value}' on path {Type.FullName}.{path}\n\n{e}");
                     return false;
                 }
             }
 
-            Internal.TraceEvent(TraceEventType.Warning, $"There is no property or field {Type.FullName}.{path}");
+            Log.TraceEvent(TraceEventType.Error, $"There is no property or field {Type.FullName}.{path}");
             return false;
         }
 
@@ -308,7 +306,7 @@ namespace Dccelerator.Reflection {
                 .ToList();
 
             if (props.Count > 1)
-                Internal.TraceEvent(TraceEventType.Warning, $"Type {type.FullName} contains {props.Count} properties named {name}. Most closely declared property will be selected for reflection access through Dccelerator API, so make sure that here will not be any collisions");
+                Log.TraceEvent(TraceEventType.Warning, $"Type {type.FullName} contains {props.Count} properties named {name}. Most closely declared property will be selected for reflection access through Dccelerator API, so make sure that here will not be any collisions");
 
             var prop = props.MostClosedPropertyTo(type);
             if (prop == null)
@@ -322,7 +320,6 @@ namespace Dccelerator.Reflection {
         }
 
 
-        [CanBeNull]
         static PropertyPath make_property_path(string path) {
             var propertyPath = new PropertyPath();
 

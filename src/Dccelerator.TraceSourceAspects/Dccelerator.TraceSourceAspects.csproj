@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFrameworks>net40;netstandard2.0</TargetFrameworks>
     <Description>Contains TraceSourceAttribute - a PostSharp-based aspect for simple but rich logging with .Net System.Diagnostics framework. It makes completely simple to use activity tracing and locial operations stacks.</Description>
     <Copyright>Copyright © Kirill Dubinkin 2017-2018</Copyright>
     <AssemblyTitle>Dccelerator.TraceSourceAspects</AssemblyTitle>
     <VersionPrefix>0.0.17</VersionPrefix>
     <Authors>Kirill Dubinkin</Authors>
-    <TargetFramework>net40</TargetFramework>
     <AssemblyName>Dccelerator.TraceSourceAspects</AssemblyName>
     <PackageId>Dccelerator.TraceSourceAspects</PackageId>
     <PackageTags>TraceSource Diagnostics Logging AOP Aspects ActivityTracing LogicalOperationStack</PackageTags>
@@ -17,34 +17,49 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <DefineConstants>$(DefineConstants);NET40;JETBRAINS_ANNOTATIONS</DefineConstants>
-  </PropertyGroup>
-
+  
   <PropertyGroup>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>0.0.17</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>full</DebugType>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <PackageReference Include="PostSharp" Version="5.0.48" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
+    <PackageReference Include="PostSharp" Version="4.3.43" />
+  </ItemGroup>
+
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="PostSharp" Version="5.0.53" />
+    <PackageReference Include="PostSharp.Redist" Version="5.0.53" />
+    <PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />
+  </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="PostSharp.Redist" Version="5.0.48" />
+    <Compile Remove="publish\**" />
+    <EmbeddedResource Remove="publish\**" />
+    <None Remove="publish\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
 </Project>

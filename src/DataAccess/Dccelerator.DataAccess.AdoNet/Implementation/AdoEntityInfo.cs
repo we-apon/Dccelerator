@@ -130,8 +130,11 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
             if (ReaderColumns != null)
                 return;
             
-            var columns = reader.GetSchemaTable()?.Rows.Cast<DataRow>().Select(x => (string) x[0]).ToArray();
-
+#if NET40
+            var columns = reader.GetSchemaTable()?.Rows.Cast<DataRow>().Select(x => (string)x[0]).ToArray();
+#else
+            var columns = reader.GetColumnSchema().Select(x => x.ColumnName).ToArray();
+#endif           
             lock (_lock) {
                 if (ReaderColumns == null)
                     ReaderColumns = columns;
@@ -183,7 +186,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
         
 
 
-        #endregion
+#endregion
     }
 
 
