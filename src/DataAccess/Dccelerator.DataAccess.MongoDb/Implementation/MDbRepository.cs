@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dccelerator.DataAccess.Lazy;
-using Dccelerator.Reflection;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
@@ -50,7 +49,7 @@ namespace Dccelerator.DataAccess.MongoDb.Implementation {
 
         public IEnumerable<object> Read(IEntityInfo info, ICollection<IDataCriterion> criteria) {
             var collection = MongoDatabase().GetCollection<BsonDocument>(info.EntityName);
-            if (!criteria.HasAny())
+            if (criteria.Count != 0)
                 return collection.Find(new BsonDocument()).ToList().Select(x => BsonSerializer.Deserialize<object>(x));
             
             var filter = Builders<BsonDocument>.Filter.And(criteria.Select(x => x.Name == "Id" ? Builders<BsonDocument>.Filter.Eq("_id", x.Value) : Builders<BsonDocument>.Filter.Eq(x.Name, x.Value)));

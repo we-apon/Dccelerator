@@ -3,7 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Dccelerator.DataAccess.Common.Implementation;
-using Dccelerator.Reflection;
+using Dccelerator.UnFastReflection;
+
 
 namespace Dccelerator.DataAccess.Ado.Implementation {
     public abstract class CachedReadingRepository : DirectReadingRepository

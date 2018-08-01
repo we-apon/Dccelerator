@@ -7,7 +7,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Dccelerator.DataAccess.Implementation;
-using Dccelerator.Reflection;
+using Dccelerator.EnumerableHelpers;
+using Dccelerator.UnFastReflection;
+
 
 namespace Dccelerator.DataAccess.Ado.Implementation {
 

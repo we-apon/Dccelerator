@@ -3,8 +3,8 @@
 using System;
 using System.Data;
 using System.Diagnostics;
-using Dccelerator.DataAccess.Infrastructure;
-using Dccelerator.Reflection;
+using Dccelerator.UnFastReflection;
+using Dccelerator.UnSmartConvertion;
 using JetBrains.Annotations;
 
 
@@ -49,7 +49,7 @@ namespace Dccelerator.DataAccess.Ado {
                     continue;
 
                 if (!RUtils<T>.TrySet(item, column.ColumnName, value))
-                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {column.ColumnName} from '{typeof (T).FullName}' context.");
+                    Log.TraceEvent(TraceEventType.Warning, $"Can't set property {column.ColumnName} from '{typeof (T).FullName}' context.");
             }
 
             return item;
@@ -68,7 +68,7 @@ namespace Dccelerator.DataAccess.Ado {
                     continue;
 
                 if (!item.TrySet(column.ColumnName, value))
-                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {column.ColumnName} from '{item.GetType().FullName}' context.");
+                    Log.TraceEvent(TraceEventType.Warning, $"Can't set property {column.ColumnName} from '{item.GetType().FullName}' context.");
             }
 
             return item;

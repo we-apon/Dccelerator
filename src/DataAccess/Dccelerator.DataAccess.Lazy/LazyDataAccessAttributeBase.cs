@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Dccelerator.DataAccess.Infrastructure;
-using Dccelerator.Reflection;
+using Dccelerator.UnFastReflection;
 using JetBrains.Annotations;
 using PostSharp;
 using PostSharp.Aspects;
@@ -301,7 +301,7 @@ namespace Dccelerator.DataAccess.Lazy {
                 if (identifiedEntity != null)
                     id = identifiedEntity.Id;
                 else if (!args.Instance.TryGet("Id", out id)) {
-                    Internal.TraceEvent(TraceEventType.Warning, $"Can't get value of property of not identified entity '{args.Instance.GetType().FullName}.Id'");
+                    Log.TraceEvent(TraceEventType.Warning, $"Can't get value of property of not identified entity '{args.Instance.GetType().FullName}.Id'");
                     return null;
                 }
 
@@ -316,7 +316,7 @@ namespace Dccelerator.DataAccess.Lazy {
             }
 
             if (!args.Instance.TryGet(args.Location.PropertyInfo.Name + "Id", out id)) {
-                Internal.TraceEvent(TraceEventType.Warning, $"Can't get value of property '{args.Location.PropertyInfo.Name}Id'");
+                Log.TraceEvent(TraceEventType.Warning, $"Can't get value of property '{args.Location.PropertyInfo.Name}Id'");
                 return null;
             }
 

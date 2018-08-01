@@ -20,6 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Dccelerator.UnSmartConvertion\Dccelerator.UnSmartConvertion.csproj" />
     <ProjectReference Include="..\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.csproj" />
   </ItemGroup>
 
@@ -50,5 +51,8 @@
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="System.Collections.NonGeneric" Version="4.3.0" />
   </ItemGroup>
+
+  
+  <Import Project="..\..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
   
 </Project>

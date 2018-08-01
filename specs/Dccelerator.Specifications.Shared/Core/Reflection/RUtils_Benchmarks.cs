@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Dccelerator.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
@@ -12,6 +11,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Reports;
+using Dccelerator.UnFastReflection;
 using FastMember;
 #if !NET40
 using BenchmarkDotNet.Exporters.Csv;

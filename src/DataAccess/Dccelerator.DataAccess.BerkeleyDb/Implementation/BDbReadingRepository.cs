@@ -35,7 +35,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
                 SecondaryKeyAttribute secondaryKeyInfo;
                 if (!info.SecondaryKeys.TryGetValue(criterion.Name, out secondaryKeyInfo)) {
                     var msg = $"Missed secondaty key '{criterion.Name}' for entity {info.EntityName} ({info.EntityType}).";
-                    Internal.TraceEvent(TraceEventType.Critical, msg);
+                    Log.TraceEvent(TraceEventType.Critical, msg);
                     throw new InvalidOperationException(msg);
                 }
 

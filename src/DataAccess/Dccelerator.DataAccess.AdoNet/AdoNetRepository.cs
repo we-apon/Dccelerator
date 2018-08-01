@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dccelerator.DataAccess.Ado.Implementation;
 using Dccelerator.DataAccess.Infrastructure;
-using Dccelerator.Reflection;
+using Dccelerator.UnFastReflection;
 using JetBrains.Annotations;
 
 
@@ -532,7 +532,7 @@ namespace Dccelerator.DataAccess.Ado {
                                 mainObjects.Add(keyId, item);
                             }
                             catch (Exception e) {
-                                Internal.TraceEvent(TraceEventType.Critical,
+                                Log.TraceEvent(TraceEventType.Critical,
                                     $"On reading '{mainObjectInfo.EntityType}' using special name {mainObjectInfo.EntityName} getted exception, " +
                                     "possibly because reader contains more then one object with same identifier.\n" +
                                     $"Identifier: {keyId}\n" +
@@ -550,7 +550,7 @@ namespace Dccelerator.DataAccess.Ado {
 
                             Includeon includeon;
                             if (!mainObjectInfo.Inclusions.TryGetValue(tableIndex, out includeon)) {
-                                Internal.TraceEvent(TraceEventType.Warning,
+                                Log.TraceEvent(TraceEventType.Warning,
                                     $"Reader for object {mainObjectInfo.EntityType.FullName} returned more than one table, " +
                                     $"but it has not includeon information for table#{tableIndex}.");
                                 continue;
@@ -567,7 +567,7 @@ namespace Dccelerator.DataAccess.Ado {
                                     var item = ReadItem(reader, mainObjectInfo, includeon, out keyId);
 
                                     if (keyId == null) {
-                                        Internal.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.EntityType}, {includeon.Attribute.TargetPath} (used on entity {mainObjectInfo.EntityType}");
+                                        Log.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.EntityType}, {includeon.Attribute.TargetPath} (used on entity {mainObjectInfo.EntityType}");
                                         break;
                                     }
 
@@ -579,7 +579,7 @@ namespace Dccelerator.DataAccess.Ado {
                                                 return; //keyId should be just primary key of ServiceWorkPlace
 
                                             if (!mainObject.TrySet(includeon.Attribute.TargetPath, item))
-                                                Internal.TraceEvent(TraceEventType.Warning,
+                                                Log.TraceEvent(TraceEventType.Warning,
                                                     $"Can't set property {includeon.Attribute.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.EntityType} in result set #{index}.");
                                         });
                                 }
@@ -592,7 +592,7 @@ namespace Dccelerator.DataAccess.Ado {
                                     var item = ReadItem(reader, mainObjectInfo, includeon, out keyId);
 
                                     if (keyId == null) {
-                                        Internal.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.EntityType}, {includeon.Attribute.TargetPath} (used on entity {mainObjectInfo.EntityType}");
+                                        Log.TraceEvent(TraceEventType.Error, $"Can't get key id from item with info {info.EntityType}, {includeon.Attribute.TargetPath} (used on entity {mainObjectInfo.EntityType}");
                                         break;
                                     }
 
@@ -612,13 +612,13 @@ namespace Dccelerator.DataAccess.Ado {
                                     child => {
                                         object mainObject;
                                         if (!mainObjects.TryGetValue(child.Key, out mainObject)) {
-                                            Internal.TraceEvent(TraceEventType.Warning,
+                                            Log.TraceEvent(TraceEventType.Warning,
                                                 $"In result set #{index} finded data row of type {info.EntityType}, that doesn't has owner object in result set #1.\nOwner Id is {child.Key}.\nTarget path is '{includeon.Attribute.TargetPath}'.");
                                             return;
                                         }
 
                                         if (!mainObject.TrySet(includeon.Attribute.TargetPath, child.Value))
-                                            Internal.TraceEvent(TraceEventType.Warning,
+                                            Log.TraceEvent(TraceEventType.Warning,
                                                 $"Can't set property {includeon.Attribute.TargetPath} from '{mainObjectInfo.EntityType.FullName}' context.\nTarget path specified for child item {info.EntityType} in result set #{index}.");
 
                                         if (string.IsNullOrWhiteSpace(includeon.OwnerNavigationReferenceName))
@@ -626,7 +626,7 @@ namespace Dccelerator.DataAccess.Ado {
 
                                         foreach (var item in child.Value) {
                                             if (!item.TrySet(includeon.OwnerNavigationReferenceName, mainObject))
-                                                Internal.TraceEvent(TraceEventType.Warning,
+                                                Log.TraceEvent(TraceEventType.Warning,
                                                     $"Can't set property {includeon.OwnerNavigationReferenceName} from '{info.EntityType}' context. This should be reference to owner object ({mainObject})");
                                         }
                                     });
@@ -686,7 +686,7 @@ namespace Dccelerator.DataAccess.Ado {
                     keyId = value;
 
                 if (!item.TrySet(name, value))
-                    Internal.TraceEvent(TraceEventType.Warning, $"Can't set property {name} from '{entityType.FullName}' context.");
+                    Log.TraceEvent(TraceEventType.Warning, $"Can't set property {name} from '{entityType.FullName}' context.");
             }
             return item;
         }

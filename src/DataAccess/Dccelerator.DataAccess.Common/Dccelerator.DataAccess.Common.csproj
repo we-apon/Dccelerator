@@ -55,4 +55,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
+  <Import Project="..\..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
+
 </Project>

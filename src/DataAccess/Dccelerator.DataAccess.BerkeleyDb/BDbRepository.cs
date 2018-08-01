@@ -59,7 +59,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 cursor.Add(new KeyValuePair<DatabaseEntry, DatabaseEntry>(key, DataOf(element.Entity)));
             else {
                 var message = $"On inserting, database already contains entity with key {key.Data}\n{element.Entity}";
-                Internal.TraceEvent(TraceEventType.Error, message);
+                Log.TraceEvent(TraceEventType.Error, message);
                 throw new InvalidOperationException(message);
             }
         }
@@ -74,7 +74,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 cursor.Overwrite(DataOf(element.Entity));
             else {
                 var message = $"On updating, database doesn't contains entity with key {key.Data}\n{element.Entity}";
-                Internal.TraceEvent(TraceEventType.Error, message);
+                Log.TraceEvent(TraceEventType.Error, message);
                 throw new InvalidOperationException(message);
             }
         }
@@ -91,7 +91,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
             else {
                 
                 var message = $"On deleting, database doesn't contains entity with key {key.Data}\n{element.Entity}";
-                Internal.TraceEvent(TraceEventType.Error, message);
+                Log.TraceEvent(TraceEventType.Error, message);
                 throw new InvalidOperationException(message);
             }
         }
@@ -175,7 +175,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                     SecondaryKeyAttribute secondaryKey;
                     if (!info.SecondaryKeys.TryGetValue(criterion.Name, out secondaryKey)) {
                         var msg = $"Missed secondaty key '{criterion.Name}' for entity {info.EntityName} ({info.EntityType}).";
-                        Internal.TraceEvent(TraceEventType.Critical, msg);
+                        Log.TraceEvent(TraceEventType.Critical, msg);
                         throw new InvalidOperationException(msg);
                     }
 
@@ -238,7 +238,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb {
                 return true;
             }
             catch (Exception e) {
-                Internal.TraceEvent(TraceEventType.Error, e.ToString());
+                Log.TraceEvent(TraceEventType.Error, e.ToString());
                 transaction?.Abort();
                 return false;
             }

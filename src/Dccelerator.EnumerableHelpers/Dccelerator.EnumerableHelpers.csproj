@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net40;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <RootNamespace>Dccelerator.EnumerableHelpers</RootNamespace>
+    <Authors>Kirill Dubinkin</Authors>
+    <Product>Dccelerator</Product>
+    <Description>Implementation of runtime-generated delegates, useful for accessing objects faster than with standard .net reflection.</Description>
+    <Copyright>Copyright © Kirill Dubinkin 2015-2018</Copyright>
+    <PackageLicenseUrl>https://github.com/we-apon/Dccelerator/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/we-apon/Dccelerator</PackageProjectUrl>
+    <PackageTags>enumerable enumerables collection collections extension extensions helper helpers</PackageTags>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
+    <PackageReference Include="System.Diagnostics.TraceSource">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <Import Project="..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
+
+</Project>

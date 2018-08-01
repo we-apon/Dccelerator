@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using Dccelerator.Reflection;
+using Dccelerator.UnFastReflection;
+
 
 namespace Dccelerator.DataAccess.Ado.Implementation.Internal {
 

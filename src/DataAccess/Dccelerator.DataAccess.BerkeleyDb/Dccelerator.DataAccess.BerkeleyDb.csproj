@@ -51,4 +51,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
+  <Import Project="..\..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
+
 </Project>

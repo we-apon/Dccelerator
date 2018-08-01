@@ -61,4 +61,6 @@
     <PackageReference Include="PostSharp.Redist" Version="5.0.53" />
   </ItemGroup>
 
+  <Import Project="..\..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
+
 </Project>

@@ -1,5 +1,6 @@
 ﻿using Dccelerator.DataAccess.BerkeleyDb.Implementation;
-using Dccelerator.Reflection;
+using Dccelerator.UnFastReflection;
+
 
 namespace Dccelerator.DataAccess.BerkeleyDb.Infrastructure {
     class BDbInfoAbout<TEntity> {

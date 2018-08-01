@@ -60,9 +60,6 @@
     <Reference Include="FastMember, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\FastMember.1.4.1\lib\net461\FastMember.dll</HintPath>
     </Reference>
-    <Reference Include="JetBrains.Annotations, Version=2018.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\JetBrains.Annotations.2018.2.1\lib\net20\JetBrains.Annotations.dll</HintPath>
-    </Reference>
     <Reference Include="Machine.Specifications, Version=0.12.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Machine.Specifications.0.12.0\lib\net45\Machine.Specifications.dll</HintPath>
     </Reference>
@@ -282,9 +279,9 @@
       <Project>{ed664bd5-35fd-40e6-9156-1514c14155d6}</Project>
       <Name>Dccelerator.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Dccelerator.FastReflection\Dccelerator.FastReflection.csproj">
+    <ProjectReference Include="..\..\src\Dccelerator.UnFastReflection\Dccelerator.UnFastReflection.csproj">
       <Project>{18ddaee0-47b6-4814-8a4b-c0fa6e787b01}</Project>
-      <Name>Dccelerator.FastReflection</Name>
+      <Name>Dccelerator.UnFastReflection</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Dccelerator.TraceSourceAspects\Dccelerator.TraceSourceAspects.csproj">
       <Project>{bdb0faea-2ff9-4697-a20b-5e5e99cf304a}</Project>

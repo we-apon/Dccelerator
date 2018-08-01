@@ -1,9 +1,10 @@
-﻿#if NET40 || NET45
+﻿#if !NETSTANDARD1_3
 
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using Dccelerator.UnSmartConvertion;
 
 
 namespace Dccelerator {
@@ -31,7 +32,7 @@ namespace Dccelerator {
                     return stream.ToArray();
                 }
                 catch (Exception e) {
-                    Internal.TraceEvent(TraceEventType.Error, $"Can't serialize entity {entity} to {nameof(Byte)}[].\n\n{e}");
+                    Log.TraceEvent(TraceEventType.Error, $"Can't serialize entity {entity} to {nameof(Byte)}[].\n\n{e}");
                     return null;
                 }
             }

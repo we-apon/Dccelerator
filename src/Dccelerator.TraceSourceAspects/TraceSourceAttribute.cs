@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Dccelerator.TraceSourceAttributes {
+namespace Dccelerator.TraceSourceAspects {
 
     /// <summary>
     /// <para xml:lang="en"></para>

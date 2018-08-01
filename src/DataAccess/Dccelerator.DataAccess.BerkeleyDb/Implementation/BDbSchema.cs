@@ -7,8 +7,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BerkeleyDB;
-using Dccelerator.Reflection;
 using Dccelerator.DataAccess.Infrastructure;
+using Dccelerator.UnFastReflection;
 using JetBrains.Annotations;
 
 
@@ -57,7 +57,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
 
             if (Path.GetFileName(_dbPath) != _dbPath) {
                 var msg = $"BerkeleyDb file name '{dbPath}' is an absolute or relative path, but should be just file name (with or without extension)";
-                Internal.TraceEvent(TraceEventType.Error, msg);
+                Log.TraceEvent(TraceEventType.Error, msg);
                 throw new ArgumentException(msg, nameof(dbPath));
             }
 
@@ -67,7 +67,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
                 }
                 catch (Exception e) {
                     var msg = $"Can't create environment directory {environmentPath}";
-                    Internal.TraceEvent(TraceEventType.Error, msg);
+                    Log.TraceEvent(TraceEventType.Error, msg);
                     throw new InvalidOperationException(msg, e);
                 }
             }

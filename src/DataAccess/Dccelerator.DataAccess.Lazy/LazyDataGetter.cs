@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
-using Dccelerator.Reflection;
-
+using Dccelerator.EnumerableHelpers;
+using Dccelerator.UnFastReflection;
 
 
 namespace Dccelerator.DataAccess.Lazy {
@@ -95,7 +95,11 @@ namespace Dccelerator.DataAccess.Lazy {
         IEnumerable<object> LazyLoad(LazyEntity parent, Type type, ICollection<IDataCriterion> criteria) {
             var info = _lazyFactory.InfoAbout(type);
             var repository = _lazyFactory.ReadingRepository();
-            return repository.Read(info, criteria).Perform(item => CopyLazyContext(parent, item));
+
+            foreach (var item in repository.Read(info, criteria)) {
+                CopyLazyContext(parent, item);
+                yield return item;
+            }
         }
 
 

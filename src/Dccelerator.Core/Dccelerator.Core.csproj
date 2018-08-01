@@ -42,7 +42,6 @@ It contains some nice stuff like RUtils, SmartConvert and many usefull reflectio
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
@@ -55,7 +54,8 @@ It contains some nice stuff like RUtils, SmartConvert and many usefull reflectio
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dccelerator.FastReflection\Dccelerator.FastReflection.csproj" />
+    <ProjectReference Include="..\Dccelerator.UnFastReflection\Dccelerator.UnFastReflection.csproj" />
+    <ProjectReference Include="..\Dccelerator.UnSmartConvertion\Dccelerator.UnSmartConvertion.csproj" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -67,5 +67,7 @@ It contains some nice stuff like RUtils, SmartConvert and many usefull reflectio
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+
+  <Import Project="..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
 
 </Project>

@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using Dccelerator.Reflection;
+using Dccelerator.UnFastReflection;
+
 
 namespace Dccelerator.DataAccess.Ado.Implementation {
 
