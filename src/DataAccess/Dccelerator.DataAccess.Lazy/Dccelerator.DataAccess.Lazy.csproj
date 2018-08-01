@@ -21,7 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Dccelerator.EnumerableHelpers\Dccelerator.EnumerableHelpers.csproj" />
+    <ProjectReference Include="..\..\Dccelerator.UnEnumeratedHelpers\Dccelerator.UnEnumeratedHelpers.csproj" />
     <ProjectReference Include="..\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.csproj" />
   </ItemGroup>
 
@@ -65,6 +65,6 @@
     <PackageReference Include="PostSharp.Redist" Version="5.0.53" />
   </ItemGroup>
 
-  <Import Project="..\..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
+  <Import Project="..\..\Dccelerator.UnShared\Dccelerator.UnShared.projitems" Label="Shared" />
 
 </Project>

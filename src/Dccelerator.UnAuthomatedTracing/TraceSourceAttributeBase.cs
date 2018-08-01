@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using PostSharp.Aspects;
 
 
-namespace Dccelerator.TraceSourceAspects {
+namespace Dccelerator.UnAuthomatedTracing {
 
 
     /// <summary>

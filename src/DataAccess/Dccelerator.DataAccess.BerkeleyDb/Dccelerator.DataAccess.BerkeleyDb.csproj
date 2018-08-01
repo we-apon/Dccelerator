@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Berkeley Db adapter for Dccelerator.DataAccess ORM</Description>
@@ -53,6 +53,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
-  <Import Project="..\..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
+  <Import Project="..\..\Dccelerator.UnShared\Dccelerator.UnShared.projitems" Label="Shared" />
 
 </Project>

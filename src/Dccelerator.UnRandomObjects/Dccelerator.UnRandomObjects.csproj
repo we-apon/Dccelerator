@@ -41,6 +41,6 @@
     <ProjectReference Include="..\Dccelerator.UnFastReflection\Dccelerator.UnFastReflection.csproj" />
   </ItemGroup>
 
-  <Import Project="..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
+  <Import Project="..\Dccelerator.UnShared\Dccelerator.UnShared.projitems" Label="Shared" />
 
 </Project>

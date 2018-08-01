@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
-using Dccelerator.EnumerableHelpers;
+using Dccelerator.UnEnumeratedHelpers;
 using Dccelerator.UnFastReflection;
 
 
@@ -34,8 +34,7 @@ namespace Dccelerator.DataAccess.Lazy {
         }
 
         void SetupLazyContext(object entity) {
-            var lazyEntity = entity as LazyEntity;
-            if (lazyEntity != null) {
+            if (entity is LazyEntity lazyEntity) {
                 if (_mainEntityInfo.Inclusions == null) {
                     SafetySetReadCallbackTo(lazyEntity);
                     return;

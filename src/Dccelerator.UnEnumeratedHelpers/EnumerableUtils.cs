@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 
 
-namespace Dccelerator.EnumerableHelpers
+namespace Dccelerator.UnEnumeratedHelpers
 {
     /// <summary>
     /// Declarative extensions for interacting with collections

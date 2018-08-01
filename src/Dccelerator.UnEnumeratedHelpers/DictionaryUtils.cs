@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 
 
-namespace Dccelerator.EnumerableHelpers
+namespace Dccelerator.UnEnumeratedHelpers
 {
     /// <summary>
     /// Utilities usable with dictionaries

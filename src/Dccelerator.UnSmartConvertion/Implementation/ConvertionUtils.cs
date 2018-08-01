@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using Dccelerator.EnumerableHelpers;
+using Dccelerator.UnEnumeratedHelpers;
 using Dccelerator.UnFastReflection;
 
 

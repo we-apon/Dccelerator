@@ -119,9 +119,9 @@
       <Project>{18ddaee0-47b6-4814-8a4b-c0fa6e787b01}</Project>
       <Name>Dccelerator.UnFastReflection</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Dccelerator.TraceSourceAspects\Dccelerator.TraceSourceAspects.csproj">
+    <ProjectReference Include="..\..\src\Dccelerator.UnAuthomatedTracing\Dccelerator.UnAuthomatedTracing.csproj">
       <Project>{bdb0faea-2ff9-4697-a20b-5e5e99cf304a}</Project>
-      <Name>Dccelerator.TraceSourceAspects</Name>
+      <Name>Dccelerator.UnAuthomatedTracing</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.projitems" Label="Shared" />

@@ -55,7 +55,7 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
 
-  <Import Project="..\..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
+  <Import Project="..\..\Dccelerator.UnShared\Dccelerator.UnShared.projitems" Label="Shared" />
 
 </Project>
  

@@ -41,11 +41,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dccelerator.EnumerableHelpers\Dccelerator.EnumerableHelpers.csproj" />
+    <ProjectReference Include="..\Dccelerator.UnEnumeratedHelpers\Dccelerator.UnEnumeratedHelpers.csproj" />
     <ProjectReference Include="..\Dccelerator.UnFastReflection\Dccelerator.UnFastReflection.csproj" />
   </ItemGroup>
 
-  <Import Project="..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
+  <Import Project="..\Dccelerator.UnShared\Dccelerator.UnShared.projitems" Label="Shared" />
+
+
+
 
 
 </Project>

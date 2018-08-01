@@ -2,7 +2,7 @@
 using System.Linq;
 
 
-namespace Dccelerator.EnumerableHelpers {
+namespace Dccelerator.UnEnumeratedHelpers {
     public class ByteArrayComparer : IEqualityComparer<byte[]> {
         public bool Equals(byte[] left, byte[] right) {
             if (left == null || right == null) {

@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Dccelerator.TraceSourceAspects {
+namespace Dccelerator.UnAuthomatedTracing {
 
     /// <summary>
     /// <para xml:lang="en"></para>

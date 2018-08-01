@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net40;netstandard1.3;netstandard2.0</TargetFrameworks>
-    <RootNamespace>Dccelerator.EnumerableHelpers</RootNamespace>
+    <RootNamespace>Dccelerator.UnEnumeratedHelpers</RootNamespace>
     <Authors>Kirill Dubinkin</Authors>
     <Product>Dccelerator</Product>
     <Description>Implementation of runtime-generated delegates, useful for accessing objects faster than with standard .net reflection.</Description>
@@ -17,6 +17,7 @@
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Dccelerator.UnEnumeratedHelpers</AssemblyName>
   </PropertyGroup>
 
 
@@ -37,6 +38,6 @@
     </PackageReference>
   </ItemGroup>
 
-  <Import Project="..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
+  <Import Project="..\Dccelerator.UnShared\Dccelerator.UnShared.projitems" Label="Shared" />
 
 </Project>

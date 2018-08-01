@@ -52,7 +52,7 @@
     <PackageReference Include="System.Collections.NonGeneric" Version="4.3.0" />
   </ItemGroup>
 
-  
-  <Import Project="..\..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
+
+  <Import Project="..\..\Dccelerator.UnShared\Dccelerator.UnShared.projitems" Label="Shared" />
   
 </Project>

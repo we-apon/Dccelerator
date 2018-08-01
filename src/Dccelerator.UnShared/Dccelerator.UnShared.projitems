@@ -3,10 +3,10 @@
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <SharedGUID>10d89328-1dd9-4a5a-b769-d267b4fb2d90</SharedGUID>
+    <SharedGUID>a1627539-ba93-441e-bb41-00fa61fa5a38</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>Dccelerator.Shared</Import_RootNamespace>
+    <Import_RootNamespace>Dccelerator.UnShared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)JetBrains.Annotations.cs" />
