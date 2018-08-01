@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 
 
-namespace Dccelerator.Logging {
+namespace Dccelerator.DataAccess.Logging {
     public abstract class LoggerSessionBase : ILoggerSession {
         readonly string _sourceName;
         readonly byte[] _eventId;

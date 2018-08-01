@@ -20,7 +20,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Dccelerator.Core\Dccelerator.Core.csproj" />
+    <Compile Remove="publish\**" />
+    <EmbeddedResource Remove="publish\**" />
+    <None Remove="publish\**" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
@@ -37,6 +39,11 @@
     <PackageReference Include="System.Threading.Tasks.Parallel">
       <Version>4.3.0</Version>
     </PackageReference>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Dccelerator.UnFastReflection\Dccelerator.UnFastReflection.csproj" />
   </ItemGroup>
   
 

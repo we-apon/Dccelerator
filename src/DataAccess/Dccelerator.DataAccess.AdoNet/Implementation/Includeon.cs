@@ -111,7 +111,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 var msg = $"{nameof(GetForeignKeyFromMainEntityToCurrent)}: Can't find even possible foreign key to main entity '{_ownerInfo.EntityName}' from includeon {Info.EntityName}." +
                           $"So, you need to override search method in used {nameof(IAdoNetRepository)}, or use {nameof(ForeignKeyAttribute)}.";
 
-                Infrastructure.Internal.TraceEvent(TraceEventType.Critical, msg);
+                Log.TraceEvent(TraceEventType.Critical, msg);
                 throw new InvalidOperationException(msg);
             }
         }
@@ -135,7 +135,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                 var msg = $"{nameof(GetForeignKeyFromMainEntityToCurrent)}: Can't find even possible foreign key to includeon '{Info.EntityName}'." +
                           $"So, you need to override search method in used {nameof(IAdoNetRepository)}, or use {nameof(IncludeChildrenAttribute)}.{nameof(IncludeChildrenAttribute.KeyIdName)} or {nameof(ForeignKeyAttribute)}.";
 
-                Infrastructure.Internal.TraceEvent(TraceEventType.Critical, msg);
+                Log.TraceEvent(TraceEventType.Critical, msg);
                 throw new InvalidOperationException(msg);
             }
         }
@@ -153,7 +153,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
             var ownerProps = mainInfo.EntityType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).ToList();
             var foreignNavigationProp = ownerProps.Where(x => x.PropertyType.IsAssignableFrom(foreignInfo.EntityType) && subCriteria(x)).ToArray();
             if (foreignNavigationProp.Length > 1) {
-                Infrastructure.Internal.TraceEvent(TraceEventType.Warning, 
+                Log.TraceEvent(TraceEventType.Warning, 
                     $"{nameof(GetForeignKeyFromMainEntityToCurrent)}: Founded more than one possible navigation keys for includeon '{foreignInfo.EntityName}'." +
                     "Chosen foreign key can be wrong.");
             }

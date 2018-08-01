@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using Dccelerator.Logging;
+using Dccelerator.DataAccess.Logging;
 
 
 namespace Dccelerator.DataAccess.BerkeleyDb {

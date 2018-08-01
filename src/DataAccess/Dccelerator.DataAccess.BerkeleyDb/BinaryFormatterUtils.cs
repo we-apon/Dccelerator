@@ -1,14 +1,11 @@
-﻿#if !NETSTANDARD1_3
-
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using Dccelerator.UnSmartConvertion;
 
 
-namespace Dccelerator {
-
+namespace Dccelerator.DataAccess.BerkeleyDb {
 
     public static class BinaryFormatterUtils {
         static readonly Type _nullableGuid = typeof (Guid?);
@@ -57,5 +54,3 @@ namespace Dccelerator {
 
 
 }
-
-#endif

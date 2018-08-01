@@ -20,7 +20,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Dccelerator.UnSmartConvertion\Dccelerator.UnSmartConvertion.csproj" />
     <ProjectReference Include="..\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.csproj" />
+    <ProjectReference Include="..\Dccelerator.DataAccess.Logging\Dccelerator.DataAccess.Logging.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,14 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+
   <PropertyGroup>
-    <Description>Lazy Loading and navigation properties support for Dccelerator.DataAccess ORM.</Description>
-    <AssemblyTitle>Dccelerator.DataAccess.Lazy</AssemblyTitle>
-    <VersionPrefix>0.0.12</VersionPrefix>
+    <Description>Contains interfaces and base implementation of Dccelerator.DataAccess ORM.</Description>
+    <AssemblyTitle>Dccelerator.DataAccess.Common</AssemblyTitle>
+    <VersionPrefix>0.0.21</VersionPrefix>
     <Authors>Kirill Dubinkin</Authors>
-    <TargetFrameworks>net40;netstandard1.3;netstandard2.0</TargetFrameworks> <!-- netstandard1.3 -->
-    <AssemblyName>Dccelerator.DataAccess.Lazy</AssemblyName>
-    <PackageId>Dccelerator.DataAccess.Lazy</PackageId>
-    <PackageTags>ORM Lazy Loading</PackageTags>
+    <TargetFrameworks>net40;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <PackageTags>ORM</PackageTags>
     <PackageProjectUrl>https://github.com/we-apon/Dccelerator</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/we-apon/Dccelerator/blob/master/LICENSE</PackageLicenseUrl>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -17,24 +16,20 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <Version>0.0.17</Version>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Dccelerator.EnumerableHelpers\Dccelerator.EnumerableHelpers.csproj" />
-    <ProjectReference Include="..\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
+    <Compile Remove="publish\**" />
+    <EmbeddedResource Remove="publish\**" />
+    <None Remove="publish\**" />
   </ItemGroup>
 
 
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DebugType>full</DebugType>
@@ -47,24 +42,21 @@
   </PropertyGroup>
 
 
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
-    <PackageReference Include="PostSharp" Version="4.3.43" />
-  </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
-    <PackageReference Include="PostSharp" Version="5.0.53" />
-    <PackageReference Include="PostSharp.Redist" Version="5.0.53" />
+    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Serialization.Formatters">
       <Version>4.3.0</Version>
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="PostSharp" Version="5.0.53" />
-    <PackageReference Include="PostSharp.Redist" Version="5.0.53" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.csproj" />
   </ItemGroup>
 
+
+
   <Import Project="..\..\Dccelerator.Shared\Dccelerator.Shared.projitems" Label="Shared" />
+
 
 </Project>

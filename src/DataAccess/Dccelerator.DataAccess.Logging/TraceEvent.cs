@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Dccelerator.DataAccess;
 using JetBrains.Annotations;
 
 
-namespace Dccelerator.Logging {
+namespace Dccelerator.DataAccess.Logging {
 
     [Serializable]
     public class TraceEvent : IIdentified<byte[]> {

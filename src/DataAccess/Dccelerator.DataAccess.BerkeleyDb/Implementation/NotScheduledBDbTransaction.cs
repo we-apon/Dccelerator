@@ -143,7 +143,7 @@ namespace Dccelerator.DataAccess.BerkeleyDb.Implementation {
                 }
                 catch (Exception e) {
                     error = e.ToString();
-                    DataAccess.Infrastructure.Internal.TraceEvent(TraceEventType.Critical, error);
+                    Log.TraceEvent(TraceEventType.Critical, error);
                     return false;
                 }
             }

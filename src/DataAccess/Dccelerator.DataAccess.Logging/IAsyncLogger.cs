@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 
 
-namespace Dccelerator.Logging {
+namespace Dccelerator.DataAccess.Logging {
     public interface IAsyncLoggerManager {
         ILoggerSession BeginLogSession();
         ILoggerSession BeginLogSession(Guid sessionId);

@@ -1,9 +1,8 @@
 using System;
-using Dccelerator.DataAccess;
 using JetBrains.Annotations;
 
 
-namespace Dccelerator.Logging {
+namespace Dccelerator.DataAccess.Logging {
     [Serializable]
     public class TracedObjectMember : IIdentified<byte[]> {
         

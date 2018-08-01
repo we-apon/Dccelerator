@@ -41,11 +41,11 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                     error = $"On attempt count #{attemptNumber} gaived sql exception:\n{exception}";
 
                     if (!IsDeadlockException(exception) || (attemptNumber++ > retryCount)) {
-                        Infrastructure.Internal.TraceEvent(TraceEventType.Critical, error);
+                        Log.TraceEvent(TraceEventType.Critical, error);
                         return false;
                     }
 
-                    Infrastructure.Internal.TraceEvent(TraceEventType.Warning, error);
+                    Log.TraceEvent(TraceEventType.Warning, error);
                 }
             }
         }

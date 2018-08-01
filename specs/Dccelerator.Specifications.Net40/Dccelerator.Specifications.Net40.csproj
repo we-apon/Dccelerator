@@ -115,10 +115,6 @@
       <Project>{5c576a43-3ee7-48cb-8a8c-9b58becff0ae}</Project>
       <Name>Dccelerator.DataAccess.Lazy</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Dccelerator.Core\Dccelerator.Core.csproj">
-      <Project>{ed664bd5-35fd-40e6-9156-1514c14155d6}</Project>
-      <Name>Dccelerator.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Dccelerator.UnFastReflection\Dccelerator.UnFastReflection.csproj">
       <Project>{18ddaee0-47b6-4814-8a4b-c0fa6e787b01}</Project>
       <Name>Dccelerator.UnFastReflection</Name>

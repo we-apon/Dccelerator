@@ -17,7 +17,7 @@ namespace Dccelerator.DataAccess.Ado.Implementation {
                     return func();
                 }
                 catch (Exception exception) {
-                    Infrastructure.Internal.TraceEvent(TraceEventType.Critical, $"On attempt coun #{attemptNumber} gaived exception:\n{exception}");
+                    Log.TraceEvent(TraceEventType.Critical, $"On attempt coun #{attemptNumber} gaived exception:\n{exception}");
 
                     if (!IsDeadlock(exception) || (attemptNumber++ > DeadLockRetryCount))
                         throw;
