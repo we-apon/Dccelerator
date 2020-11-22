@@ -9,9 +9,9 @@ using Npgsql;
 
 namespace Dccelerator.DataAccess.Adapters.PostgreSql {
     /// <summary>
-    /// SQL Client Repository for PostgreSQL database
+    /// Repository for PostgreSQL database
     /// </summary>
-    public abstract class PostgreSqlClientRepository : AdoNetRepository<NpgsqlCommand, NpgsqlParameter, NpgsqlConnection> {
+    public abstract class PostgreSqlRepository : AdoNetRepository<NpgsqlCommand, NpgsqlParameter, NpgsqlConnection> {
 
         protected override string DatabaseSpecificNameOf(string parameter) => "@" + parameter;
 
