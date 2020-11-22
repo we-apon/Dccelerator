@@ -13,7 +13,16 @@ namespace Dccelerator {
         static readonly TraceSource _trace = new TraceSource(typeof(Log).Assembly.GetName().Name);
 #endif
 
+
         internal static void TraceEvent(TraceEventType eventType, string message) {
+            _trace.Switch = new SourceSwitch(nameof(Log)) {
+                Level = SourceLevels.All
+            };
+            _trace.Listeners.Remove("Default");
+            _trace.Listeners.Add(new TextWriterTraceListener("test.txt") {
+                Filter = new EventTypeFilter(SourceLevels.All)
+            });
+
             _trace.TraceEvent(eventType, 0, message);
         }
     }
