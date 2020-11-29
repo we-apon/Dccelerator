@@ -8,20 +8,20 @@ using Dccelerator.DataAccess.Ado.Implementation;
 
 namespace Dccelerator.DataAccess.Adapters.PostgreSql
 {
-    public class PostgreSqlDataManagerFactory<TRepository> : DataManagerAdoFactoryBase<PostgreSqlEntityInfo<TRepository>> where TRepository : class, IAdoNetRepository
+    public abstract class PostgreSqlDataManagerFactory<TRepository> : DataManagerAdoFactoryBase<PostgreSqlEntityInfo<TRepository>> where TRepository : class, IAdoNetRepository
     {
         protected override DirectReadingRepository NotCachedReadingRepository<TEntity>() {
-            throw new NotImplementedException();
+            return new PostgreSqlDirectReadingRepository();
         }
 
 
         public override IDataTransaction DataTransaction(ITransactionScheduler scheduler, IsolationLevel isolationLevel = IsolationLevel.ReadCommitted) {
-            throw new NotImplementedException();
+            return new PostgreSqlDataTransaction(scheduler, this, isolationLevel);
         }
 
 
         public override IReadingRepository ReadingRepository() {
-            throw new NotImplementedException();
+            return new PostgreSqlForcedCacheReadingRepository();
         }
 
 
