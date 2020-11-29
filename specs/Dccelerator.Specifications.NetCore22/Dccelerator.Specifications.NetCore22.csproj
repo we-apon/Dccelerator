@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
+      <PackageReference Include="FakeItEasy" Version="6.2.1" />
+      <PackageReference Include="FastMember" Version="1.5.0" />
+      <PackageReference Include="Machine.Specifications" Version="1.0.0" />
+      <PackageReference Include="Machine.Specifications.Should" Version="1.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.Adapters.MsSql\Dccelerator.DataAccess.Adapters.MsSql.csproj" />
+      <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.Adapters.Oracle\Dccelerator.DataAccess.Adapters.Oracle.csproj" />
+      <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.Adapters.PostgreSql\Dccelerator.DataAccess.Adapters.PostgreSql.csproj" />
+      <ProjectReference Include="..\..\src\Dccelerator.UnFastReflection\Dccelerator.UnFastReflection.csproj" />
+    </ItemGroup>
+
+    <Import Project="..\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.projitems" Label="Shared" />
+
+</Project>
