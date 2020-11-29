@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description></Description>
     <AssemblyTitle>Dccelerator.DataAccess.Adapters.PostgreSql</AssemblyTitle>
-    <VersionPrefix>0.0.12</VersionPrefix>
+    <VersionPrefix>0.0.1</VersionPrefix>
     <Authors>Kirill Dubinkin</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>Dccelerator.DataAccess.Adapters.PostgreSql</AssemblyName>
@@ -14,6 +14,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <PackageVersion>0.0.1</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
