@@ -21,6 +21,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="PostSharp.Redist" Version="6.7.11" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Dccelerator.UnEnumeratedHelpers\Dccelerator.UnEnumeratedHelpers.csproj" />
     <ProjectReference Include="..\Dccelerator.DataAccess.Common\Dccelerator.DataAccess.Common.csproj" />
   </ItemGroup>
@@ -49,20 +53,20 @@
 
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
-    <PackageReference Include="PostSharp" Version="4.3.43" />
+    <PackageReference Include="PostSharp" Version="6.7.11" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
-    <PackageReference Include="PostSharp" Version="5.0.53" />
-    <PackageReference Include="PostSharp.Redist" Version="5.0.53" />
+    <PackageReference Include="PostSharp" Version="6.7.11" />
+    <PackageReference Include="PostSharp.Redist" Version="6.7.11" />
     <PackageReference Include="System.Runtime.Serialization.Formatters">
       <Version>4.3.0</Version>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="PostSharp" Version="5.0.53" />
-    <PackageReference Include="PostSharp.Redist" Version="5.0.53" />
+    <PackageReference Include="PostSharp" Version="6.7.11" />
+    <PackageReference Include="PostSharp.Redist" Version="6.7.11" />
   </ItemGroup>
 
   <Import Project="..\..\Dccelerator.UnShared\Dccelerator.UnShared.projitems" Label="Shared" />
