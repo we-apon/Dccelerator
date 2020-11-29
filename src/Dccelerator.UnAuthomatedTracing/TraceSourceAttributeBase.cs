@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
 using PostSharp.Aspects;
+using PostSharp.Serialization;
 
 
 namespace Dccelerator.UnAuthomatedTracing {
@@ -22,7 +23,11 @@ namespace Dccelerator.UnAuthomatedTracing {
     /// Кстати, для знакомства с System.Diagnostics.TraceSource хорошо подходит документация расширяюшего его фрейворка - <see hrev="https://essentialdiagnostics.codeplex.com/">Essential.Diagnostics</see>.
     /// </para>
     /// </summary>
+#if NETCOREAPP2_2
+    [PSerializable]
+#else
     [Serializable]
+#endif
     public abstract class TraceSourceAttributeBase : OnMethodBoundaryAspect {
 
         protected static readonly ConcurrentDictionary<Guid, string> FormatedGenerics = new ConcurrentDictionary<Guid, string>();

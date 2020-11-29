@@ -24,4 +24,8 @@ using System.Runtime.InteropServices;
 
 #if DEBUG
 [assembly:InternalsVisibleTo("Dccelerator.Specifications")]
+
+[assembly: InternalsVisibleTo("Dccelerator.Specifications.NetCore40")]
+[assembly: InternalsVisibleTo("Dccelerator.Specifications.NetCore46")]
+[assembly: InternalsVisibleTo("Dccelerator.Specifications.NetCore22")]
 #endif

@@ -1,7 +1,7 @@
 ﻿#if DEBUG
 
 using System;
-using Dccelerator.TraceSourceAttributes;
+using Dccelerator.UnAuthomatedTracing;
 using Machine.Specifications;
 
 

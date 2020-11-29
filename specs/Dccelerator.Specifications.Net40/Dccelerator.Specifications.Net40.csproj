@@ -123,6 +123,10 @@
       <Project>{bdb0faea-2ff9-4697-a20b-5e5e99cf304a}</Project>
       <Name>Dccelerator.UnAuthomatedTracing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Dccelerator.UnRandomObjects\Dccelerator.UnRandomObjects.csproj">
+      <Project>{0ae18bea-e8b5-4521-b8da-4932610a4de6}</Project>
+      <Name>Dccelerator.UnRandomObjects</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
