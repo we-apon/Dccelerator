@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
+      <PackageReference Include="FakeItEasy" Version="4.7.1" />
+      <PackageReference Include="FakeItEasy.Analyzer.CSharp" Version="4.9.2" />
+      <PackageReference Include="FakeItEasy.Analyzer.VisualBasic" Version="4.9.2" />
+      <PackageReference Include="FastMember" Version="1.3.0" />
+      <PackageReference Include="Machine.Specifications" Version="1.0.0" />
+      <PackageReference Include="Machine.Specifications.Should" Version="1.0.0" />
+      <PackageReference Include="PostSharp" Version="6.7.11" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.Adapters.MsSql\Dccelerator.DataAccess.Adapters.MsSql.csproj" />
+      <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.Adapters.PostgreSql\Dccelerator.DataAccess.Adapters.PostgreSql.csproj" />
+      <ProjectReference Include="..\..\src\Dccelerator.UnAuthomatedTracing\Dccelerator.UnAuthomatedTracing.csproj" />
+      <ProjectReference Include="..\..\src\Dccelerator.UnFastReflection\Dccelerator.UnFastReflection.csproj" />
+      <ProjectReference Include="..\..\src\Dccelerator.UnRandomObjects\Dccelerator.UnRandomObjects.csproj" />
+    </ItemGroup>
+
+    <Import Project="..\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.projitems" Label="Shared" />
+
+</Project>

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}"
 EndProject
@@ -53,12 +53,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.DataAccess.Logg
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Dccelerator.UnShared", "src\Dccelerator.UnShared\Dccelerator.UnShared.shproj", "{A1627539-BA93-441E-BB41-00FA61FA5A38}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.DataAccess.Adapters.PostgreSql", "src\DataAccess\Dccelerator.DataAccess.Adapters.PostgreSql\Dccelerator.DataAccess.Adapters.PostgreSql.csproj", "{08ABE5D8-C12D-4991-A0D7-AFE4CFC317E4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccelerator.Specifications.NetCore22", "specs\Dccelerator.Specifications.NetCore22\Dccelerator.Specifications.NetCore22.csproj", "{C681783A-B5B1-40DA-B368-E89FA068607C}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		specs\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.projitems*{33695d1e-6efd-4c81-a607-ae5d541c41be}*SharedItemsImports = 13
 		src\Dccelerator.UnShared\Dccelerator.UnShared.projitems*{a1627539-ba93-441e-bb41-00fa61fa5a38}*SharedItemsImports = 13
 		specs\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.projitems*{cc4e0cee-8cd4-40ae-b76b-c2f3cf82dbe6}*SharedItemsImports = 4
-		specs\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.projitems*{ec791b19-57fd-443e-86db-56d2bbd6f87a}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,6 +136,14 @@ Global
 		{C684BC22-1DCF-4946-88B4-3F0075C786C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C684BC22-1DCF-4946-88B4-3F0075C786C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C684BC22-1DCF-4946-88B4-3F0075C786C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08ABE5D8-C12D-4991-A0D7-AFE4CFC317E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08ABE5D8-C12D-4991-A0D7-AFE4CFC317E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08ABE5D8-C12D-4991-A0D7-AFE4CFC317E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08ABE5D8-C12D-4991-A0D7-AFE4CFC317E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C681783A-B5B1-40DA-B368-E89FA068607C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C681783A-B5B1-40DA-B368-E89FA068607C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C681783A-B5B1-40DA-B368-E89FA068607C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C681783A-B5B1-40DA-B368-E89FA068607C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -158,6 +169,8 @@ Global
 		{6F72E935-2CF6-4CE7-8FD0-4DDBB23A8E7A} = {94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}
 		{C684BC22-1DCF-4946-88B4-3F0075C786C4} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
 		{A1627539-BA93-441E-BB41-00FA61FA5A38} = {94A412A9-BC0F-4EC6-8DF8-E15AECB154C5}
+		{08ABE5D8-C12D-4991-A0D7-AFE4CFC317E4} = {2E9AB6D9-9EDB-4652-9B98-7C24AF8DD5B7}
+		{C681783A-B5B1-40DA-B368-E89FA068607C} = {8FCF91C8-AB08-4481-BBEE-94F54CF7F170}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {86E545B5-25AD-4F90-A8B1-D3FD862AECCD}

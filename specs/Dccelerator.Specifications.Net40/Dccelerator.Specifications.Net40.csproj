@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\PostSharp.6.0.21\build\PostSharp.props" Condition="Exists('..\..\packages\PostSharp.6.0.21\build\PostSharp.props')" />
+  <Import Project="..\..\packages\PostSharp.6.7.11\build\PostSharp.props" Condition="Exists('..\..\packages\PostSharp.6.7.11\build\PostSharp.props')" />
   <Import Project="D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.props" Condition="Exists('D:\Dev\Dccelerator\packages\PostSharp.5.0.32\build\PostSharp.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -54,21 +54,20 @@
     <Reference Include="FastMember, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\FastMember.1.3.0\lib\net40\FastMember.dll</HintPath>
     </Reference>
-    <Reference Include="Machine.Specifications, Version=0.11.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Machine.Specifications.0.11.1\lib\net40\Machine.Specifications.dll</HintPath>
+    <Reference Include="Machine.Specifications, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Machine.Specifications.1.0.0\lib\net40\Machine.Specifications.dll</HintPath>
     </Reference>
-    <Reference Include="Machine.Specifications.Should, Version=0.11.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Machine.Specifications.Should.0.11.0\lib\net40\Machine.Specifications.Should.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Machine.Specifications.Should, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Machine.Specifications.Should.1.0.0\lib\net40\Machine.Specifications.Should.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Oracle.ManagedDataAccess, Version=4.122.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Oracle.ManagedDataAccess.12.2.1100\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
     </Reference>
-    <Reference Include="PostSharp, Version=6.0.21.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PostSharp.Redist.6.0.21\lib\net35-client\PostSharp.dll</HintPath>
+    <Reference Include="PostSharp, Version=6.7.11.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\PostSharp.Redist.6.7.11\lib\net35-client\PostSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -90,9 +89,6 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\..\packages\FakeItEasy.Analyzer.CSharp.4.0.0\analyzers\dotnet\cs\FakeItEasy.Analyzer.CSharp.dll" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\DataAccess\Dccelerator.DataAccess.Adapters.MsSql\Dccelerator.DataAccess.Adapters.MsSql.csproj">
@@ -123,6 +119,13 @@
       <Project>{bdb0faea-2ff9-4697-a20b-5e5e99cf304a}</Project>
       <Name>Dccelerator.UnAuthomatedTracing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Dccelerator.UnRandomObjects\Dccelerator.UnRandomObjects.csproj">
+      <Project>{0ae18bea-e8b5-4521-b8da-4932610a4de6}</Project>
+      <Name>Dccelerator.UnRandomObjects</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\..\packages\FakeItEasy.Analyzer.CSharp.4.9.2\analyzers\dotnet\cs\FakeItEasy.Analyzer.CSharp.dll" />
   </ItemGroup>
   <Import Project="..\Dccelerator.Specifications.Shared\Dccelerator.Specifications.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -134,10 +137,10 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\PostSharp.6.0.21\build\PostSharp.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\PostSharp.6.0.21\build\PostSharp.props'))" />
-    <Error Condition="!Exists('..\..\packages\PostSharp.6.0.21\build\PostSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\PostSharp.6.0.21\build\PostSharp.targets'))" />
+    <Error Condition="!Exists('..\..\packages\PostSharp.6.7.11\build\PostSharp.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\PostSharp.6.7.11\build\PostSharp.props'))" />
+    <Error Condition="!Exists('..\..\packages\PostSharp.6.7.11\build\PostSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\PostSharp.6.7.11\build\PostSharp.targets'))" />
   </Target>
-  <Import Project="..\..\packages\PostSharp.6.0.21\build\PostSharp.targets" Condition="Exists('..\..\packages\PostSharp.6.0.21\build\PostSharp.targets')" />
+  <Import Project="..\..\packages\PostSharp.6.7.11\build\PostSharp.targets" Condition="Exists('..\..\packages\PostSharp.6.7.11\build\PostSharp.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

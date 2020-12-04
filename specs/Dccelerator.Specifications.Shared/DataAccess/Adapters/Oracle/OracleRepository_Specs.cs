@@ -1,5 +1,9 @@
 ﻿#if DEBUG
 
+#if NETCOREAPP2_2
+
+#else
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -10,8 +14,10 @@ using FakeItEasy;
 using Machine.Specifications;
 using Oracle.ManagedDataAccess.Client;
 
+
 namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.Oracle {
-    
+
+
     [Subject(typeof(OracleRepository))]
     class When_getting_select_query {
         Establish context = () => {
@@ -130,6 +136,7 @@ namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.Oracle {
                                     "where Id = :Id";
     }
 
+
     [Subject(typeof(OracleRepository))]
     class When_getting_delete_query {
         Establish context = () => {
@@ -169,8 +176,7 @@ namespace Dccelerator.Specifications.Shared.DataAccess.Adapters.Oracle {
         static string _validQuery = "delete from EntName " +
                                     "where Id = :Id";
     }
-
-    
 }
 
+#endif
 #endif

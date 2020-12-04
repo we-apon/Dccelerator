@@ -8,6 +8,7 @@ using System.Reflection;
 using Dccelerator.DataAccess;
 using Dccelerator.DataAccess.Ado;
 using Dccelerator.DataAccess.Ado.SqlClient;
+using Dccelerator.UnRandomObjects;
 using FakeItEasy;
 using Machine.Specifications;
 

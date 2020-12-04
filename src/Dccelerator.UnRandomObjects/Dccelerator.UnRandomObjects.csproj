@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net40;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net40;netstandard1.3;netstandard2.0;netcoreapp2.2</TargetFrameworks>
     <RootNamespace>Dccelerator.UnRandomObjects</RootNamespace>
     <Authors>Kirill Dubinkin</Authors>
     <Product>Dccelerator</Product>
